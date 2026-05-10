@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, release-*]
+
+jobs:
+  devops:
+    name: Tests & CodeQL & SonarCloud
+    runs-on: ubuntu-22.04
+
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ☕ Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: 🛠️ Setup Gradle permissions
+        run: chmod +x ./gradlew
+
+      - name: 🧪 Run Unit Tests
+        run: ./gradlew test
+
+      - name: 🔍 Run Lint (Android static analysis)
+        run: ./gradlew lint
+
+      - name: 🏗️ Build project
+        run: ./gradlew build
+
+      - name: 🛡️ Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+          queries: security-extended
+
+      - name: 🔍 CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:java"
+
+      - name: 📊 SonarCloud Analysis
+        run: >
+          ./gradlew sonar
+          -Dsonar.projectKey=LinkalApp_linkal-app
+          -Dsonar.organization=linkalapp
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }}

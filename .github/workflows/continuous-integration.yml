@@ -1,3 +1,8 @@
+name: CI
+on:
+  push:
+    branches: [develop,release-*]
+
 jobs:
   devops:
     runs-on: ubuntu-22.04

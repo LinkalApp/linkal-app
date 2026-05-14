@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Linkal</string>
+    <string name="linkal" translatable="false">Linkal</string>
+    <string name="logIn">Iniciar Sesión</string>
+    <string name="signUp">Registrarse</string>
 </resources>

@@ -1,4 +1,4 @@
-package es.miw.tfm.linkal;
+package es.miw.tfm.linkal.activities;
 
 import android.os.Bundle;
 
@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import es.miw.tfm.linkal.R;
 
 public class MainActivity extends AppCompatActivity {
 

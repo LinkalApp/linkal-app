@@ -6,6 +6,8 @@ plugins {
 
 sonar {
     properties {
+        property "sonar.coverage.jacoco.xmlReportPaths",
+                "${project(':app').buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
         // Excluir de cobertura clases que requieren Android runtime (Activities)
         // y las interfaces de API que no tienen lógica propia
         property "sonar.coverage.exclusions",

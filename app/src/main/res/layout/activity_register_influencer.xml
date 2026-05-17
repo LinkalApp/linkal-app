@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.RegisterInfluencerActivity">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp">
+
+            <!-- HEADER -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/poppins_bold"
+                android:text="@string/titleInfluencerPerfil"
+                android:textColor="@color/black"
+                android:textSize="26sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/poppins"
+                android:paddingBottom="8dp"
+                android:text="@string/txtCompleteData"
+                android:textColor="#A7ADB8"
+                android:textSize="16sp" />
+
+            <!-- NOMBRE ARTÍSTICO -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins"
+                android:text="@string/txtArtisticName"
+                android:textColor="#2D3142"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/edtArtisticName"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:fontFamily="@font/poppins_regular"
+                android:hint="@string/hintArtisticName"
+                android:paddingHorizontal="16dp"
+                android:textColor="#2D3142"
+                android:textColorHint="#A7ADB8"
+                android:textSize="16sp" />
+
+            <!-- INTERESES -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins"
+                android:text="@string/txtInterests"
+                android:textColor="#2D3142"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins_regular"
+                android:text="@string/hintOneCompulsory"
+                android:textColor="#A7ADB8"
+                android:textSize="13sp" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupInterests"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:chipSpacingHorizontal="8dp"
+                app:chipSpacingVertical="6dp" />
+
+            <!-- REDES SOCIALES -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins"
+                android:text="@string/txtSocialNetworks"
+                android:textColor="#2D3142"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins_regular"
+                android:text="@string/hintOneCompulsory"
+                android:textColor="#A7ADB8"
+                android:textSize="13sp" />
+
+            <!-- Instagram -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins"
+                android:text="Instagram"
+                android:textColor="#2D3142"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/edtInstagram"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:fontFamily="@font/poppins_regular"
+                android:hint="@string/hintSocialNetworks"
+                android:paddingHorizontal="16dp"
+                android:textColor="#2D3142"
+                android:textColorHint="#A7ADB8"
+                android:textSize="16sp" />
+
+            <!-- TikTok -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins"
+                android:text="TikTok"
+                android:textColor="#2D3142"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/edtTikTok"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:fontFamily="@font/poppins_regular"
+                android:hint="@string/hintSocialNetworks"
+                android:paddingHorizontal="16dp"
+                android:textColor="#2D3142"
+                android:textColorHint="#A7ADB8"
+                android:textSize="16sp" />
+
+            <!-- YouTube -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins"
+                android:text="YouTube"
+                android:textColor="#2D3142"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/edtYoutube"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:fontFamily="@font/poppins_regular"
+                android:hint="@string/hintPlatforms"
+                android:paddingHorizontal="16dp"
+                android:textColor="#2D3142"
+                android:textColorHint="#A7ADB8"
+                android:textSize="16sp" />
+
+            <!-- BOTÓN -->
+            <Button
+                android:id="@+id/btnRegisterInfluencer"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_button_rounded"
+                app:backgroundTint="@null"
+                android:fontFamily="@font/poppins_bold"
+                android:text="@string/signUp"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

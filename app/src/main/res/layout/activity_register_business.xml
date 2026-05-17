@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.RegisterBusinessActivity">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp">
+
+            <!-- HEADER -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/poppins_bold"
+                android:text="@string/titleBusinessPerfil"
+                android:textColor="@color/black"
+                android:textSize="26sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/poppins"
+                android:paddingBottom="8dp"
+                android:text="@string/txtCompleteData"
+                android:textColor="#A7ADB8"
+                android:textSize="16sp" />
+
+            <!-- DIRECCIÓN -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins"
+                android:text="@string/txtDirection"
+                android:textColor="#2D3142"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/edtAddress"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:fontFamily="@font/poppins_regular"
+                android:hint="@string/hintDirection"
+                android:paddingHorizontal="16dp"
+                android:textColor="#2D3142"
+                android:textColorHint="#A7ADB8"
+                android:textSize="16sp" />
+
+            <!-- PROVINCIA -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins"
+                android:text="@string/txtProvince"
+                android:textColor="#2D3142"
+                android:textSize="18sp" />
+
+            <Spinner
+                android:id="@+id/spinnerProvincia"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:paddingHorizontal="12dp"
+                android:fontFamily="@font/poppins_regular"
+                android:textSize="16sp" />
+
+            <!-- PÁGINA WEB -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins"
+                android:text="@string/txtWebPage"
+                android:textColor="#2D3142"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/edtWebsite"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:fontFamily="@font/poppins_regular"
+                android:hint="www.tunegocio.com"
+                android:inputType="textUri"
+                android:paddingHorizontal="16dp"
+                android:textColor="#2D3142"
+                android:textColorHint="#A7ADB8"
+                android:textSize="16sp" />
+
+            <!-- CATEGORÍA -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins"
+                android:text="@string/txtCategory"
+                android:textColor="#2D3142"
+                android:textSize="18sp" />
+
+            <Spinner
+                android:id="@+id/spinnerCategory"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:paddingHorizontal="12dp"
+                android:fontFamily="@font/poppins_regular"
+                android:textSize="16sp" />
+
+            <!-- OTRA CATEGORÍA (visible solo si se selecciona "Otra") -->
+            <TextView
+                android:id="@+id/txtOtherCategoryLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/poppins"
+                android:text="Especifica tu categoría"
+                android:textColor="#2D3142"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <EditText
+                android:id="@+id/edtOtherCategory"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:fontFamily="@font/poppins_regular"
+                android:hint="Escribe tu categoría"
+                android:paddingHorizontal="16dp"
+                android:textColor="#2D3142"
+                android:textColorHint="#A7ADB8"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <!-- BOTÓN -->
+            <Button
+                android:id="@+id/btnRegisterBusiness"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_button_rounded"
+                app:backgroundTint="@null"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Registrarse"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

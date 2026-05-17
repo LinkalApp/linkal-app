@@ -1,3 +1,38 @@
 <resources>
-    <string name="app_name">Linkal</string>
+    <string name="linkal" translatable="false">Linkal</string>
+    <string name="logIn">Iniciar Sesión</string>
+    <string name="signUp">Registrarse</string>
+    <string name="title_signUp">Crea tu cuenta</string>
+    <string name="selectionRole">¿Cómo quieres usar Linkal?</string>
+    <string name="roleBusiness">Soy un comercio</string>
+    <string name="roleInfluencer">Soy un influencer</string>
+    <string name="searchBusiness">Busco marcas</string>
+    <string name="searchInfluencers">Busco influencers</string>
+    <string name="titleNameSurnameInfluencer">Nombre y apellidos del influencer</string>
+    <string name="titleNameBusiness">Nombre del comercio</string>
+    <string name="hintNameBusiness">La Cuchara</string>
+    <string name="hintNameInfluencer">María Forte</string>
+    <string name="titlePassword">Contraseña</string>
+    <string name="titleConfirmPassword">Repita la contraseña</string>
+    <string name="titlePhoneNumber">Número de teléfono</string>
+    <string name="titleDescription">Descripción</string>
+    <string name="hintDescription">Cuéntanos un poco sobre ti</string>
+    <string name="txtContinue">Continuar</string>
+    <string name="titleBusinessPerfil">Tu perfil de negocio</string>
+    <string name="titleInfluencerPerfil">Tu perfil de influencer</string>
+    <string name="txtCompleteData">Completa tus datos</string>
+    <string name="txtArtisticName">Nombre artístico</string>
+    <string name="hintArtisticName">Tu nombre en redes</string>
+    <string name="txtInterests">Intereses</string>
+    <string name="txtSocialNetworks">Redes Sociales</string>
+    <string name="hintPlatforms">\@canal</string>
+    <string name="hintSocialNetworks">\@usuario</string>
+    <string name="txtDirection">Dirección del negocio</string>
+    <string name="hintDirection">Calle, número, ciudad...</string>
+    <string name="txtProvince">Provincia</string>
+    <string name="txtWebPage">Página Web</string>
+    <string name="txtCategory">Categoría / Sector</string>
+    <string name="hintOneCompulsory">Al menos una obligatoria</string>
+
+
 </resources>

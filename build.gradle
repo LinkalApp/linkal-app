@@ -3,3 +3,13 @@ plugins {
     alias(libs.plugins.android.application) apply false
     id "org.sonarqube" version "7.3.0.8198"
 }
+
+sonar {
+    properties {
+        // Excluir de cobertura clases que requieren Android runtime (Activities)
+        // y las interfaces de API que no tienen lógica propia
+        property "sonar.coverage.exclusions",
+                "**/activities/**," +
+                        "**/data/api/**"
+    }
+}

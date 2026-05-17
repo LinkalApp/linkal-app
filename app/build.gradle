@@ -17,6 +17,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableUnitTestCoverage true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -44,4 +47,29 @@ dependencies {
     testImplementation libs.arch.core.testing
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+}
+tasks.register('jacocoTestReport', JacocoReport) {
+    dependsOn 'testDebugUnitTest'
+
+    reports {
+        xml.required  = true
+        html.required = true
+    }
+
+    def classFilter = [
+            '**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*',
+            '**/*Test*.*', 'android/**/*.*'
+    ]
+    def compiledClasses = fileTree(
+            dir: "${buildDir}/intermediates/javac/debug/compileDebugJavaWithJavac/classes",
+            excludes: classFilter
+    )
+
+    classDirectories.setFrom(files(compiledClasses))
+    sourceDirectories.setFrom(files(["${project.projectDir}/src/main/java"]))
+
+    executionData.setFrom(fileTree(
+            dir: "${buildDir}",
+            includes: ["outputs/unit_test_code_coverage/debugUnitTest/*.exec"]
+    ))
 }

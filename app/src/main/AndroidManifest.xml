@@ -31,9 +31,13 @@
         <activity
             android:name=".activities.RegisterInfluencerActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.RegisterBusinessActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.LoginActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"/>
     </application>

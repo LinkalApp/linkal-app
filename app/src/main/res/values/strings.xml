@@ -1,6 +1,7 @@
 <resources>
     <string name="linkal" translatable="false">Linkal</string>
     <string name="logIn">Iniciar Sesión</string>
+    <string name="title_logIn">Inicia sesión</string>
     <string name="signUp">Registrarse</string>
     <string name="title_signUp">Crea tu cuenta</string>
     <string name="selectionRole">¿Cómo quieres usar Linkal?</string>

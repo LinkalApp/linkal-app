@@ -15,7 +15,7 @@ import es.miw.tfm.linkal.R;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button btnSignUp;
+    private Button btnSignUp, btnLogIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +29,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnSignUp = findViewById(R.id.btnSignUp);
+        btnLogIn = findViewById(R.id.btnLogIn);
 
         btnSignUp.setOnClickListener(v -> {
             Intent singUp = new Intent(this, RegisterActivity.class);
             startActivity(singUp);
+        });
+
+        btnLogIn.setOnClickListener(v -> {;
+            Intent logIn = new Intent(this, LoginActivity.class);
+            startActivity(logIn);
         });
     }
 }

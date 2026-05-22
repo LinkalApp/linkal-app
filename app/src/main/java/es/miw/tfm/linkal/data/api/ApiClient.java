@@ -28,4 +28,8 @@ public class ApiClient {
     public static BusinessApiService getBusinessApiService() {
         return getInstance().create(BusinessApiService.class);
     }
+
+    public static AuthApiService getAuthApiService() {
+        return getInstance().create(AuthApiService.class);
+    }
 }

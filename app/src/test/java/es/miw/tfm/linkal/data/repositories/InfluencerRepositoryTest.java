@@ -18,6 +18,7 @@ import es.miw.tfm.linkal.data.api.BusinessApiService;
 import es.miw.tfm.linkal.data.api.InfluencerApiService;
 import es.miw.tfm.linkal.models.requests.RegisterBusinessRequest;
 import es.miw.tfm.linkal.models.requests.RegisterInfluencerRequest;
+import es.miw.tfm.linkal.models.responses.InfluencerProfileResponse;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,14 +31,17 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class InfluencerRepositoryTest {
 
-    @Mock private InfluencerApiService     mockApiService;
-    @Mock private Call<Void>               mockCall;
-    @Mock private ResponseBody             mockErrorBody;
-    @Mock private MutableLiveData<Boolean> successLiveData;
-    @Mock private MutableLiveData<String>  errorLiveData;
-    @Mock private MutableLiveData<Boolean> loadingLiveData;
+    @Mock private InfluencerApiService mockApiService;
+    @Mock private Call<Void> mockCall;
+    @Mock private Call<InfluencerProfileResponse> mockProfileCall;
 
-    private InfluencerRepository      repository;
+    @Mock private ResponseBody mockErrorBody;
+    @Mock private MutableLiveData<Boolean> successLiveData;
+    @Mock private MutableLiveData<String> errorLiveData;
+    @Mock private MutableLiveData<Boolean> loadingLiveData;
+    @Mock private MutableLiveData<InfluencerProfileResponse> profileLiveData;
+
+    private InfluencerRepository repository;
     private RegisterInfluencerRequest request;
 
     @Before
@@ -50,6 +54,7 @@ public class InfluencerRepositoryTest {
                 "@laurastyle", "@lauratiktok", "LauraYT"
         );
         when(mockApiService.register(any())).thenReturn(mockCall);
+        when(mockApiService.getProfile(anyString())).thenReturn(mockProfileCall);
     }
 
     // Singleton -------------------------------------------------------------
@@ -157,6 +162,67 @@ public class InfluencerRepositoryTest {
         repository.register(request, successLiveData, errorLiveData, loadingLiveData);
 
         verify(errorLiveData).postValue(any());
+        verify(loadingLiveData).postValue(false);
+    }
+
+    // getProfile ------------------------------------------------------------
+
+    @Test
+    public void getProfile_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockProfileCall).enqueue(any());
+
+        repository.getProfile("Bearer token", profileLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void getProfile_onSuccess_postsProfileData() {
+        InfluencerProfileResponse profile = new InfluencerProfileResponse();
+        profile.setEmail("user@test.com");
+
+        doAnswer(invocation -> {
+            Callback<InfluencerProfileResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockProfileCall, Response.success(profile));
+            return null;
+        }).when(mockProfileCall).enqueue(any());
+
+        repository.getProfile("Bearer token", profileLiveData, errorLiveData, loadingLiveData);
+
+        verify(profileLiveData).postValue(profile);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getProfile_on401Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<InfluencerProfileResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockProfileCall, Response.error(401, mockErrorBody));
+            return null;
+        }).when(mockProfileCall).enqueue(any());
+
+        repository.getProfile("Bearer expired", profileLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("401"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getProfile_onNetworkFailure_postsConnectionErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<InfluencerProfileResponse> cb = invocation.getArgument(0);
+            cb.onFailure(mockProfileCall, new RuntimeException("Sin conexión"));
+            return null;
+        }).when(mockProfileCall).enqueue(any());
+
+        repository.getProfile("Bearer token", profileLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("Sin conexión"));
         verify(loadingLiveData).postValue(false);
     }
 }

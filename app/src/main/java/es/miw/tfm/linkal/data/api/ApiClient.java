@@ -6,7 +6,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiClient {
     //private static final String BASE_URL = "https://ec2-51-48-43-213.eu-south-2.compute.amazonaws.com/api/";
     public static final String BASE_URL = "http://10.0.2.2:9090/api/";
-
     private static Retrofit retrofit;
 
     private ApiClient() {}

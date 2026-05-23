@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background"
+    tools:context=".activities.InfluencerProfileActivity">
+
+    <!-- Contenido principal -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Cabecera: avatar + nombre + nombre artístico -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="36dp"
+                android:paddingBottom="20dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:background="@color/white">
+
+                <!-- Avatar circular con iniciales -->
+                <FrameLayout
+                    android:layout_width="88dp"
+                    android:layout_height="88dp"
+                    android:layout_marginBottom="14dp">
+
+                    <View
+                        android:layout_width="88dp"
+                        android:layout_height="88dp"
+                        android:background="@drawable/bg_avatar_circle"/>
+
+                    <TextView
+                        android:id="@+id/txtInitials"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/secondary"/>
+                </FrameLayout>
+
+                <!-- Nombre real + badge verificado -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
+
+                    <TextView
+                        android:id="@+id/txtName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/neutral_dark"/>
+
+                    <!-- Badge -->
+                    <ImageView
+                        android:id="@+id/imgVerifiedBadge"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_marginStart="6dp"
+                        android:src="@drawable/ic_verified_badge"
+                        android:contentDescription="Verificado"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+
+                <!-- Nombre artístico -->
+                <TextView
+                    android:id="@+id/txtArtisticName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/neutral_medium"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- Tags de intereses (multi-línea, centrado) -->
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/tagsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:flexWrap="wrap"
+                    app:justifyContent="center"
+                    app:alignItems="center"/>
+
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/neutral_light"/>
+
+            <!-- Sección: Sobre mí -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/aboutMe"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/neutral_dark"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/txtDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#444444"
+                    android:lineSpacingExtra="4dp"/>
+
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/neutral_light"/>
+
+            <!-- Sección: Redes sociales -->
+            <LinearLayout
+                android:id="@+id/sectionSocial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txtSocialNetworks"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/neutral_dark"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- Instagram -->
+                <LinearLayout
+                    android:id="@+id/rowInstagram"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/instagram"
+                        android:textSize="16sp"
+                        android:textColor="@color/neutral_medium"/>
+
+                    <TextView
+                        android:id="@+id/txtInstagram"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@color/secondary"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <!-- TikTok -->
+                <LinearLayout
+                    android:id="@+id/rowTiktok"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tiktok"
+                        android:textSize="16sp"
+                        android:textColor="@color/neutral_medium"/>
+
+                    <TextView
+                        android:id="@+id/txtTiktok"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@color/secondary"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <!-- YouTube -->
+                <LinearLayout
+                    android:id="@+id/rowYoutube"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/youtube"
+                        android:textSize="16sp"
+                        android:textColor="@color/neutral_medium"/>
+
+                    <TextView
+                        android:id="@+id/txtYoutube"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@color/secondary"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Error -->
+            <TextView
+                android:id="@+id/txtError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="24dp"
+                android:textColor="#E53935"
+                android:textSize="16sp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Barra de navegación horizontal -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:menu="@menu/nav_influencer_menu"
+        app:itemIconTint="@color/nav_item_color"
+        app:itemTextColor="@color/nav_item_color"
+        app:labelVisibilityMode="labeled"
+        app:elevation="8dp"/>
+
+</LinearLayout>

@@ -4,6 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 
 public class InfluencerViewModelTest {
 
@@ -32,6 +35,11 @@ public class InfluencerViewModelTest {
     }
 
     @Test
+    public void profile_initialValue_isNull() {
+        assertNull(viewModel.getProfile().getValue());
+    }
+
+    @Test
     public void getIsLoading_returnsLiveData() {
         assertNotNull(viewModel.getIsLoading());
     }
@@ -44,5 +52,10 @@ public class InfluencerViewModelTest {
     @Test
     public void getErrorMessage_returnsLiveData() {
         assertNotNull(viewModel.getErrorMessage());
+    }
+
+    @Test
+    public void getProfile_returnsLiveData() {
+        assertNotNull(viewModel.getProfile());
     }
 }

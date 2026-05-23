@@ -84,4 +84,52 @@ public class UserViewModelTest {
                 any(), any(), any()
         );
     }
+
+    // forgotPassword() delega en el repository --------------------------------------------
+
+    @Test
+    public void forgotPassword_delegatesToRepository() {
+        viewModel.forgotPassword("user@test.com");
+
+        verify(mockAuthRepository).forgotPassword(
+                eq("user@test.com"),
+                any(), any(), any()
+        );
+    }
+
+    @Test
+    public void forgotPassword_withDifferentEmail_passesItToRepository() {
+        viewModel.forgotPassword("otro@linkal.es");
+
+        verify(mockAuthRepository).forgotPassword(
+                eq("otro@linkal.es"),
+                any(), any(), any()
+        );
+    }
+
+    // resetPassword() delega en el repository --------------------------------------------
+
+    @Test
+    public void resetPassword_delegatesToRepository() {
+        viewModel.resetPassword("user@test.com", "123456", "newPass1");
+
+        verify(mockAuthRepository).resetPassword(
+                eq("user@test.com"),
+                eq("123456"),
+                eq("newPass1"),
+                any(), any(), any()
+        );
+    }
+
+    @Test
+    public void resetPassword_withDifferentParams_passesThemToRepository() {
+        viewModel.resetPassword("inf@linkal.es", "654321", "secret99");
+
+        verify(mockAuthRepository).resetPassword(
+                eq("inf@linkal.es"),
+                eq("654321"),
+                eq("secret99"),
+                any(), any(), any()
+        );
+    }
 }

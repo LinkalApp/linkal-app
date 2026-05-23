@@ -22,7 +22,7 @@ import es.miw.tfm.linkal.viewModel.UserViewModel;
 public class LoginActivity extends AppCompatActivity {
 
     EditText edtEmail, edtPassword;
-    TextView txtError;
+    TextView txtError, txtForgotPassword;
     Button btnLogin;
 
     UserViewModel userViewModel;
@@ -44,12 +44,16 @@ public class LoginActivity extends AppCompatActivity {
         this.observeViewModel();
 
         btnLogin.setOnClickListener(v -> validateUser());
+
+        txtForgotPassword.setOnClickListener(v ->
+                startActivity(new Intent(this, ForgotPasswordActivity.class)));
     }
 
     public void initViews(){
         edtEmail = findViewById(R.id.edtEmail);
         edtPassword = findViewById(R.id.edtPassword);
         txtError = findViewById(R.id.txtError);
+        txtForgotPassword = findViewById(R.id.txtForgotPassword);
         btnLogin = findViewById(R.id.btnLogin);
     }
 

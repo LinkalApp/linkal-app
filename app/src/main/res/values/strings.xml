@@ -34,6 +34,17 @@
     <string name="txtWebPage">Página Web</string>
     <string name="txtCategory">Categoría / Sector</string>
     <string name="hintOneCompulsory">Al menos una obligatoria</string>
+    <string name="welcomeBack">Bienvenido de nuevo</string>
+    <string name="forgotPassword">¿Olvidaste tu contraseña?</string>
+    <string name="forgotPasswordSubtitle">Introduce tu email y te enviaremos un código de verificación</string>
+    <string name="sendCode">Enviar código</string>
+    <string name="backToLogin">Volver al inicio de sesión</string>
+    <string name="resetPassword">Nueva contraseña</string>
+    <string name="resetPasswordSubtitle">Introduce el código que te hemos enviado y tu nueva contraseña</string>
+    <string name="verificationCode">Código de verificación</string>
+    <string name="newPassword">Nueva contraseña</string>
+    <string name="confirmPassword">Confirmar contraseña</string>
+    <string name="changePassword">Cambiar contraseña</string>
 
 
 </resources>

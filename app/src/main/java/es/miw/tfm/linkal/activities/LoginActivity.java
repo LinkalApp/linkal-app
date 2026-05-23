@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import es.miw.tfm.linkal.R;
+import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.BusinessViewModel;
 import es.miw.tfm.linkal.viewModel.UserViewModel;
 
@@ -71,6 +72,10 @@ public class LoginActivity extends AppCompatActivity {
 
         userViewModel.getAuthResult().observe(this, authResponse -> {
             if (authResponse != null) {
+                SessionManager.getInstance().saveSession(
+                        authResponse.getToken(),
+                        authResponse.getEmail(),
+                        authResponse.getRole());
                 String role = authResponse.getRole();
                 Intent intent;
                 if ("BUSINESS".equals(role)) {
@@ -78,9 +83,9 @@ public class LoginActivity extends AppCompatActivity {
                     Log.i("LoginActivity", "Usuario con rol BUSINESS, redirigiendo a MainActivity");
                     intent = new Intent(this, MainActivity.class);
                 } else {
-                    // TODO: sustituir por la Activity del dashboard de Influencer
-                    Log.i("LoginActivity", "Usuario con rol " + role + ", redirigiendo a MainActivity");
-                    intent = new Intent(this, MainActivity.class);
+                    // TODO: sustituir por la Activity del home de Influencer
+                    Log.i("LoginActivity", "Usuario con rol " + role + ", redirigiendo a InfluencerProfileActivity");
+                    intent = new Intent(this, InfluencerProfileActivity.class);
                 }
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

@@ -12,6 +12,7 @@
 
         <!-- Background -->
         <item name="android:colorBackground">@color/background</item>
+        <item name="android:windowBackground">@color/background</item>
 
         <!-- Surface -->
         <item name="colorSurface">@color/neutral_light</item>

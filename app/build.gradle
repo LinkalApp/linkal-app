@@ -42,6 +42,7 @@ dependencies {
     implementation libs.gson
     implementation libs.lifecycle.livedata.ktx
     implementation libs.lifecycle.viewmodel.ktx
+    implementation libs.flexbox
     testImplementation libs.junit
     testImplementation libs.mockito.core
     testImplementation libs.arch.core.testing

@@ -45,6 +45,10 @@
     <string name="newPassword">Nueva contraseña</string>
     <string name="confirmPassword">Confirmar contraseña</string>
     <string name="changePassword">Cambiar contraseña</string>
+    <string name="aboutMe">Sobre mí</string>
+    <string name="instagram">Instagram</string>
+    <string name="tiktok">Tiktok</string>
+    <string name="youtube">Youtube</string>
 
 
 </resources>

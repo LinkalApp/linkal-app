@@ -43,9 +43,13 @@
         <activity
             android:name=".activities.ResetPasswordActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.ForgotPasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.InfluencerProfileActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"/>
     </application>

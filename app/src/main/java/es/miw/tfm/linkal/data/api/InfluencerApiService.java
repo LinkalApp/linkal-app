@@ -1,8 +1,11 @@
 package es.miw.tfm.linkal.data.api;
 
 import es.miw.tfm.linkal.models.requests.RegisterInfluencerRequest;
+import es.miw.tfm.linkal.models.responses.InfluencerProfileResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 public interface InfluencerApiService {
@@ -10,4 +13,7 @@ public interface InfluencerApiService {
     String base = "influencers";
     @POST(base)
     Call<Void> register(@Body RegisterInfluencerRequest request);
+
+    @GET(base + "/me")
+    Call<InfluencerProfileResponse> getProfile(@Header("Authorization") String token);
 }

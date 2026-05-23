@@ -14,7 +14,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AuthRepository {
+public class AuthRepository extends BaseRepository {
     private static AuthRepository instance;
     private final AuthApiService apiService;
 
@@ -41,24 +41,17 @@ public class AuthRepository {
                       MutableLiveData<String> error,
                       MutableLiveData<Boolean> loading) {
         loading.setValue(true);
-        LoginRequest request = new LoginRequest(email, password);
-        apiService.login(request).enqueue(new Callback<AuthResponse>() {
-            @Override
-            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                loading.postValue(false);
-                if (response.isSuccessful() && response.body() != null) {
-                    authResult.postValue(response.body());
-                } else {
-                    error.postValue("Error " + response.code() + ": " + response.message());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<AuthResponse> call, Throwable t) {
-                loading.postValue(false);
-                error.postValue("Error de conexión: " + t.getMessage());
-            }
-        });
+        apiService.login(new LoginRequest(email, password)).enqueue(
+                new ApiCallback<AuthResponse>(loading, error) {
+                    @Override
+                    protected void onSuccess(AuthResponse body) {
+                        if (body != null) {
+                            authResult.postValue(body);
+                        } else {
+                            postError("Error: respuesta vacía del servidor");
+                        }
+                    }
+                });
     }
 
     // Forgot password ------------------------------------------------------------------
@@ -68,23 +61,13 @@ public class AuthRepository {
                                MutableLiveData<String> error,
                                MutableLiveData<Boolean> loading) {
         loading.setValue(true);
-        apiService.forgotPassword(new ForgotPasswordRequest(email)).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                loading.postValue(false);
-                if (response.isSuccessful()) {
-                    success.postValue(true);
-                } else {
-                    error.postValue("Error " + response.code() + ": " + response.message());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                loading.postValue(false);
-                error.postValue("Error de conexión: " + t.getMessage());
-            }
-        });
+        apiService.forgotPassword(new ForgotPasswordRequest(email)).enqueue(
+                new ApiCallback<Void>(loading, error) {
+                    @Override
+                    protected void onSuccess(Void body) {
+                        success.postValue(true);
+                    }
+                });
     }
 
     // Reset password ------------------------------------------------------------------
@@ -94,22 +77,12 @@ public class AuthRepository {
                               MutableLiveData<String> error,
                               MutableLiveData<Boolean> loading) {
         loading.setValue(true);
-        apiService.resetPassword(new ResetPasswordRequest(email, code, newPassword)).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                loading.postValue(false);
-                if (response.isSuccessful()) {
-                    success.postValue(true);
-                } else {
-                    error.postValue("Error " + response.code() + ": " + response.message());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                loading.postValue(false);
-                error.postValue("Error de conexión: " + t.getMessage());
-            }
-        });
+        apiService.resetPassword(new ResetPasswordRequest(email, code, newPassword)).enqueue(
+                new ApiCallback<Void>(loading, error) {
+                    @Override
+                    protected void onSuccess(Void body) {
+                        success.postValue(true);
+                    }
+                });
     }
 }

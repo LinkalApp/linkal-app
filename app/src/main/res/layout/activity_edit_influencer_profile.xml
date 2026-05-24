@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.EditInfluencerProfileActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp"
+        android:background="@color/white"
+        android:elevation="2dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_arrow_back"
+            android:contentDescription="Volver"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Editar perfil"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/neutral_dark"
+            android:paddingStart="8dp"/>
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Guardar"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/secondary"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"/>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- DATOS PERSONALES -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Datos personales"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/neutral_medium"
+                android:textAllCaps="true"
+                android:letterSpacing="0.08"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Nombre -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nombre"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/edtName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:inputType="textPersonName"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:hint="Tu nombre completo"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Nombre artístico -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/txtArtisticName"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/edtArtisticName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:inputType="textPersonName"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:hint="@string/hintArtisticName"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Teléfono -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/titlePhoneNumber"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/edtPhone"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:inputType="phone"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:hint="Ej. 666000000"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Descripción -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/titleDescription"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/edtDescription"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@drawable/bg_input"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:inputType="textMultiLine"
+                android:gravity="top"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:hint="@string/hintDescription"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- INTERESES -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Intereses"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/neutral_medium"
+                android:textAllCaps="true"
+                android:letterSpacing="0.08"
+                android:layout_marginBottom="12dp"/>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/interestsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:flexWrap="wrap"
+                app:alignItems="center"
+                android:layout_marginBottom="24dp"/>
+
+            <!--  REDES SOCIALES  -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Redes sociales"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/neutral_medium"
+                android:textAllCaps="true"
+                android:letterSpacing="0.08"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Instagram -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Instagram"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/edtInstagram"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:inputType="text"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:hint="@string/hintPlatforms"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- TikTok -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TikTok"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/edtTiktok"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:inputType="text"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:hint="@string/hintPlatforms"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- YouTube -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="YouTube"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/edtYoutube"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:inputType="text"
+                android:textSize="14sp"
+                android:textColor="@color/neutral_dark"
+                android:hint="Nombre del canal"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Error -->
+            <TextView
+                android:id="@+id/txtError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#E53935"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Progress -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        style="?android:attr/progressBarStyle"/>
+
+</LinearLayout>

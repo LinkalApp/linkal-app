@@ -12,10 +12,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -35,11 +38,19 @@ public class InfluencerProfileActivity extends AppCompatActivity {
     TextView txtInitials, txtName, txtArtisticName, txtDescription, txtRatingValue, txtInstagram, txtTiktok, txtYoutube, txtError;
     LinearLayout rowRating, rowInstagram, rowTiktok, rowYoutube;
     FlexboxLayout tagsContainer;
-    ImageView imgVerifiedBadge;
+    ImageView imgVerifiedBadge, btnMoreOptions;
     ImageView[] linkIcons;
     BottomNavigationView bottomNavigation;
 
     private InfluencerViewModel influencerViewModel;
+
+    /** Lanzador para la pantalla de edición; recarga el perfil al volver */
+    private final ActivityResultLauncher<Intent> editLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    influencerViewModel.loadProfile(SessionManager.getInstance().getBearerToken());
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +103,24 @@ public class InfluencerProfileActivity extends AppCompatActivity {
         rowTiktok = findViewById(R.id.rowTiktok);
         rowYoutube = findViewById(R.id.rowYoutube);
         imgVerifiedBadge = findViewById(R.id.imgVerifiedBadge);
+        btnMoreOptions   = findViewById(R.id.btnMoreOptions);
         bottomNavigation = findViewById(R.id.bottomNavigation);
+
+        btnMoreOptions.setOnClickListener(this::showOptionsMenu);
+    }
+
+    // Menú 3 puntos
+    private void showOptionsMenu(View anchor) {
+        PopupMenu popup = new PopupMenu(this, anchor);
+        popup.getMenuInflater().inflate(R.menu.menu_profile_options, popup.getMenu());
+        popup.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_edit_profile) {
+                editLauncher.launch(new Intent(this, EditInfluencerProfileActivity.class));
+                return true;
+            }
+            return false;
+        });
+        popup.show();
     }
 
     private void setupBottomNavigation() {

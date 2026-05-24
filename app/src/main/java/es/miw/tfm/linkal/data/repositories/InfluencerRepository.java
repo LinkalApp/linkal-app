@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import es.miw.tfm.linkal.data.api.ApiClient;
 import es.miw.tfm.linkal.data.api.InfluencerApiService;
 import es.miw.tfm.linkal.models.requests.RegisterInfluencerRequest;
+import es.miw.tfm.linkal.models.requests.UpdateInfluencerRequest;
 import es.miw.tfm.linkal.models.responses.InfluencerProfileResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,6 +51,21 @@ public class InfluencerRepository extends BaseRepository {
                            MutableLiveData<Boolean> loading) {
         loading.setValue(true);
         apiService.getProfile(token).enqueue(
+                new ApiCallback<InfluencerProfileResponse>(loading, error) {
+                    @Override
+                    protected void onSuccess(InfluencerProfileResponse body) {
+                        profileResult.postValue(body);
+                    }
+                });
+    }
+
+    public void updateProfile(String token,
+                              UpdateInfluencerRequest request,
+                              MutableLiveData<InfluencerProfileResponse> profileResult,
+                              MutableLiveData<String> error,
+                              MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.updateProfile(token, request).enqueue(
                 new ApiCallback<InfluencerProfileResponse>(loading, error) {
                     @Override
                     protected void onSuccess(InfluencerProfileResponse body) {

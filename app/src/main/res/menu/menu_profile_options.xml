@@ -4,4 +4,7 @@
         android:id="@+id/action_edit_profile"
         android:title="Editar perfil"
         android:icon="@drawable/ic_edit"/>
+    <item
+        android:id="@+id/action_delete_account"
+        android:title="Eliminar cuenta"/>
 </menu>

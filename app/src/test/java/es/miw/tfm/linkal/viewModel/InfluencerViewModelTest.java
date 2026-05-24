@@ -45,6 +45,12 @@ public class InfluencerViewModelTest {
     }
 
     @Test
+    public void deleteSuccess_initialValue_isNull() {
+        assertNull(viewModel.getDeleteSuccess().getValue());
+    }
+
+
+    @Test
     public void getIsLoading_returnsLiveData() {
         assertNotNull(viewModel.getIsLoading());
     }
@@ -67,5 +73,10 @@ public class InfluencerViewModelTest {
     @Test
     public void getUpdateSuccess_returnsLiveData() {
         assertNotNull(viewModel.getUpdateSuccess());
+    }
+
+    @Test
+    public void getDeleteSuccess_returnsLiveData() {
+        assertNotNull(viewModel.getDeleteSuccess());
     }
 }

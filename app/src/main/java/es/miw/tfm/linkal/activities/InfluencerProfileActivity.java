@@ -4,6 +4,7 @@ import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
@@ -117,10 +118,23 @@ public class InfluencerProfileActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.action_edit_profile) {
                 editLauncher.launch(new Intent(this, EditInfluencerProfileActivity.class));
                 return true;
+            } else if (item.getItemId() == R.id.action_delete_account) {
+                showDeleteAccountDialog();
+                return true;
             }
             return false;
         });
         popup.show();
+    }
+
+    private void showDeleteAccountDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Eliminar cuenta")
+                .setMessage("¿Estás segura de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.")
+                .setPositiveButton("Eliminar", (dialog, which) ->
+                        influencerViewModel.deleteAccount(SessionManager.getInstance().getBearerToken()))
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
     private void setupBottomNavigation() {
@@ -154,6 +168,15 @@ public class InfluencerProfileActivity extends AppCompatActivity {
             if (error != null) {
                 txtError.setText(error);
                 txtError.setVisibility(View.VISIBLE);
+            }
+        });
+
+        influencerViewModel.getDeleteSuccess().observe(this, success -> {
+            if (Boolean.TRUE.equals(success)) {
+                SessionManager.getInstance().clearSession();
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
             }
         });
     }

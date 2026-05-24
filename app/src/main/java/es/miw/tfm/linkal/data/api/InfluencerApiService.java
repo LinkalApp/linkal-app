@@ -5,6 +5,7 @@ import es.miw.tfm.linkal.models.requests.UpdateInfluencerRequest;
 import es.miw.tfm.linkal.models.responses.InfluencerProfileResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -19,7 +20,10 @@ public interface InfluencerApiService {
     @GET(base + "/me")
     Call<InfluencerProfileResponse> getProfile(@Header("Authorization") String token);
 
-    @PUT("influencers/me")
+    @PUT(base + "/me")
     Call<InfluencerProfileResponse> updateProfile(@Header("Authorization") String token,
                                                   @Body UpdateInfluencerRequest request);
+
+    @DELETE(base + "/me")
+    Call<Void> deleteAccount(@Header("Authorization") String token);
 }

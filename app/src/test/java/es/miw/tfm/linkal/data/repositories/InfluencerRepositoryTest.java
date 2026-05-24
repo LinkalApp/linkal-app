@@ -36,12 +36,14 @@ public class InfluencerRepositoryTest {
     @Mock private Call<Void> mockCall;
     @Mock private Call<InfluencerProfileResponse> mockProfileCall;
     @Mock private Call<InfluencerProfileResponse> mockUpdateCall;
+    @Mock private Call<Void> mockDeleteCall;
 
     @Mock private ResponseBody mockErrorBody;
     @Mock private MutableLiveData<Boolean> successLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
     @Mock private MutableLiveData<Boolean> loadingLiveData;
     @Mock private MutableLiveData<InfluencerProfileResponse> profileLiveData;
+    @Mock private MutableLiveData<Boolean> deleteSuccessLiveData;
 
     private InfluencerRepository repository;
     private RegisterInfluencerRequest request;
@@ -63,6 +65,7 @@ public class InfluencerRepositoryTest {
         when(mockApiService.register(any())).thenReturn(mockCall);
         when(mockApiService.getProfile(anyString())).thenReturn(mockProfileCall);
         when(mockApiService.updateProfile(anyString(), any())).thenReturn(mockUpdateCall);
+        when(mockApiService.deleteAccount(anyString())).thenReturn(mockDeleteCall);
     }
 
     // Singleton -------------------------------------------------------------
@@ -312,5 +315,81 @@ public class InfluencerRepositoryTest {
         assertTrue(captor.getValue().contains("Sin conexión"));
         verify(loadingLiveData).postValue(false);
         verify(profileLiveData, never()).postValue(any());
+    }
+
+    // deleteAccount ----------------------------------------------------------------
+
+    @Test
+    public void deleteAccount_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteAccount("Bearer token", deleteSuccessLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void deleteAccount_onSuccess_postsDeleteSuccessTrue() {
+        doAnswer(invocation -> {
+            Callback<Void> cb = invocation.getArgument(0);
+            cb.onResponse(mockDeleteCall, Response.success(null));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteAccount("Bearer token", deleteSuccessLiveData, errorLiveData, loadingLiveData);
+
+        verify(deleteSuccessLiveData).postValue(true);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void deleteAccount_on401Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<Void> cb = invocation.getArgument(0);
+            cb.onResponse(mockDeleteCall, Response.error(401, mockErrorBody));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteAccount("Bearer expired", deleteSuccessLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("401"));
+        verify(loadingLiveData).postValue(false);
+        verify(deleteSuccessLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void deleteAccount_on404Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<Void> cb = invocation.getArgument(0);
+            cb.onResponse(mockDeleteCall, Response.error(404, mockErrorBody));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteAccount("Bearer token", deleteSuccessLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("404"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void deleteAccount_onNetworkFailure_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<Void> cb = invocation.getArgument(0);
+            cb.onFailure(mockDeleteCall, new RuntimeException("Sin conexión"));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteAccount("Bearer token", deleteSuccessLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("Sin conexión"));
+        verify(loadingLiveData).postValue(false);
+        verify(deleteSuccessLiveData, never()).postValue(any());
     }
 }

@@ -21,6 +21,11 @@
             android:orientation="vertical">
 
             <!-- Cabecera: avatar + nombre + nombre artístico -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white">
+                
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -145,6 +150,21 @@
                 </LinearLayout>
 
             </LinearLayout>
+
+            <!-- Menú de 3 puntos -->
+            <ImageView
+                android:id="@+id/btnMoreOptions"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="8dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_more_vert"
+                app:tint="@color/neutral_dark"
+                android:contentDescription="Opciones"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+
+            </FrameLayout>
 
             <!-- Divider -->
             <View

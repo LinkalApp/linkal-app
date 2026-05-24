@@ -23,7 +23,7 @@
     <string name="titleInfluencerPerfil">Tu perfil de influencer</string>
     <string name="txtCompleteData">Completa tus datos</string>
     <string name="txtArtisticName">Nombre artístico</string>
-    <string name="hintArtisticName">Tu nombre en redes</string>
+    <string name="hintArtisticName">Tu alias o nombre artísticos</string>
     <string name="txtInterests">Intereses</string>
     <string name="txtSocialNetworks">Redes Sociales</string>
     <string name="hintPlatforms">\@canal</string>

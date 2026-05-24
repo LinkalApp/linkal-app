@@ -35,6 +35,11 @@ public class InfluencerViewModelTest {
     }
 
     @Test
+    public void updateSuccess_initialValue_isNull() {
+        assertNull(viewModel.getUpdateSuccess().getValue());
+    }
+
+    @Test
     public void profile_initialValue_isNull() {
         assertNull(viewModel.getProfile().getValue());
     }
@@ -57,5 +62,10 @@ public class InfluencerViewModelTest {
     @Test
     public void getProfile_returnsLiveData() {
         assertNotNull(viewModel.getProfile());
+    }
+
+    @Test
+    public void getUpdateSuccess_returnsLiveData() {
+        assertNotNull(viewModel.getUpdateSuccess());
     }
 }

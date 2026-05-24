@@ -6,6 +6,7 @@ import com.google.android.material.chip.Chip;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.util.List;
+import java.util.Locale;
 
 import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.models.responses.InfluencerProfileResponse;
@@ -30,10 +32,11 @@ import es.miw.tfm.linkal.viewModel.InfluencerViewModel;
 
 public class InfluencerProfileActivity extends AppCompatActivity {
 
-    TextView txtInitials, txtName, txtArtisticName, txtDescription, txtInstagram, txtTiktok, txtYoutube, txtError;
-    LinearLayout rowInstagram, rowTiktok, rowYoutube;
+    TextView txtInitials, txtName, txtArtisticName, txtDescription, txtRatingValue, txtInstagram, txtTiktok, txtYoutube, txtError;
+    LinearLayout rowRating, rowInstagram, rowTiktok, rowYoutube;
     FlexboxLayout tagsContainer;
     ImageView imgVerifiedBadge;
+    ImageView[] linkIcons;
     BottomNavigationView bottomNavigation;
 
     private InfluencerViewModel influencerViewModel;
@@ -76,6 +79,15 @@ public class InfluencerProfileActivity extends AppCompatActivity {
         txtYoutube = findViewById(R.id.txtYoutube);
         txtError = findViewById(R.id.txtError);
         tagsContainer = findViewById(R.id.tagsContainer);
+        rowRating        = findViewById(R.id.rowRating);
+        linkIcons        = new ImageView[]{
+                findViewById(R.id.link1),
+                findViewById(R.id.link2),
+                findViewById(R.id.link3),
+                findViewById(R.id.link4),
+                findViewById(R.id.link5)
+        };
+        txtRatingValue   = findViewById(R.id.txtRatingValue);
         rowInstagram = findViewById(R.id.rowInstagram);
         rowTiktok = findViewById(R.id.rowTiktok);
         rowYoutube = findViewById(R.id.rowYoutube);
@@ -139,6 +151,9 @@ public class InfluencerProfileActivity extends AppCompatActivity {
         // Badge verificado: solo se muestra si está verificado
         imgVerifiedBadge.setVisibility(
                 Boolean.TRUE.equals(profile.getVerified()) ? View.VISIBLE : View.GONE);
+
+        // Rating promedio
+        showRating(profile.getAverageRating());
 
         // Tags de intereses
         addInterestTags(profile.getInterests());
@@ -205,6 +220,23 @@ public class InfluencerProfileActivity extends AppCompatActivity {
 
             tagsContainer.addView(chip);
         }
+    }
+
+    private void showRating(Double avg) {
+        if (avg == null) {
+            avg = 0.0;
+        }
+
+        int filled = (int) Math.round(avg); // 0-5 links encendidos
+        int colorOn  = getColor(R.color.secondary);     // morado
+        int colorOff = getColor(R.color.neutral_light); // gris
+
+        for (int i = 0; i < linkIcons.length; i++) {
+            linkIcons[i].setColorFilter(i < filled ? colorOn : colorOff, PorterDuff.Mode.SRC_IN);
+        }
+
+        txtRatingValue.setText(String.format(Locale.getDefault(), "%.1f / 5", avg));
+        rowRating.setVisibility(View.VISIBLE);
     }
 
     private void showSocialRow(LinearLayout row, TextView label, String value) {

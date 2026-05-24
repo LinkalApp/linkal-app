@@ -13,6 +13,7 @@ public class InfluencerProfileResponse {
     private String tiktok;
     private String youtube;
     private Boolean verified;
+    private Double averageRating;
 
     public InfluencerProfileResponse() {}
 
@@ -55,6 +56,9 @@ public class InfluencerProfileResponse {
     public Boolean getVerified() {
         return verified;
     }
+    public Double getAverageRating() {
+        return averageRating;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -94,5 +98,9 @@ public class InfluencerProfileResponse {
 
     public void setVerified(Boolean verified) {
         this.verified = verified;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
     }
 }

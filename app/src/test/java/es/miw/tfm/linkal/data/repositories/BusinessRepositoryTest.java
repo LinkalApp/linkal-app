@@ -11,6 +11,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import es.miw.tfm.linkal.data.api.BusinessApiService;
 import es.miw.tfm.linkal.models.requests.RegisterBusinessRequest;
+import es.miw.tfm.linkal.models.responses.BusinessProfileResponse;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,12 +24,15 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class BusinessRepositoryTest {
 
-    @Mock private BusinessApiService       mockApiService;
-    @Mock private Call<Void>               mockCall;
-    @Mock private ResponseBody             mockErrorBody;
+    @Mock private BusinessApiService mockApiService;
+    @Mock private Call<Void> mockCall;
+    @Mock private Call<BusinessProfileResponse> mockProfileCall;
+    @Mock private ResponseBody mockErrorBody;
     @Mock private MutableLiveData<Boolean> successLiveData;
-    @Mock private MutableLiveData<String>  errorLiveData;
+    @Mock private MutableLiveData<String> errorLiveData;
     @Mock private MutableLiveData<Boolean> loadingLiveData;
+    @Mock private MutableLiveData<BusinessProfileResponse>  profileLiveData;
+
 
     private BusinessRepository      repository;
     private RegisterBusinessRequest request;
@@ -42,6 +46,7 @@ public class BusinessRepositoryTest {
                 "https://empresa.com", "Tecnología"
         );
         when(mockApiService.register(any())).thenReturn(mockCall);
+        when(mockApiService.getProfile(anyString())).thenReturn(mockProfileCall);
     }
 
     // Singleton ------------------------------------------------------------------
@@ -150,5 +155,84 @@ public class BusinessRepositoryTest {
 
         verify(errorLiveData).postValue(any());
         verify(loadingLiveData).postValue(false);
+    }
+
+    // getProfile -------------------------------------------------------------------------
+    @Test
+    public void getProfile_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockProfileCall).enqueue(any());
+
+        repository.getProfile("Bearer token", profileLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void getProfile_onSuccess_postsProfileData() {
+        BusinessProfileResponse profile = new BusinessProfileResponse();
+        profile.setEmail("empresa@test.com");
+        profile.setAddress("Calle Mayor 1");
+
+        doAnswer(invocation -> {
+            Callback<BusinessProfileResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockProfileCall, Response.success(profile));
+            return null;
+        }).when(mockProfileCall).enqueue(any());
+
+        repository.getProfile("Bearer token", profileLiveData, errorLiveData, loadingLiveData);
+
+        verify(profileLiveData).postValue(profile);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getProfile_on401Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<BusinessProfileResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockProfileCall, Response.error(401, mockErrorBody));
+            return null;
+        }).when(mockProfileCall).enqueue(any());
+
+        repository.getProfile("Bearer expired", profileLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("401"));
+        verify(loadingLiveData).postValue(false);
+        verify(profileLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getProfile_on403Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<BusinessProfileResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockProfileCall, Response.error(403, mockErrorBody));
+            return null;
+        }).when(mockProfileCall).enqueue(any());
+
+        repository.getProfile("Bearer token", profileLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("403"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getProfile_onNetworkFailure_postsConnectionErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<BusinessProfileResponse> cb = invocation.getArgument(0);
+            cb.onFailure(mockProfileCall, new RuntimeException("Sin conexión"));
+            return null;
+        }).when(mockProfileCall).enqueue(any());
+
+        repository.getProfile("Bearer token", profileLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("Sin conexión"));
+        verify(loadingLiveData).postValue(false);
+        verify(profileLiveData, never()).postValue(any());
     }
 }

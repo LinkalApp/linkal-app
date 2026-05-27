@@ -32,6 +32,11 @@ public class BusinessViewModelTest {
     }
 
     @Test
+    public void profile_initialValue_isNull() {
+        assertNull(viewModel.getProfile().getValue());
+    }
+
+    @Test
     public void getIsLoading_returnsLiveData() {
         assertNotNull(viewModel.getIsLoading());
     }
@@ -44,5 +49,10 @@ public class BusinessViewModelTest {
     @Test
     public void getErrorMessage_returnsLiveData() {
         assertNotNull(viewModel.getErrorMessage());
+    }
+
+    @Test
+    public void getProfile_returnsLiveData() {
+        assertNotNull(viewModel.getProfile());
     }
 }

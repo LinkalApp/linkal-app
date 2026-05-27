@@ -79,9 +79,9 @@ public class LoginActivity extends AppCompatActivity {
                 String role = authResponse.getRole();
                 Intent intent;
                 if ("BUSINESS".equals(role)) {
-                    // TODO: sustituir por la Activity del dashboard de Business
+                    // TODO: sustituir por la Activity del home de Business
                     Log.i("LoginActivity", "Usuario con rol BUSINESS, redirigiendo a MainActivity");
-                    intent = new Intent(this, MainActivity.class);
+                    intent = new Intent(this, BusinessProfileActivity.class);
                 } else {
                     // TODO: sustituir por la Activity del home de Influencer
                     Log.i("LoginActivity", "Usuario con rol " + role + ", redirigiendo a InfluencerProfileActivity");

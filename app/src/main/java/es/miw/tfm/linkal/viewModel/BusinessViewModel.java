@@ -6,12 +6,14 @@ import androidx.lifecycle.ViewModel;
 
 import es.miw.tfm.linkal.data.repositories.BusinessRepository;
 import es.miw.tfm.linkal.models.requests.RegisterBusinessRequest;
+import es.miw.tfm.linkal.models.responses.BusinessProfileResponse;
 
 public class BusinessViewModel extends ViewModel {
 
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> registerSuccess = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<BusinessProfileResponse> profile = new MutableLiveData<>();
 
     private final BusinessRepository businessRepository = BusinessRepository.getInstance();
 
@@ -20,7 +22,13 @@ public class BusinessViewModel extends ViewModel {
         businessRepository.register(request, registerSuccess, errorMessage, isLoading);
     }
 
-    public LiveData<Boolean> getIsLoading()       { return isLoading; }
+    // PERFIL
+    public void loadProfile(String token) {
+        businessRepository.getProfile(token, profile, errorMessage, isLoading);
+    }
+
+    public LiveData<Boolean> getIsLoading() { return isLoading; }
     public LiveData<Boolean> getRegisterSuccess() { return registerSuccess; }
-    public LiveData<String>  getErrorMessage()    { return errorMessage; }
+    public LiveData<String>  getErrorMessage() { return errorMessage; }
+    public LiveData<BusinessProfileResponse> getProfile() { return profile; }
 }

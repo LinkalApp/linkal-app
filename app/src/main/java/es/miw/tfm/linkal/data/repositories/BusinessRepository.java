@@ -5,11 +5,12 @@ import androidx.lifecycle.MutableLiveData;
 import es.miw.tfm.linkal.data.api.ApiClient;
 import es.miw.tfm.linkal.data.api.BusinessApiService;
 import es.miw.tfm.linkal.models.requests.RegisterBusinessRequest;
+import es.miw.tfm.linkal.models.responses.BusinessProfileResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class BusinessRepository {
+public class BusinessRepository extends BaseRepository{
     private static BusinessRepository instance;
     private final BusinessApiService apiService;
 
@@ -34,22 +35,26 @@ public class BusinessRepository {
                          MutableLiveData<String> error,
                          MutableLiveData<Boolean> loading) {
         loading.setValue(true);
-        apiService.register(request).enqueue(new Callback<Void>() { // ← apiService, no ApiClient
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                loading.postValue(false);
-                if (response.isSuccessful()) {
-                    success.postValue(true);
-                } else {
-                    error.postValue("Error " + response.code() + ": " + response.message());
-                }
-            }
+        apiService.register(request).enqueue(
+                new ApiCallback<Void>(loading, error) {
+                    @Override
+                    protected void onSuccess(Void body) {
+                        success.postValue(true);
+                    }
+                });
+    }
 
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                loading.postValue(false);
-                error.postValue("Error de conexión: " + t.getMessage());
-            }
-        });
+    public void getProfile(String token,
+                           MutableLiveData<BusinessProfileResponse> profile,
+                           MutableLiveData<String> error,
+                           MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.getProfile(token).enqueue(
+                new ApiCallback<BusinessProfileResponse>(loading, error) {
+                    @Override
+                    protected void onSuccess(BusinessProfileResponse body) {
+                        profile.postValue(body);
+                    }
+                });
     }
 }

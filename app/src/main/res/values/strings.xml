@@ -49,6 +49,12 @@
     <string name="instagram">Instagram</string>
     <string name="tiktok">Tiktok</string>
     <string name="youtube">Youtube</string>
+    <string name="goBack">Volver</string>
+    <string name="optionEditProfile">Editar perfil</string>
+    <string name="save">Guardar</string>
+    <string name="businessData">Datos del negocio</string>
+    <string name="hintBusinessDescription">Describe tu negocio</string>
+    <string name="titleLocation">Ubicación</string>
 
 
 </resources>

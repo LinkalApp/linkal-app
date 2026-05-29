@@ -141,6 +141,18 @@
 
                 </LinearLayout>
 
+                <!-- Menú de 3 puntos -->
+                <ImageView
+                    android:id="@+id/btnMoreOptions"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="top|end"
+                    android:layout_margin="8dp"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_more_vert"
+                    app:tint="@color/neutral_dark"
+                    android:contentDescription="Opciones"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
 
             </FrameLayout>
 

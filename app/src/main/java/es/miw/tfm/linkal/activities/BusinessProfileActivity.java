@@ -1,5 +1,6 @@
 package es.miw.tfm.linkal.activities;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -111,10 +112,23 @@ public class BusinessProfileActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.action_edit_profile) {
                 editLauncher.launch(new Intent(this, EditBusinessProfileActivity.class));
                 return true;
+            }else if (item.getItemId() == R.id.action_delete_account) {
+                showDeleteAccountDialog();
+                return true;
             }
             return false;
         });
         popup.show();
+    }
+
+    private void showDeleteAccountDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Eliminar cuenta")
+                .setMessage("¿Estás segura de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.")
+                .setPositiveButton("Eliminar", (dialog, which) ->
+                        businessViewModel.deleteAccount(SessionManager.getInstance().getBearerToken()))
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
     //Navegación
@@ -147,6 +161,15 @@ public class BusinessProfileActivity extends AppCompatActivity {
             if (error != null) {
                 txtError.setText(error);
                 txtError.setVisibility(View.VISIBLE);
+            }
+        });
+
+        businessViewModel.getDeleteSuccess().observe(this, success -> {
+            if (Boolean.TRUE.equals(success)) {
+                SessionManager.getInstance().clearSession();
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
             }
         });
     }

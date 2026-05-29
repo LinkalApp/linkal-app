@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -28,13 +31,20 @@ import es.miw.tfm.linkal.viewModel.BusinessViewModel;
 public class BusinessProfileActivity extends AppCompatActivity {
 
     TextView txtInitials, txtName, txtCategory, txtDescription, txtAddress, txtProvince, txtWebsite, txtPhone, txtRatingValue, txtError;
-    ImageView imgVerifiedBadge;
+    ImageView imgVerifiedBadge, btnMoreOptions;
     ImageView[] linkIcons;
     LinearLayout rowAddress, rowProvince, rowWebsite, rowPhone, rowRating;
     BottomNavigationView bottomNavigation;
 
     private BusinessViewModel businessViewModel;
 
+    /** Lanzador para la pantalla de edición; recarga el perfil al volver */
+    private final ActivityResultLauncher<Intent> editLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    businessViewModel.loadProfile(SessionManager.getInstance().getBearerToken());
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +67,8 @@ public class BusinessProfileActivity extends AppCompatActivity {
 
         initViews();
         setupBottomNavigation();
+
+        btnMoreOptions.setOnClickListener(this::showOptionsMenu);
 
         businessViewModel = new ViewModelProvider(this).get(BusinessViewModel.class);
         observeViewModel();
@@ -89,6 +101,20 @@ public class BusinessProfileActivity extends AppCompatActivity {
         rowPhone = findViewById(R.id.rowPhone);
         rowRating = findViewById(R.id.rowRating);
         bottomNavigation = findViewById(R.id.bottomNavigation);
+        btnMoreOptions = findViewById(R.id.btnMoreOptions);
+    }
+
+    private void showOptionsMenu(View anchor) {
+        PopupMenu popup = new PopupMenu(this, anchor);
+        popup.getMenuInflater().inflate(R.menu.menu_profile_options, popup.getMenu());
+        popup.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_edit_profile) {
+                editLauncher.launch(new Intent(this, EditBusinessProfileActivity.class));
+                return true;
+            }
+            return false;
+        });
+        popup.show();
     }
 
     //Navegación

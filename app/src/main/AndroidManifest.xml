@@ -59,6 +59,10 @@
         <activity
             android:name=".activities.BusinessProfileActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.EditBusinessProfileActivity"
+            android:exported="false"
             android:windowSoftInputMode="adjustResize"/>
     </application>
 

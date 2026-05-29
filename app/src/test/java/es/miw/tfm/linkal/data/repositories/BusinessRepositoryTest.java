@@ -11,6 +11,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import es.miw.tfm.linkal.data.api.BusinessApiService;
 import es.miw.tfm.linkal.models.requests.RegisterBusinessRequest;
+import es.miw.tfm.linkal.models.requests.UpdateBusinessRequest;
 import es.miw.tfm.linkal.models.responses.BusinessProfileResponse;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -27,6 +28,7 @@ public class BusinessRepositoryTest {
     @Mock private BusinessApiService mockApiService;
     @Mock private Call<Void> mockCall;
     @Mock private Call<BusinessProfileResponse> mockProfileCall;
+    @Mock private Call<BusinessProfileResponse> mockUpdateCall;
     @Mock private ResponseBody mockErrorBody;
     @Mock private MutableLiveData<Boolean> successLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
@@ -47,6 +49,7 @@ public class BusinessRepositoryTest {
         );
         when(mockApiService.register(any())).thenReturn(mockCall);
         when(mockApiService.getProfile(anyString())).thenReturn(mockProfileCall);
+        when(mockApiService.updateProfile(anyString(), any())).thenReturn(mockUpdateCall);
     }
 
     // Singleton ------------------------------------------------------------------
@@ -232,6 +235,86 @@ public class BusinessRepositoryTest {
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(errorLiveData).postValue(captor.capture());
         assertTrue(captor.getValue().contains("Sin conexión"));
+        verify(loadingLiveData).postValue(false);
+        verify(profileLiveData, never()).postValue(any());
+    }
+
+    // updateProfile --------------------------------------------------------------------
+
+    @Test
+    public void updateProfile_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockUpdateCall).enqueue(any());
+
+        UpdateBusinessRequest updateRequest = new UpdateBusinessRequest(
+                "Empresa Test", "611000000", "Descripción",
+                "Calle Mayor 1", "Madrid", "https://empresa.com");
+
+        repository.updateProfile("Bearer token", updateRequest, profileLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void updateProfile_onSuccess_postsUpdatedProfile() {
+        BusinessProfileResponse updated = new BusinessProfileResponse();
+        updated.setEmail("empresa@test.com");
+        updated.setAddress("Calle Mayor 1");
+
+        doAnswer(invocation -> {
+            Callback<BusinessProfileResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockUpdateCall, Response.success(updated));
+            return null;
+        }).when(mockUpdateCall).enqueue(any());
+
+        UpdateBusinessRequest updateRequest = new UpdateBusinessRequest(
+                "Empresa Test", "611000000", "Descripción",
+                "Calle Mayor 1", "Madrid", "https://empresa.com");
+
+        repository.updateProfile("Bearer token", updateRequest, profileLiveData, errorLiveData, loadingLiveData);
+
+        verify(profileLiveData).postValue(updated);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void updateProfile_on400Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<BusinessProfileResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockUpdateCall, Response.error(400, mockErrorBody));
+            return null;
+        }).when(mockUpdateCall).enqueue(any());
+
+        UpdateBusinessRequest updateRequest = new UpdateBusinessRequest(
+                "Empresa Test", "611000000", "Descripción",
+                "Calle Mayor 1", "Madrid", "https://empresa.com");
+
+        repository.updateProfile("Bearer token", updateRequest, profileLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("400"));
+        verify(loadingLiveData).postValue(false);
+        verify(profileLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void updateProfile_onNetworkFailure_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<BusinessProfileResponse> cb = invocation.getArgument(0);
+            cb.onFailure(mockUpdateCall, new RuntimeException("timeout"));
+            return null;
+        }).when(mockUpdateCall).enqueue(any());
+
+        UpdateBusinessRequest updateRequest = new UpdateBusinessRequest(
+                "Empresa Test", "611000000", "Descripción",
+                "Calle Mayor 1", "Madrid", "https://empresa.com");
+
+        repository.updateProfile("Bearer token", updateRequest, profileLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("timeout"));
         verify(loadingLiveData).postValue(false);
         verify(profileLiveData, never()).postValue(any());
     }

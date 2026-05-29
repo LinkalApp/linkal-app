@@ -5,7 +5,10 @@ import androidx.lifecycle.MutableLiveData;
 import es.miw.tfm.linkal.data.api.ApiClient;
 import es.miw.tfm.linkal.data.api.BusinessApiService;
 import es.miw.tfm.linkal.models.requests.RegisterBusinessRequest;
+import es.miw.tfm.linkal.models.requests.UpdateBusinessRequest;
+import es.miw.tfm.linkal.models.requests.UpdateInfluencerRequest;
 import es.miw.tfm.linkal.models.responses.BusinessProfileResponse;
+import es.miw.tfm.linkal.models.responses.InfluencerProfileResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -54,6 +57,21 @@ public class BusinessRepository extends BaseRepository{
                     @Override
                     protected void onSuccess(BusinessProfileResponse body) {
                         profile.postValue(body);
+                    }
+                });
+    }
+
+    public void updateProfile(String token,
+                              UpdateBusinessRequest request,
+                              MutableLiveData<BusinessProfileResponse> profileResult,
+                              MutableLiveData<String> error,
+                              MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.updateProfile(token, request).enqueue(
+                new ApiCallback<BusinessProfileResponse>(loading, error) {
+                    @Override
+                    protected void onSuccess(BusinessProfileResponse body) {
+                        profileResult.postValue(body);
                     }
                 });
     }

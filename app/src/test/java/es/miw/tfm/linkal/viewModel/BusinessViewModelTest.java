@@ -97,4 +97,30 @@ public class BusinessViewModelTest {
 
         verify(mockRepository).updateProfile(eq("Bearer other-token"), eq(request), any(), any(), any());
     }
+
+    // ─── deleteAccount ────────────────────────────────────────────────────────
+
+    @Test
+    public void deleteSuccess_initialValue_isNull() {
+        assertNull(viewModel.getDeleteSuccess().getValue());
+    }
+
+    @Test
+    public void getDeleteSuccess_returnsLiveData() {
+        assertNotNull(viewModel.getDeleteSuccess());
+    }
+
+    @Test
+    public void deleteAccount_delegatesToRepository() {
+        viewModel.deleteAccount("Bearer my-token");
+
+        verify(mockRepository).deleteAccount(eq("Bearer my-token"), any(), any(), any());
+    }
+
+    @Test
+    public void deleteAccount_withDifferentToken_passesItToRepository() {
+        viewModel.deleteAccount("Bearer other-token");
+
+        verify(mockRepository).deleteAccount(eq("Bearer other-token"), any(), any(), any());
+    }
 }

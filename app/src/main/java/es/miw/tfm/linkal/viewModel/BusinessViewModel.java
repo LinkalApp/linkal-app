@@ -17,6 +17,8 @@ public class BusinessViewModel extends ViewModel {
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<BusinessProfileResponse> profile = new MutableLiveData<>();
     private final MutableLiveData<Boolean> updateSuccess = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> deleteSuccess = new MutableLiveData<>();
+
 
     private final BusinessRepository businessRepository;
 
@@ -44,9 +46,15 @@ public class BusinessViewModel extends ViewModel {
         updateSuccess.setValue(true);
     }
 
+    // ELIMINAR CUENTA
+    public void deleteAccount(String token) {
+        businessRepository.deleteAccount(token, deleteSuccess, errorMessage, isLoading);
+    }
+
     public LiveData<Boolean> getIsLoading() { return isLoading; }
     public LiveData<Boolean> getRegisterSuccess() { return registerSuccess; }
     public LiveData<String>  getErrorMessage() { return errorMessage; }
     public LiveData<BusinessProfileResponse> getProfile() { return profile; }
     public LiveData<Boolean> getUpdateSuccess() { return updateSuccess; }
+    public LiveData<Boolean> getDeleteSuccess() { return deleteSuccess; }
 }

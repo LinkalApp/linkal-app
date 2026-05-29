@@ -75,4 +75,18 @@ public class BusinessRepository extends BaseRepository{
                     }
                 });
     }
+
+    public void deleteAccount(String token,
+                              MutableLiveData<Boolean> deleteSuccess,
+                              MutableLiveData<String> error,
+                              MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.deleteAccount(token).enqueue(
+                new ApiCallback<Void>(loading, error) {
+                    @Override
+                    protected void onSuccess(Void body) {
+                        deleteSuccess.postValue(true);
+                    }
+                });
+    }
 }

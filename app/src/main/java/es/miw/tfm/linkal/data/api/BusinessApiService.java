@@ -7,6 +7,7 @@ import es.miw.tfm.linkal.models.responses.BusinessProfileResponse;
 import es.miw.tfm.linkal.models.responses.InfluencerProfileResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -25,4 +26,6 @@ public interface BusinessApiService {
     Call<BusinessProfileResponse> updateProfile(@Header("Authorization") String token,
                                                   @Body UpdateBusinessRequest request);
 
+    @DELETE(base + "/me")
+    Call<Void> deleteAccount(@Header("Authorization") String token);
 }

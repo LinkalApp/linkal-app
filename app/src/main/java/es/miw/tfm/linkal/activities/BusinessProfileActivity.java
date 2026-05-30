@@ -142,6 +142,10 @@ public class BusinessProfileActivity extends AppCompatActivity {
             } else if (id == R.id.nav_home) {
                 Toast.makeText(this, "Inicio (próximamente)", Toast.LENGTH_SHORT).show();
                 return true;
+            } else if (id == R.id.nav_campaigns) {
+                startActivity(new Intent(this, CampaignsActivity.class));
+                finish();
+                return true;
             } else if (id == R.id.nav_matches) {
                 Toast.makeText(this, "Matches (próximamente)", Toast.LENGTH_SHORT).show();
                 return true;

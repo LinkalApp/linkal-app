@@ -12,6 +12,11 @@
         android:title="Matches"/>
 
     <item
+        android:id="@+id/nav_campaigns"
+        android:icon="@drawable/ic_nav_campaigns"
+        android:title="Campañas"/>
+
+    <item
         android:id="@+id/nav_chat"
         android:icon="@drawable/ic_nav_chat"
         android:title="Chat"/>

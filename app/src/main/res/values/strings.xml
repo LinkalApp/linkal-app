@@ -55,6 +55,18 @@
     <string name="businessData">Datos del negocio</string>
     <string name="hintBusinessDescription">Describe tu negocio</string>
     <string name="titleLocation">Ubicación</string>
+    <string name="titleActiveCampaigns">Mis campañas activas</string>
+    <string name="txtAddCampaign">+ Crear nueva campaña</string>
+    <string name="titleReward">Recompensa</string>
+    <string name="hintRequirements">Ej: Mínimo 10k seguidores, nicho lifestyle...</string>
+    <string name="titleRequirements">Requisitos para el influencer</string>
+    <string name="hintObjective">Ej: Aumentar ventas, visibilidad de marca...</string>
+    <string name="titleObjective">Objetivo</string>
+    <string name="hintDescriptionCampaign">Describe tu campaña...</string>
+    <string name="hintNameCampaign">Ej: Campaña verano 2025</string>
+    <string name="titleNameCampaign">Nombre de la campaña</string>
+    <string name="txtNewCampaign">Nueva campaña</string>
+    <string name="hintReward">Ej: 200€, producto gratis, comisión 10%...</string>
 
 
 </resources>

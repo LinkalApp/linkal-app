@@ -63,6 +63,14 @@
         <activity
             android:name=".activities.EditBusinessProfileActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.CreateCampaignActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"/>
+        <activity
+            android:name=".activities.CampaignsActivity"
+            android:exported="false"
             android:windowSoftInputMode="adjustResize"/>
     </application>
 

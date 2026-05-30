@@ -31,6 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SessionManager.init(this);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -75,7 +76,8 @@ public class LoginActivity extends AppCompatActivity {
                 SessionManager.getInstance().saveSession(
                         authResponse.getToken(),
                         authResponse.getEmail(),
-                        authResponse.getRole());
+                        authResponse.getRole(),
+                        authResponse.getId());
                 String role = authResponse.getRole();
                 Intent intent;
                 if ("BUSINESS".equals(role)) {

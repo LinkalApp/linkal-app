@@ -40,6 +40,7 @@ public class CampaignAdapter extends RecyclerView.Adapter<CampaignAdapter.ViewHo
         holder.txtStatus.setText(c.getStatus() != null ? c.getStatus() : "OPEN");
         holder.txtObjective.setText(c.getObjective() != null ? c.getObjective() : "");
         holder.txtReward.setText(c.getReward() != null ? c.getReward() : "");
+        applyStatus(holder.txtStatus, c.getStatus());
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), CampaignDetailActivity.class);
@@ -57,6 +58,32 @@ public class CampaignAdapter extends RecyclerView.Adapter<CampaignAdapter.ViewHo
 
     @Override
     public int getItemCount() { return items.size(); }
+
+    /**
+     * Aplica texto y color al badge de estado.
+     * - Texto e icono con el color del estado
+     * - Fondo con el mismo color al 20 % de opacidad (0x33 alpha)
+     */
+    public static void applyStatus(TextView badge, String status) {
+        if (status == null) status = "OPEN";
+
+        int colorRes;
+        switch (status) {
+            case "IN_PROGRESS": colorRes = R.color.status_in_progress; break;
+            case "CLOSED":      colorRes = R.color.status_closed;      break;
+            default:            colorRes = R.color.status_open;        break;
+        }
+
+        int color   = badge.getContext().getColor(colorRes);
+        int bgColor = (color & 0x00FFFFFF) | 0x1A000000;
+
+        badge.setText(status);
+        badge.setTextColor(color);
+        android.graphics.drawable.Drawable bg =
+                badge.getContext().getDrawable(R.drawable.bg_badge_open).mutate();
+        bg.setTint(bgColor);
+        badge.setBackground(bg);
+    }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtTitle, txtStatus, txtObjective, txtReward;

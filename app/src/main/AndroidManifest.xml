@@ -75,6 +75,10 @@
         <activity
             android:name=".activities.CampaignDetailActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.EditCampaignActivity"
+            android:exported="false"
             android:windowSoftInputMode="adjustResize"/>
     </application>
 

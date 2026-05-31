@@ -15,4 +15,9 @@
 
     <color name="links">#5C6BC0</color>
 
+    <!-- Estado de campaña -->
+    <color name="status_open">#7BC8B4</color>
+    <color name="status_in_progress">#FFB7A3</color>
+    <color name="status_closed">#D06F6F</color>
+
 </resources>

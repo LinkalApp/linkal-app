@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import es.miw.tfm.linkal.data.api.ApiClient;
 import es.miw.tfm.linkal.data.api.CampaignApiService;
 import es.miw.tfm.linkal.models.requests.CreateCampaignRequest;
+import es.miw.tfm.linkal.models.requests.UpdateCampaignRequest;
 import es.miw.tfm.linkal.models.responses.CampaignResponse;
 
 public class CampaignRepository extends BaseRepository{
@@ -36,6 +37,22 @@ public class CampaignRepository extends BaseRepository{
                        MutableLiveData<Boolean> loading) {
         loading.setValue(true);
         apiService.create(token, request).enqueue(
+                new ApiCallback<CampaignResponse>(loading, error) {
+                    @Override
+                    protected void onSuccess(CampaignResponse body) {
+                        result.postValue(body);
+                    }
+                });
+    }
+
+    public void update(String token,
+                       String campaignId,
+                       UpdateCampaignRequest request,
+                       MutableLiveData<CampaignResponse> result,
+                       MutableLiveData<String> error,
+                       MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.update(token, campaignId, request).enqueue(
                 new ApiCallback<CampaignResponse>(loading, error) {
                     @Override
                     protected void onSuccess(CampaignResponse body) {

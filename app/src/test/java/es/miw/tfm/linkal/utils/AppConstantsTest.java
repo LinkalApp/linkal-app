@@ -103,4 +103,51 @@ public class AppConstantsTest {
             assertNotNull(interest);
         }
     }
+
+    // STATUS CAMPAIGN OPTIONS ---------------------------------------------------
+
+    @Test
+    public void statusCampaignOptions_notNullAndNotEmpty() {
+        assertNotNull(AppConstants.STATUS_CAMPAIGN_OPTIONS);
+        assertTrue(AppConstants.STATUS_CAMPAIGN_OPTIONS.length > 0);
+    }
+
+    @Test
+    public void statusCampaignOptions_containsOpen() {
+        boolean found = false;
+        for (String s : AppConstants.STATUS_CAMPAIGN_OPTIONS) {
+            if ("OPEN".equals(s)) { found = true; break; }
+        }
+        assertTrue("'OPEN' should be in STATUS_CAMPAIGN_OPTIONS", found);
+    }
+
+    @Test
+    public void statusCampaignOptions_containsInProgress() {
+        boolean found = false;
+        for (String s : AppConstants.STATUS_CAMPAIGN_OPTIONS) {
+            if ("IN_PROGRESS".equals(s)) { found = true; break; }
+        }
+        assertTrue("'IN_PROGRESS' should be in STATUS_CAMPAIGN_OPTIONS", found);
+    }
+
+    @Test
+    public void statusCampaignOptions_containsClosed() {
+        boolean found = false;
+        for (String s : AppConstants.STATUS_CAMPAIGN_OPTIONS) {
+            if ("CLOSED".equals(s)) { found = true; break; }
+        }
+        assertTrue("'CLOSED' should be in STATUS_CAMPAIGN_OPTIONS", found);
+    }
+
+    @Test
+    public void statusCampaignOptions_hasExactlyThreeValues() {
+        assertEquals(3, AppConstants.STATUS_CAMPAIGN_OPTIONS.length);
+    }
+
+    @Test
+    public void statusCampaignOptions_noNullElements() {
+        for (String s : AppConstants.STATUS_CAMPAIGN_OPTIONS) {
+            assertNotNull(s);
+        }
+    }
 }

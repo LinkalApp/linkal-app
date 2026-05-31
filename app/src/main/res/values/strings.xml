@@ -67,6 +67,8 @@
     <string name="titleNameCampaign">Nombre de la campaña</string>
     <string name="txtNewCampaign">Nueva campaña</string>
     <string name="hintReward">Ej: 200€, producto gratis, comisión 10%...</string>
+    <string name="txtCreatedAt">Fecha de creación</string>
+    <string name="titleDetailCampaign">Detalle de campaña</string>
 
 
 </resources>

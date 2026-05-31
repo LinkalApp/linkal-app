@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import es.miw.tfm.linkal.data.repositories.BusinessRepository;
 import es.miw.tfm.linkal.data.repositories.CampaignRepository;
 import es.miw.tfm.linkal.models.requests.CreateCampaignRequest;
 
@@ -24,12 +25,14 @@ public class CampaignViewModelTest {
 
     @Mock
     private CampaignRepository mockRepository;
+    @Mock
+    BusinessRepository mockBusinessRepository;
 
     private CampaignViewModel viewModel;
 
     @Before
     public void setUp() {
-        viewModel = new CampaignViewModel(mockRepository);
+        viewModel = new CampaignViewModel(mockRepository, mockBusinessRepository);
     }
 
     @Test
@@ -42,6 +45,11 @@ public class CampaignViewModelTest {
     @Test
     public void createResult_initialValue_isNull() {
         assertNull(viewModel.getCreateResult().getValue());
+    }
+
+    @Test
+    public void campaigns_initialValue_isNull() {
+        assertNull(viewModel.getCampaigns().getValue());
     }
 
     @Test
@@ -60,6 +68,11 @@ public class CampaignViewModelTest {
     }
 
     @Test
+    public void getCampaigns_returnsLiveData() {
+        assertNotNull(viewModel.getCampaigns());
+    }
+
+    @Test
     public void getErrorMessage_returnsLiveData() {
         assertNotNull(viewModel.getError());
     }
@@ -70,6 +83,7 @@ public class CampaignViewModelTest {
     }
 
 
+    // create -------------------------------------------------------------
     @Test
     public void create_delegatesToRepository() {
         CreateCampaignRequest request = buildCreateRequest();
@@ -86,6 +100,29 @@ public class CampaignViewModelTest {
         viewModel.create("Bearer other-token", request);
 
         verify(mockRepository).create(eq("Bearer other-token"), eq(request), any(), any(), any());
+    }
+
+    // loadByBusiness --------------------------------------------------------------
+
+    @Test
+    public void loadByBusiness_delegatesToBusinessRepository() {
+        viewModel.loadByBusiness("Bearer token", "business-id-123");
+
+        verify(mockBusinessRepository).getCampaigns(eq("Bearer token"), eq("business-id-123"), any(), any(), any());
+    }
+
+    @Test
+    public void loadByBusiness_withDifferentToken_passesItToBusinessRepository() {
+        viewModel.loadByBusiness("Bearer other-token", "business-id-123");
+
+        verify(mockBusinessRepository).getCampaigns(eq("Bearer other-token"), eq("business-id-123"), any(), any(), any());
+    }
+
+    @Test
+    public void loadByBusiness_withDifferentBusinessId_passesItToBusinessRepository() {
+        viewModel.loadByBusiness("Bearer token", "other-business-id");
+
+        verify(mockBusinessRepository).getCampaigns(eq("Bearer token"), eq("other-business-id"), any(), any(), any());
     }
 
     // helpers ----------------------------------------------------------

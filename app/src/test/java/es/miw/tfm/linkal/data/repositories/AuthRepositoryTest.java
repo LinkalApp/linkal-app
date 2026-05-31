@@ -74,7 +74,7 @@ public class AuthRepositoryTest {
 
     @Test
     public void login_onSuccessfulResponse_postsAuthResult() {
-        AuthResponse fakeResponse = new AuthResponse("token-abc", "BUSINESS", "user@test.com");
+        AuthResponse fakeResponse = new AuthResponse("token-abc", "BUSINESS", "user@test.com", "0ddfe5e4-478a-42cb-88cb-fa094b5c1a31");
 
         doAnswer(invocation -> {
             Callback<AuthResponse> cb = invocation.getArgument(0);
@@ -91,7 +91,7 @@ public class AuthRepositoryTest {
 
     @Test
     public void login_onSuccessForInfluencer_postsAuthResultWithInfluencerRole() {
-        AuthResponse fakeResponse = new AuthResponse("token-xyz", "INFLUENCER", "inf@test.com");
+        AuthResponse fakeResponse = new AuthResponse("token-xyz", "INFLUENCER", "inf@test.com", "1d8fe5e4-478a-42cb-88cb-fa094b5c1a54");
 
         doAnswer(invocation -> {
             Callback<AuthResponse> cb = invocation.getArgument(0);

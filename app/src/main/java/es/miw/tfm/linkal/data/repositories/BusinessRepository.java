@@ -2,12 +2,14 @@ package es.miw.tfm.linkal.data.repositories;
 
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.List;
+
 import es.miw.tfm.linkal.data.api.ApiClient;
 import es.miw.tfm.linkal.data.api.BusinessApiService;
 import es.miw.tfm.linkal.models.requests.RegisterBusinessRequest;
 import es.miw.tfm.linkal.models.requests.UpdateBusinessRequest;
-import es.miw.tfm.linkal.models.requests.UpdateInfluencerRequest;
 import es.miw.tfm.linkal.models.responses.BusinessProfileResponse;
+import es.miw.tfm.linkal.models.responses.CampaignResponse;
 import es.miw.tfm.linkal.models.responses.InfluencerProfileResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -86,6 +88,21 @@ public class BusinessRepository extends BaseRepository{
                     @Override
                     protected void onSuccess(Void body) {
                         deleteSuccess.postValue(true);
+                    }
+                });
+    }
+
+    public void getCampaigns(String token,
+                             String businessId,
+                             MutableLiveData<List<CampaignResponse>> result,
+                             MutableLiveData<String> error,
+                             MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.getCampaigns(token, businessId).enqueue(
+                new ApiCallback<List<CampaignResponse>>(loading, error) {
+                    @Override
+                    protected void onSuccess(List<CampaignResponse> body) {
+                        result.postValue(body);
                     }
                 });
     }

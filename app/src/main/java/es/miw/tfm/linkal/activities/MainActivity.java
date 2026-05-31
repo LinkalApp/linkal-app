@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 
 import es.miw.tfm.linkal.R;
+import es.miw.tfm.linkal.utils.SessionManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SessionManager.init(this);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {

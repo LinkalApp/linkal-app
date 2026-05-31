@@ -45,4 +45,7 @@ public class AppConstants {
             "Gastronomía", "Música", "Arte", "Gaming", "Fitness",
             "Lifestyle", "Educación", "Humor", "Mascotas", "Sostenibilidad"
     };
+
+    //  ─── ESTADO DE LAS CAMPAÑAS ─────────────────────────────────────────────
+    public static final String[] STATUS_CAMPAIGN_OPTIONS = {"OPEN", "IN_PROGRESS", "CLOSED"};
 }

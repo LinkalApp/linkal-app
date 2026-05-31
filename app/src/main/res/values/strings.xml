@@ -69,6 +69,7 @@
     <string name="hintReward">Ej: 200€, producto gratis, comisión 10%...</string>
     <string name="txtCreatedAt">Fecha de creación</string>
     <string name="titleDetailCampaign">Detalle de campaña</string>
+    <string name="titleStatusCampaign">Estado de la campaña</string>
 
 
 </resources>

@@ -13,6 +13,7 @@ import es.miw.tfm.linkal.data.api.BusinessApiService;
 import es.miw.tfm.linkal.models.requests.RegisterBusinessRequest;
 import es.miw.tfm.linkal.models.requests.UpdateBusinessRequest;
 import es.miw.tfm.linkal.models.responses.BusinessProfileResponse;
+import es.miw.tfm.linkal.models.responses.CampaignResponse;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,6 +23,8 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
+
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class BusinessRepositoryTest {
 
@@ -30,12 +33,14 @@ public class BusinessRepositoryTest {
     @Mock private Call<BusinessProfileResponse> mockProfileCall;
     @Mock private Call<BusinessProfileResponse> mockUpdateCall;
     @Mock private Call<Void> mockDeleteCall;
+    @Mock private Call<List<CampaignResponse>> mockCampaignsCall;
     @Mock private ResponseBody mockErrorBody;
     @Mock private MutableLiveData<Boolean> successLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
     @Mock private MutableLiveData<Boolean> loadingLiveData;
     @Mock private MutableLiveData<BusinessProfileResponse>  profileLiveData;
     @Mock private MutableLiveData<Boolean> deleteSuccessLiveData;
+    @Mock private MutableLiveData<List<CampaignResponse>> campaignsLiveData;
 
 
     private BusinessRepository      repository;
@@ -53,6 +58,7 @@ public class BusinessRepositoryTest {
         when(mockApiService.getProfile(anyString())).thenReturn(mockProfileCall);
         when(mockApiService.updateProfile(anyString(), any())).thenReturn(mockUpdateCall);
         when(mockApiService.deleteAccount(anyString())).thenReturn(mockDeleteCall);
+        when(mockApiService.getCampaigns(anyString(), anyString())).thenReturn(mockCampaignsCall);
     }
 
     // Singleton ------------------------------------------------------------------
@@ -380,5 +386,118 @@ public class BusinessRepositoryTest {
         assertTrue(captor.getValue().contains("Sin conexión"));
         verify(loadingLiveData).postValue(false);
         verify(deleteSuccessLiveData, never()).postValue(any());
+    }
+
+    // getCampaigns ----------------------------------------------------------------------------
+
+    @Test
+    public void getCampaigns_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockCampaignsCall).enqueue(any());
+
+        repository.getCampaigns("Bearer token", "business-id", campaignsLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void getCampaigns_callsApiServiceWithTokenAndBusinessId() {
+        doAnswer(inv -> null).when(mockCampaignsCall).enqueue(any());
+
+        repository.getCampaigns("Bearer token", "business-id-123", campaignsLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).getCampaigns("Bearer token", "business-id-123");
+    }
+
+    @Test
+    public void getCampaigns_onSuccess_postsCampaignsList() {
+        CampaignResponse r1 = buildCampaignResponse("Campaña Verano");
+        CampaignResponse r2 = buildCampaignResponse("Campaña Invierno");
+        List<CampaignResponse> campaigns = List.of(r1, r2);
+
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockCampaignsCall, Response.success(campaigns));
+            return null;
+        }).when(mockCampaignsCall).enqueue(any());
+
+        repository.getCampaigns("Bearer token", "business-id", campaignsLiveData, errorLiveData, loadingLiveData);
+
+        verify(campaignsLiveData).postValue(campaigns);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getCampaigns_onSuccess_postsEmptyList() {
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockCampaignsCall, Response.success(List.of()));
+            return null;
+        }).when(mockCampaignsCall).enqueue(any());
+
+        repository.getCampaigns("Bearer token", "business-id", campaignsLiveData, errorLiveData, loadingLiveData);
+
+        verify(campaignsLiveData).postValue(List.of());
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getCampaigns_on401Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockCampaignsCall, Response.error(401, mockErrorBody));
+            return null;
+        }).when(mockCampaignsCall).enqueue(any());
+
+        repository.getCampaigns("Bearer expired", "business-id", campaignsLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("401"));
+        verify(loadingLiveData).postValue(false);
+        verify(campaignsLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getCampaigns_on404Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockCampaignsCall, Response.error(404, mockErrorBody));
+            return null;
+        }).when(mockCampaignsCall).enqueue(any());
+
+        repository.getCampaigns("Bearer token", "nonexistent-id", campaignsLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("404"));
+        verify(loadingLiveData).postValue(false);
+        verify(campaignsLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getCampaigns_onNetworkFailure_postsConnectionErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onFailure(mockCampaignsCall, new RuntimeException("Sin conexión"));
+            return null;
+        }).when(mockCampaignsCall).enqueue(any());
+
+        repository.getCampaigns("Bearer token", "business-id", campaignsLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("Sin conexión"));
+        verify(loadingLiveData).postValue(false);
+        verify(campaignsLiveData, never()).postValue(any());
+    }
+
+    // helpers ---------------------------------------------------------------------------------
+
+    private CampaignResponse buildCampaignResponse(String title) {
+        CampaignResponse r = new CampaignResponse();
+        r.setTitle(title);
+        r.setStatus("OPEN");
+        return r;
     }
 }

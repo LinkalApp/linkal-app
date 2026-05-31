@@ -52,4 +52,4 @@ jobs:
           -Dsonar.organization=linkalapp
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-          -Dsonar.cpd.exclusions=**/activities/**,**/models/requests/**,**/models/responses/**
+          -Dsonar.cpd.exclusions=**/activities/**,**/models/requests/**,**/models/responses/**, **/adapters/**

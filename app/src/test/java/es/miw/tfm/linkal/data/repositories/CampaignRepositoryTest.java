@@ -11,6 +11,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import es.miw.tfm.linkal.data.api.CampaignApiService;
 import es.miw.tfm.linkal.models.requests.CreateCampaignRequest;
+import es.miw.tfm.linkal.models.requests.UpdateCampaignRequest;
 import es.miw.tfm.linkal.models.responses.CampaignResponse;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -26,6 +27,7 @@ public class CampaignRepositoryTest {
 
     @Mock private CampaignApiService mockApiService;
     @Mock private Call<CampaignResponse> mockCreateCall;
+    @Mock private Call<CampaignResponse> mockUpdateCall;
     @Mock private ResponseBody mockErrorBody;
     @Mock private MutableLiveData<CampaignResponse> resultLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
@@ -45,6 +47,7 @@ public class CampaignRepositoryTest {
                 "Aumentar ventas"
         );
         when(mockApiService.create(anyString(), any())).thenReturn(mockCreateCall);
+        when(mockApiService.update(anyString(), anyString(), any())).thenReturn(mockUpdateCall);
     }
 
     // Singleton ------------------------------------------------------------------
@@ -216,6 +219,172 @@ public class CampaignRepositoryTest {
         verify(loadingLiveData).postValue(false);
     }
 
+    // update: loading ---------------------------------------------------------------
+
+    @Test
+    public void update_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockUpdateCall).enqueue(any());
+
+        repository.update("Bearer token", "campaign-id-123", buildUpdateRequest(), resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void update_callsApiServiceWithTokenAndId() {
+        doAnswer(inv -> null).when(mockUpdateCall).enqueue(any());
+        UpdateCampaignRequest request = buildUpdateRequest();
+
+        repository.update("Bearer token", "campaign-id-123", request, resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).update(eq("Bearer token"), eq("campaign-id-123"), eq(request));
+    }
+
+    @Test
+    public void update_callsEnqueueOnCall() {
+        doAnswer(inv -> null).when(mockUpdateCall).enqueue(any());
+
+        repository.update("Bearer token", "campaign-id-123", buildUpdateRequest(), resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockUpdateCall).enqueue(any());
+    }
+
+    // update: respuesta exitosa ----------------------------------------------------------------
+
+    @Test
+    public void update_onSuccess_postsUpdatedCampaignToResult() {
+        CampaignResponse updated = buildCampaignResponse();
+        updated.setStatus("IN_PROGRESS");
+
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockUpdateCall, Response.success(updated));
+            return null;
+        }).when(mockUpdateCall).enqueue(any());
+
+        repository.update("Bearer token", "campaign-id-123", buildUpdateRequest(), resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(resultLiveData).postValue(updated);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void update_onSuccessWithNullBody_postsNullToResult() {
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockUpdateCall, Response.success(null));
+            return null;
+        }).when(mockUpdateCall).enqueue(any());
+
+        repository.update("Bearer token", "campaign-id-123", buildUpdateRequest(), resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(resultLiveData).postValue(null);
+        verify(loadingLiveData).postValue(false);
+    }
+
+    // update: error HTTP -------------------------------------------------------------
+
+    @Test
+    public void update_on401Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockUpdateCall, Response.error(401, mockErrorBody));
+            return null;
+        }).when(mockUpdateCall).enqueue(any());
+
+        repository.update("Bearer expired", "campaign-id-123", buildUpdateRequest(), resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue("Debe contener el código 401", captor.getValue().contains("401"));
+        verify(loadingLiveData).postValue(false);
+        verify(resultLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void update_on403Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockUpdateCall, Response.error(403, mockErrorBody));
+            return null;
+        }).when(mockUpdateCall).enqueue(any());
+
+        repository.update("Bearer token", "campaign-id-123", buildUpdateRequest(), resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue("Debe contener el código 403", captor.getValue().contains("403"));
+        verify(loadingLiveData).postValue(false);
+        verify(resultLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void update_on404Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockUpdateCall, Response.error(404, mockErrorBody));
+            return null;
+        }).when(mockUpdateCall).enqueue(any());
+
+        repository.update("Bearer token", "campaign-id-123", buildUpdateRequest(), resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue("Debe contener el código 404", captor.getValue().contains("404"));
+        verify(loadingLiveData).postValue(false);
+        verify(resultLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void update_on500Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockUpdateCall, Response.error(500, mockErrorBody));
+            return null;
+        }).when(mockUpdateCall).enqueue(any());
+
+        repository.update("Bearer token", "campaign-id-123", buildUpdateRequest(), resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue("Debe contener el código 500", captor.getValue().contains("500"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    // update: fallo de red -----------------------------------------------------------------
+
+    @Test
+    public void update_onNetworkFailure_postsConnectionErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onFailure(mockUpdateCall, new RuntimeException("timeout"));
+            return null;
+        }).when(mockUpdateCall).enqueue(any());
+
+        repository.update("Bearer token", "campaign-id-123", buildUpdateRequest(), resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue("Debe contener el texto del error", captor.getValue().contains("timeout"));
+        verify(loadingLiveData).postValue(false);
+        verify(resultLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void update_onNullThrowableMessage_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onFailure(mockUpdateCall, new RuntimeException((String) null));
+            return null;
+        }).when(mockUpdateCall).enqueue(any());
+
+        repository.update("Bearer token", "campaign-id-123", buildUpdateRequest(), resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(errorLiveData).postValue(any());
+        verify(loadingLiveData).postValue(false);
+    }
+
     // helpers -------------------------------------------------------------------
 
     private CampaignResponse buildCampaignResponse() {
@@ -225,6 +394,12 @@ public class CampaignRepositoryTest {
         response.setDescription("Descripción de la campaña");
         response.setStatus("OPEN");
         return response;
+    }
+
+    private UpdateCampaignRequest buildUpdateRequest() {
+        return new UpdateCampaignRequest(
+                "Título actualizado", "Nueva descripción", "Nuevos requisitos",
+                "Nueva recompensa", "Nuevo objetivo", "IN_PROGRESS");
     }
 }
 

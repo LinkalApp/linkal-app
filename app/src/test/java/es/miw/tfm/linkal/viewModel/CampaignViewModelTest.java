@@ -12,6 +12,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import es.miw.tfm.linkal.data.repositories.BusinessRepository;
 import es.miw.tfm.linkal.data.repositories.CampaignRepository;
 import es.miw.tfm.linkal.models.requests.CreateCampaignRequest;
+import es.miw.tfm.linkal.models.requests.UpdateCampaignRequest;
+import es.miw.tfm.linkal.models.requests.UpdateCampaignRequestTest;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,15 +26,15 @@ public class CampaignViewModelTest {
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock
-    private CampaignRepository mockRepository;
+    private CampaignRepository mockCampaignRepository;
     @Mock
-    BusinessRepository mockBusinessRepository;
+    private BusinessRepository mockBusinessRepository;
 
     private CampaignViewModel viewModel;
 
     @Before
     public void setUp() {
-        viewModel = new CampaignViewModel(mockRepository, mockBusinessRepository);
+        viewModel = new CampaignViewModel(mockCampaignRepository, mockBusinessRepository);
     }
 
     @Test
@@ -90,7 +92,7 @@ public class CampaignViewModelTest {
 
         viewModel.create("Bearer token", request);
 
-        verify(mockRepository).create(eq("Bearer token"), eq(request), any(), any(), any());
+        verify(mockCampaignRepository).create(eq("Bearer token"), eq(request), any(), any(), any());
     }
 
     @Test
@@ -99,7 +101,7 @@ public class CampaignViewModelTest {
 
         viewModel.create("Bearer other-token", request);
 
-        verify(mockRepository).create(eq("Bearer other-token"), eq(request), any(), any(), any());
+        verify(mockCampaignRepository).create(eq("Bearer other-token"), eq(request), any(), any(), any());
     }
 
     // loadByBusiness --------------------------------------------------------------
@@ -125,6 +127,36 @@ public class CampaignViewModelTest {
         verify(mockBusinessRepository).getCampaigns(eq("Bearer token"), eq("other-business-id"), any(), any(), any());
     }
 
+    // update ---------------------------------------------------------------------
+
+    @Test
+    public void update_delegatesToCampaignRepository() {
+        UpdateCampaignRequest request = buildUpdateRequest();
+
+        viewModel.update("Bearer token", "campaign-id-123", request);
+
+        verify(mockCampaignRepository).update(eq("Bearer token"), eq("campaign-id-123"), eq(request), any(), any(), any());
+    }
+
+    @Test
+    public void update_withDifferentToken_passesItToRepository() {
+        UpdateCampaignRequest request = buildUpdateRequest();
+
+        viewModel.update("Bearer other-token", "campaign-id-123", request);
+
+        verify(mockCampaignRepository).update(eq("Bearer other-token"), eq("campaign-id-123"), eq(request), any(), any(), any());
+    }
+
+    @Test
+    public void getUpdateResult_returnsLiveData() {
+        assertNotNull(viewModel.getUpdateResult());
+    }
+
+    @Test
+    public void updateResult_initialValue_isNull() {
+        assertNull(viewModel.getUpdateResult().getValue());
+    }
+
     // helpers ----------------------------------------------------------
 
     private CreateCampaignRequest buildCreateRequest() {
@@ -135,5 +167,11 @@ public class CampaignViewModelTest {
                 "Descuento 20%",
                 "Aumentar ventas"
         );
+    }
+
+    private UpdateCampaignRequest buildUpdateRequest() {
+        return new UpdateCampaignRequest(
+                "Título actualizado", "Nueva descripción", "Nuevos requisitos",
+                "Nueva recompensa", "Nuevo objetivo", "IN_PROGRESS");
     }
 }

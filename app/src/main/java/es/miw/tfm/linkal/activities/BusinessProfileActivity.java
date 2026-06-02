@@ -140,7 +140,8 @@ public class BusinessProfileActivity extends AppCompatActivity {
             if (id == R.id.nav_profile) {
                 return true;
             } else if (id == R.id.nav_home) {
-                Toast.makeText(this, "Inicio (próximamente)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, ExploreInfluencersActivity.class));
+                finish();
                 return true;
             } else if (id == R.id.nav_campaigns) {
                 startActivity(new Intent(this, CampaignsActivity.class));

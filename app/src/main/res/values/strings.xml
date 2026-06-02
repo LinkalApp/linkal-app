@@ -72,6 +72,10 @@
     <string name="titleStatusCampaign">Estado de la campaña</string>
     <string name="titleEditCampaign">Editar campaña</string>
     <string name="titleDeleteCampaign">Eliminar campaña</string>
+    <string name="txtNoInfluencers">No hay influencers disponibles</string>
+    <string name="txtExploreInfluencers">Explorar influencers</string>
+    <string name="txtDiscoverInfluencers">Descubre los creadores de contenido disponibles</string>
+    <string name="titleContactInfo">Contacto</string>
 
 
 </resources>

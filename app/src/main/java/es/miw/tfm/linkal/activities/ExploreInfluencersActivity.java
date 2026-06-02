@@ -2,6 +2,7 @@ package es.miw.tfm.linkal.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,30 +16,28 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 
 import es.miw.tfm.linkal.R;
-import es.miw.tfm.linkal.adapters.CampaignAdapter;
+import es.miw.tfm.linkal.adapters.InfluencerAdapter;
 import es.miw.tfm.linkal.utils.SessionManager;
-import es.miw.tfm.linkal.viewModel.CampaignViewModel;
+import es.miw.tfm.linkal.viewModel.InfluencerViewModel;
 
-public class CampaignsActivity extends AppCompatActivity {
+public class ExploreInfluencersActivity extends AppCompatActivity {
 
-    private MaterialButton btnCreateCampaign;
-    private TextView txtError;
+    private RecyclerView recyclerInfluencers;
+    private TextView txtEmpty, txtError;
     private BottomNavigationView bottomNavigation;
-    private RecyclerView recyclerCampaigns;
 
-    private CampaignAdapter adapter;
-    private CampaignViewModel campaignViewModel;
+    private InfluencerViewModel influencerViewModel;
+    private InfluencerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_campaigns);
+        setContentView(R.layout.activity_explore_influencers);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
@@ -54,43 +53,40 @@ public class CampaignsActivity extends AppCompatActivity {
         }
 
         initViews();
-        setupNavigation();
         setupRecycler();
+        setupNavigation();
 
-        campaignViewModel = new ViewModelProvider(this).get(CampaignViewModel.class);
+        influencerViewModel = new ViewModelProvider(this).get(InfluencerViewModel.class);
         observeViewModel();
 
-        btnCreateCampaign.setOnClickListener(v -> {
-            startActivity(new Intent(this, CreateCampaignActivity.class));
-        });
+        influencerViewModel.loadAll(SessionManager.getInstance().getBearerToken());
     }
 
     private void initViews() {
-        btnCreateCampaign = findViewById(R.id.btnCreateCampaign);
+        recyclerInfluencers = findViewById(R.id.recyclerInfluencers);
+        txtEmpty = findViewById(R.id.txtEmpty);
         txtError = findViewById(R.id.txtError);
         bottomNavigation = findViewById(R.id.bottomNavigation);
-        recyclerCampaigns = findViewById(R.id.recyclerCampaigns);
     }
 
     private void setupRecycler() {
-        adapter = new CampaignAdapter(new ArrayList<>());
-        recyclerCampaigns.setLayoutManager(new LinearLayoutManager(this));
-        recyclerCampaigns.setAdapter(adapter);
+        adapter = new InfluencerAdapter(new ArrayList<>());
+        recyclerInfluencers.setLayoutManager(new LinearLayoutManager(this));
+        recyclerInfluencers.setAdapter(adapter);
     }
 
     private void setupNavigation() {
-        bottomNavigation.setSelectedItemId(R.id.nav_campaigns);
+        bottomNavigation.setSelectedItemId(R.id.nav_home);
         bottomNavigation.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_campaigns) {
-                return true;
+                startActivity(new Intent(this, CampaignsActivity.class));
+                finish();
             } else if (id == R.id.nav_profile) {
                 startActivity(new Intent(this, BusinessProfileActivity.class));
                 finish();
                 return true;
             } else if (id == R.id.nav_home) {
-                startActivity(new Intent(this, ExploreInfluencersActivity.class));
-                finish();
                 return true;
             } else if (id == R.id.nav_matches) {
                 Toast.makeText(this, "Matches (próximamente)", Toast.LENGTH_SHORT).show();
@@ -104,18 +100,21 @@ public class CampaignsActivity extends AppCompatActivity {
     }
 
     private void observeViewModel() {
-        campaignViewModel.getCampaigns().observe(this, campaigns -> {
-            if (campaigns != null) {
-                adapter.updateData(campaigns);
+        influencerViewModel.getInfluencers().observe(this, influencers -> {
+            if (influencers == null || influencers.isEmpty()) {
+                recyclerInfluencers.setVisibility(View.GONE);
+                txtEmpty.setVisibility(View.VISIBLE);
+            } else {
+                txtEmpty.setVisibility(View.GONE);
+                recyclerInfluencers.setVisibility(View.VISIBLE);
+                adapter.updateData(influencers);
             }
         });
 
-        campaignViewModel.getError().observe(this, error -> {
+        influencerViewModel.getErrorMessage().observe(this, error -> {
             if (error != null) {
                 txtError.setText(error);
-                txtError.setVisibility(android.view.View.VISIBLE);
-            } else {
-                txtError.setVisibility(android.view.View.GONE);
+                txtError.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -123,10 +122,6 @@ public class CampaignsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Recargar al volver de CreateCampaignActivity
-        String businessId = SessionManager.getInstance().getUserId();
-        if (businessId != null) {
-            campaignViewModel.loadByBusiness(SessionManager.getInstance().getBearerToken(), businessId);
-        }
+        influencerViewModel.loadAll(SessionManager.getInstance().getBearerToken());
     }
 }

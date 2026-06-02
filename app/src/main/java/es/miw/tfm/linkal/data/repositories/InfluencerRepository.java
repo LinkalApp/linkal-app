@@ -2,6 +2,8 @@ package es.miw.tfm.linkal.data.repositories;
 
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.List;
+
 import es.miw.tfm.linkal.data.api.ApiClient;
 import es.miw.tfm.linkal.data.api.InfluencerApiService;
 import es.miw.tfm.linkal.models.requests.RegisterInfluencerRequest;
@@ -84,6 +86,19 @@ public class InfluencerRepository extends BaseRepository {
                     @Override
                     protected void onSuccess(Void body) {
                         deleteSuccess.postValue(true);
+                    }
+                });
+    }
+    public void getAll(String token,
+                       MutableLiveData<List<InfluencerProfileResponse>> result,
+                       MutableLiveData<String> error,
+                       MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.getAll(token).enqueue(
+                new ApiCallback<List<InfluencerProfileResponse>>(loading, error) {
+                    @Override
+                    protected void onSuccess(List<InfluencerProfileResponse> body) {
+                        result.postValue(body);
                     }
                 });
     }

@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background"
+    tools:context=".activities.InfluencerDetailActivity">
+
+    <!-- Contenido scrollable -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Cabecera: avatar + nombre + nombre artístico -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white">
+
+                <!-- Botón volver -->
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="12dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_arrow_back"
+                    android:contentDescription="@string/goBack"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingTop="36dp"
+                    android:paddingBottom="20dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp">
+
+                    <!-- Avatar con iniciales -->
+                    <FrameLayout
+                        android:layout_width="88dp"
+                        android:layout_height="88dp"
+                        android:layout_marginBottom="14dp">
+
+                        <View
+                            android:layout_width="88dp"
+                            android:layout_height="88dp"
+                            android:background="@drawable/bg_avatar_circle"/>
+
+                        <TextView
+                            android:id="@+id/txtInitials"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:textSize="30sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/secondary"/>
+                    </FrameLayout>
+
+                    <!-- Nombre + badge verificado -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="4dp">
+
+                        <TextView
+                            android:id="@+id/txtName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/neutral_dark"/>
+
+                        <ImageView
+                            android:id="@+id/imgVerifiedBadge"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_marginStart="6dp"
+                            android:src="@drawable/ic_verified_badge"
+                            android:contentDescription="Verificado"
+                            android:visibility="gone"/>
+                    </LinearLayout>
+
+                    <!-- Nombre artístico -->
+                    <TextView
+                        android:id="@+id/txtArtisticName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/neutral_medium"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Sección: descripción -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="20dp"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/aboutMe"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/neutral_medium"
+                    android:layout_marginBottom="6dp"/>
+
+                <TextView
+                    android:id="@+id/txtDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:textColor="@color/neutral_dark"
+                    android:lineSpacingMultiplier="1.4"/>
+
+            </LinearLayout>
+
+            <!-- Sección: intereses -->
+            <LinearLayout
+                android:id="@+id/sectionInterests"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="20dp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txtInterests"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/neutral_medium"
+                    android:layout_marginBottom="10dp"/>
+
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/tagsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:flexWrap="wrap"
+                    app:alignItems="flex_start"
+                    app:alignContent="flex_start"/>
+
+            </LinearLayout>
+
+            <!-- Sección: redes sociales -->
+            <LinearLayout
+                android:id="@+id/sectionSocial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="20dp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txtSocialNetworks"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/neutral_medium"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- Instagram -->
+                <LinearLayout
+                    android:id="@+id/rowInstagram"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/instagram"
+                        android:textSize="13sp"
+                        android:textColor="@color/neutral_medium"/>
+
+                    <TextView
+                        android:id="@+id/txtInstagram"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:textColor="@color/primary"/>
+                </LinearLayout>
+
+                <!-- TikTok -->
+                <LinearLayout
+                    android:id="@+id/rowTiktok"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tiktok"
+                        android:textSize="13sp"
+                        android:textColor="@color/neutral_medium"/>
+
+                    <TextView
+                        android:id="@+id/txtTiktok"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:textColor="@color/primary"/>
+                </LinearLayout>
+
+                <!-- YouTube -->
+                <LinearLayout
+                    android:id="@+id/rowYoutube"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/youtube"
+                        android:textSize="13sp"
+                        android:textColor="@color/neutral_medium"/>
+
+                    <TextView
+                        android:id="@+id/txtYoutube"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:textColor="@color/primary"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Sección: contacto -->
+            <LinearLayout
+                android:id="@+id/sectionContact"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/titleContactInfo"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/neutral_medium"
+                    android:layout_marginBottom="10dp"/>
+
+                <LinearLayout
+                    android:id="@+id/rowEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Email"
+                        android:textSize="13sp"
+                        android:textColor="@color/neutral_medium"/>
+
+                    <TextView
+                        android:id="@+id/txtEmail"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:textColor="@color/neutral_dark"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

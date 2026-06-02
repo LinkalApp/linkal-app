@@ -37,13 +37,14 @@ public class InfluencerRepositoryTest {
     @Mock private Call<InfluencerProfileResponse> mockProfileCall;
     @Mock private Call<InfluencerProfileResponse> mockUpdateCall;
     @Mock private Call<Void> mockDeleteCall;
-
+    @Mock private Call<List<InfluencerProfileResponse>> mockGetAllCall;
     @Mock private ResponseBody mockErrorBody;
     @Mock private MutableLiveData<Boolean> successLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
     @Mock private MutableLiveData<Boolean> loadingLiveData;
     @Mock private MutableLiveData<InfluencerProfileResponse> profileLiveData;
     @Mock private MutableLiveData<Boolean> deleteSuccessLiveData;
+    @Mock private MutableLiveData<List<InfluencerProfileResponse>> influencersLiveData;
 
     private InfluencerRepository repository;
     private RegisterInfluencerRequest request;
@@ -66,6 +67,7 @@ public class InfluencerRepositoryTest {
         when(mockApiService.getProfile(anyString())).thenReturn(mockProfileCall);
         when(mockApiService.updateProfile(anyString(), any())).thenReturn(mockUpdateCall);
         when(mockApiService.deleteAccount(anyString())).thenReturn(mockDeleteCall);
+        when(mockApiService.getAll(anyString())).thenReturn(mockGetAllCall);
     }
 
     // Singleton -------------------------------------------------------------
@@ -237,7 +239,7 @@ public class InfluencerRepositoryTest {
         verify(loadingLiveData).postValue(false);
     }
 
-    // ─── updateProfile ────────────────────────────────────────────────────────
+    // updateProfile --------------------------------------------------------------
 
     @Test
     public void updateProfile_setsLoadingTrueOnStart() {
@@ -391,5 +393,102 @@ public class InfluencerRepositoryTest {
         assertTrue(captor.getValue().contains("Sin conexión"));
         verify(loadingLiveData).postValue(false);
         verify(deleteSuccessLiveData, never()).postValue(any());
+    }
+
+    // ─── getAll ───────────────────────────────────────────────────────────────
+
+    @Test
+    public void getAll_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockGetAllCall).enqueue(any());
+
+        repository.getAll("Bearer token", influencersLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void getAll_callsApiServiceWithToken() {
+        doAnswer(inv -> null).when(mockGetAllCall).enqueue(any());
+
+        repository.getAll("Bearer token", influencersLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).getAll(eq("Bearer token"));
+    }
+
+    @Test
+    public void getAll_onSuccess_postsListToResult() {
+        List<InfluencerProfileResponse> list = Arrays.asList(
+                buildInfluencerResponse("Laura"), buildInfluencerResponse("Carmen"));
+
+        doAnswer(invocation -> {
+            Callback<List<InfluencerProfileResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetAllCall, Response.success(list));
+            return null;
+        }).when(mockGetAllCall).enqueue(any());
+
+        repository.getAll("Bearer token", influencersLiveData, errorLiveData, loadingLiveData);
+
+        verify(influencersLiveData).postValue(list);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getAll_onSuccessEmptyList_postsEmptyList() {
+        doAnswer(invocation -> {
+            Callback<List<InfluencerProfileResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetAllCall, Response.success(Arrays.asList()));
+            return null;
+        }).when(mockGetAllCall).enqueue(any());
+
+        repository.getAll("Bearer token", influencersLiveData, errorLiveData, loadingLiveData);
+
+        verify(influencersLiveData).postValue(Arrays.asList());
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getAll_on401Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<InfluencerProfileResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetAllCall, Response.error(401, mockErrorBody));
+            return null;
+        }).when(mockGetAllCall).enqueue(any());
+
+        repository.getAll("Bearer expired", influencersLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("401"));
+        verify(loadingLiveData).postValue(false);
+        verify(influencersLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getAll_onNetworkFailure_postsConnectionErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<InfluencerProfileResponse>> cb = invocation.getArgument(0);
+            cb.onFailure(mockGetAllCall, new RuntimeException("timeout"));
+            return null;
+        }).when(mockGetAllCall).enqueue(any());
+
+        repository.getAll("Bearer token", influencersLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("timeout"));
+        verify(loadingLiveData).postValue(false);
+        verify(influencersLiveData, never()).postValue(any());
+    }
+
+    // helpers -----------------------------------------------------------------
+
+    private InfluencerProfileResponse buildInfluencerResponse(String name) {
+        InfluencerProfileResponse r = new InfluencerProfileResponse();
+        r.setId("id-" + name.toLowerCase());
+        r.setName(name);
+        r.setArtisticName(name + "Style");
+        r.setEmail(name.toLowerCase() + "@test.com");
+        return r;
     }
 }

@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.List;
+
 import es.miw.tfm.linkal.data.repositories.InfluencerRepository;
 import es.miw.tfm.linkal.models.requests.RegisterInfluencerRequest;
 import es.miw.tfm.linkal.models.requests.UpdateInfluencerRequest;
@@ -17,9 +19,18 @@ public class InfluencerViewModel extends ViewModel {
     private final MutableLiveData<InfluencerProfileResponse> profile = new MutableLiveData<>();
     private final MutableLiveData<Boolean> updateSuccess = new MutableLiveData<>();
     private final MutableLiveData<Boolean> deleteSuccess = new MutableLiveData<>();
+    private final MutableLiveData<List<InfluencerProfileResponse>> influencers = new MutableLiveData<>();
 
+    private final InfluencerRepository influencerRepository;
 
-    private final InfluencerRepository influencerRepository = InfluencerRepository.getInstance();
+    public InfluencerViewModel() {
+        this.influencerRepository = InfluencerRepository.getInstance();
+    }
+
+    /** Constructor package-private para inyección en tests. */
+    InfluencerViewModel(InfluencerRepository influencerRepository) {
+        this.influencerRepository = influencerRepository;
+    }
 
     // REGISTRO
     public void register(RegisterInfluencerRequest request) {
@@ -41,10 +52,16 @@ public class InfluencerViewModel extends ViewModel {
         influencerRepository.deleteAccount(token, deleteSuccess, errorMessage, isLoading);
     }
 
+    // EXPLORAR INFLUENCERS (uso business)
+    public void loadAll(String token) {
+        influencerRepository.getAll(token, influencers, errorMessage, isLoading);
+    }
+
     public LiveData<Boolean> getIsLoading() { return isLoading; }
     public LiveData<Boolean> getRegisterSuccess() { return registerSuccess; }
     public LiveData<String>  getErrorMessage() { return errorMessage; }
     public LiveData<InfluencerProfileResponse> getProfile() { return profile; }
     public LiveData<Boolean> getUpdateSuccess() { return updateSuccess; }
     public LiveData<Boolean> getDeleteSuccess() { return deleteSuccess; }
+    public LiveData<List<InfluencerProfileResponse>> getInfluencers() { return influencers; }
 }

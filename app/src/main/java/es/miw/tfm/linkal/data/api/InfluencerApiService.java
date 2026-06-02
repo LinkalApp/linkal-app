@@ -1,5 +1,7 @@
 package es.miw.tfm.linkal.data.api;
 
+import java.util.List;
+
 import es.miw.tfm.linkal.models.requests.RegisterInfluencerRequest;
 import es.miw.tfm.linkal.models.requests.UpdateInfluencerRequest;
 import es.miw.tfm.linkal.models.responses.InfluencerProfileResponse;
@@ -19,6 +21,9 @@ public interface InfluencerApiService {
 
     @GET(base + "/me")
     Call<InfluencerProfileResponse> getProfile(@Header("Authorization") String token);
+
+    @GET(base)
+    Call<List<InfluencerProfileResponse>> getAll(@Header("Authorization") String token);
 
     @PUT(base + "/me")
     Call<InfluencerProfileResponse> updateProfile(@Header("Authorization") String token,

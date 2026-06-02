@@ -15,6 +15,8 @@ import static org.mockito.Mockito.verify;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import es.miw.tfm.linkal.data.repositories.InfluencerRepository;
+import es.miw.tfm.linkal.models.requests.RegisterInfluencerRequest;
+import es.miw.tfm.linkal.models.requests.UpdateInfluencerRequest;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InfluencerViewModelTest {
@@ -92,6 +94,88 @@ public class InfluencerViewModelTest {
     @Test
     public void getDeleteSuccess_returnsLiveData() {
         assertNotNull(viewModel.getDeleteSuccess());
+    }
+
+    // Register -----------------------------------------------------------------------------------
+    @Test
+    public void register_delegatesToRepository() {
+        RegisterInfluencerRequest request = new RegisterInfluencerRequest(
+                "Laura", "laura@test.com", "Pass1.", "666000000",
+                "Bio", "ArtName", null, null, null, null);
+
+        viewModel.register(request);
+
+        verify(mockRepository).register(eq(request), any(), any(), any());
+    }
+
+    // loadProfile --------------------------------------------------------------------------------
+
+    @Test
+    public void loadProfile_delegatesToRepository() {
+        viewModel.loadProfile("Bearer my-token");
+
+        verify(mockRepository).getProfile(eq("Bearer my-token"), any(), any(), any());
+    }
+
+    @Test
+    public void loadProfile_withDifferentToken_passesItToRepository() {
+        viewModel.loadProfile("Bearer other-token");
+
+        verify(mockRepository).getProfile(eq("Bearer other-token"), any(), any(), any());
+    }
+
+    // updateProfile ------------------------------------------------------------------------------
+
+    @Test
+    public void updateProfile_delegatesToRepository() {
+        UpdateInfluencerRequest request = new UpdateInfluencerRequest(
+                null, null, null, null, null,
+                "@ig", "@tt", null
+        );
+
+        viewModel.updateProfile("Bearer my-token", request);
+
+        verify(mockRepository).updateProfile(eq("Bearer my-token"), eq(request), any(), any(), any());
+    }
+
+    @Test
+    public void updateProfile_withDifferentToken_passesItToRepository() {
+        UpdateInfluencerRequest request = new UpdateInfluencerRequest(
+                null, null, null, null, null,
+                "@ig", null, null
+        );
+
+        viewModel.updateProfile("Bearer other-token", request);
+
+        verify(mockRepository).updateProfile(eq("Bearer other-token"), eq(request), any(), any(), any());
+    }
+
+    @Test
+    public void updateProfile_withFullRequest_delegatesAllFields() {
+        UpdateInfluencerRequest request = new UpdateInfluencerRequest(
+                "Laura", "600000000", "Bio", "LauraStyle",
+                null, "@ig", "@tt", "YT"
+        );
+
+        viewModel.updateProfile("Bearer token", request);
+
+        verify(mockRepository).updateProfile(eq("Bearer token"), eq(request), any(), any(), any());
+    }
+
+    // deleteAccount --------------------------------------------------------------------------------
+
+    @Test
+    public void deleteAccount_delegatesToRepository() {
+        viewModel.deleteAccount("Bearer my-token");
+
+        verify(mockRepository).deleteAccount(eq("Bearer my-token"), any(), any(), any());
+    }
+
+    @Test
+    public void deleteAccount_withDifferentToken_passesItToRepository() {
+        viewModel.deleteAccount("Bearer other-token");
+
+        verify(mockRepository).deleteAccount(eq("Bearer other-token"), any(), any(), any());
     }
 
     // loadAll ------------------------------------------------------------------------------------

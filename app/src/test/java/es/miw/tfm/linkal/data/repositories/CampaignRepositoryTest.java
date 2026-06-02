@@ -28,6 +28,7 @@ public class CampaignRepositoryTest {
     @Mock private CampaignApiService mockApiService;
     @Mock private Call<CampaignResponse> mockCreateCall;
     @Mock private Call<CampaignResponse> mockUpdateCall;
+    @Mock private Call<Void> mockDeleteCall;
     @Mock private ResponseBody mockErrorBody;
     @Mock private MutableLiveData<CampaignResponse> resultLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
@@ -48,6 +49,7 @@ public class CampaignRepositoryTest {
         );
         when(mockApiService.create(anyString(), any())).thenReturn(mockCreateCall);
         when(mockApiService.update(anyString(), anyString(), any())).thenReturn(mockUpdateCall);
+        when(mockApiService.delete(anyString(), anyString())).thenReturn(mockDeleteCall);
     }
 
     // Singleton ------------------------------------------------------------------
@@ -383,6 +385,114 @@ public class CampaignRepositoryTest {
 
         verify(errorLiveData).postValue(any());
         verify(loadingLiveData).postValue(false);
+    }
+
+    // delete: loading ---------------------------------------------------------------------------------
+
+    @Test
+    public void delete_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockDeleteCall).enqueue(any());
+
+        repository.delete("Bearer token", "campaign-id-123", loadingLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void delete_callsApiServiceWithTokenAndId() {
+        doAnswer(inv -> null).when(mockDeleteCall).enqueue(any());
+
+        repository.delete("Bearer token", "campaign-id-123", loadingLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).delete(eq("Bearer token"), eq("campaign-id-123"));
+    }
+
+    @Test
+    public void delete_callsEnqueueOnCall() {
+        doAnswer(inv -> null).when(mockDeleteCall).enqueue(any());
+
+        repository.delete("Bearer token", "campaign-id-123", loadingLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockDeleteCall).enqueue(any());
+    }
+
+    // delete: respuesta exitosa -----------------------------------------------------------------------------------
+
+    @Test
+    public void delete_onSuccess_postsTrueToResult() {
+        MutableLiveData<Boolean> deleteResult = mock(MutableLiveData.class);
+
+        doAnswer(invocation -> {
+            Callback<Void> cb = invocation.getArgument(0);
+            cb.onResponse(mockDeleteCall, Response.success(null));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.delete("Bearer token", "campaign-id-123", deleteResult, errorLiveData, loadingLiveData);
+
+        verify(deleteResult).postValue(true);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    // delete: error HTTP -----------------------------------------------------------------
+
+    @Test
+    public void delete_on403Response_postsErrorMessage() {
+        MutableLiveData<Boolean> deleteResult = mock(MutableLiveData.class);
+
+        doAnswer(invocation -> {
+            Callback<Void> cb = invocation.getArgument(0);
+            cb.onResponse(mockDeleteCall, Response.error(403, mockErrorBody));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.delete("Bearer token", "campaign-id-123", deleteResult, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue("Debe contener el código 403", captor.getValue().contains("403"));
+        verify(loadingLiveData).postValue(false);
+        verify(deleteResult, never()).postValue(any());
+    }
+
+    @Test
+    public void delete_on404Response_postsErrorMessage() {
+        MutableLiveData<Boolean> deleteResult = mock(MutableLiveData.class);
+
+        doAnswer(invocation -> {
+            Callback<Void> cb = invocation.getArgument(0);
+            cb.onResponse(mockDeleteCall, Response.error(404, mockErrorBody));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.delete("Bearer token", "campaign-id-123", deleteResult, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("404"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    // delete: fallo de red --------------------------------------------------------------
+
+    @Test
+    public void delete_onNetworkFailure_postsConnectionErrorMessage() {
+        MutableLiveData<Boolean> deleteResult = mock(MutableLiveData.class);
+
+        doAnswer(invocation -> {
+            Callback<Void> cb = invocation.getArgument(0);
+            cb.onFailure(mockDeleteCall, new RuntimeException("timeout"));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.delete("Bearer token", "campaign-id-123", deleteResult, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("timeout"));
+        verify(loadingLiveData).postValue(false);
+        verify(deleteResult, never()).postValue(any());
     }
 
     // helpers -------------------------------------------------------------------

@@ -45,15 +45,15 @@ public class CampaignViewModelTest {
     }
 
     @Test
-    public void createResult_initialValue_isNull() {
-        assertNull(viewModel.getCreateResult().getValue());
-    }
-
+    public void createResult_initialValue_isNull() { assertNull(viewModel.getCreateResult().getValue()); }
+    @Test
+    public void updateResult_initialValue_isNull() { assertNull(viewModel.getUpdateResult().getValue()); }
+    @Test
+    public void deleteResult_initialValue_isNull() { assertNull(viewModel.getDeleteResult().getValue()); }
     @Test
     public void campaigns_initialValue_isNull() {
         assertNull(viewModel.getCampaigns().getValue());
     }
-
     @Test
     public void errorMessage_initialValue_isNull() {
         assertNull(viewModel.getError().getValue());
@@ -63,27 +63,28 @@ public class CampaignViewModelTest {
     public void getIsLoading_returnsLiveData() {
         assertNotNull(viewModel.getIsLoading());
     }
-
     @Test
     public void getCreateResult_returnsLiveData() {
         assertNotNull(viewModel.getCreateResult());
     }
-
+    @Test
+    public void getUpdateResult_returnsLiveData() {
+        assertNotNull(viewModel.getUpdateResult());
+    }
+    @Test
+    public void getDeleteResult_returnsLiveData() { assertNotNull(viewModel.getDeleteResult());}
     @Test
     public void getCampaigns_returnsLiveData() {
         assertNotNull(viewModel.getCampaigns());
     }
-
     @Test
     public void getErrorMessage_returnsLiveData() {
         assertNotNull(viewModel.getError());
     }
-
     @Test
     public void getError_returnsSameLiveDataAsGetErrorMessage() {
         assertSame(viewModel.getError(), viewModel.getError());
     }
-
 
     // create -------------------------------------------------------------
     @Test
@@ -147,14 +148,27 @@ public class CampaignViewModelTest {
         verify(mockCampaignRepository).update(eq("Bearer other-token"), eq("campaign-id-123"), eq(request), any(), any(), any());
     }
 
+    // delete ---------------------------------------------------------------------
+
     @Test
-    public void getUpdateResult_returnsLiveData() {
-        assertNotNull(viewModel.getUpdateResult());
+    public void delete_delegatesToCampaignRepository() {
+        viewModel.delete("Bearer token", "campaign-id-123");
+
+        verify(mockCampaignRepository).delete(eq("Bearer token"), eq("campaign-id-123"), any(), any(), any());
     }
 
     @Test
-    public void updateResult_initialValue_isNull() {
-        assertNull(viewModel.getUpdateResult().getValue());
+    public void delete_withDifferentToken_passesItToRepository() {
+        viewModel.delete("Bearer other-token", "campaign-id-123");
+
+        verify(mockCampaignRepository).delete(eq("Bearer other-token"), eq("campaign-id-123"), any(), any(), any());
+    }
+
+    @Test
+    public void delete_withDifferentCampaignId_passesItToRepository() {
+        viewModel.delete("Bearer token", "other-campaign-id");
+
+        verify(mockCampaignRepository).delete(eq("Bearer token"), eq("other-campaign-id"), any(), any(), any());
     }
 
     // helpers ----------------------------------------------------------

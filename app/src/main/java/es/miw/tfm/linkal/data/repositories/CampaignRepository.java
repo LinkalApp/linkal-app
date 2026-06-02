@@ -60,4 +60,19 @@ public class CampaignRepository extends BaseRepository{
                     }
                 });
     }
+
+    public void delete(String token,
+                       String campaignId,
+                       MutableLiveData<Boolean> result,
+                       MutableLiveData<String> error,
+                       MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.delete(token, campaignId).enqueue(
+                new ApiCallback<Void>(loading, error) {
+                    @Override
+                    protected void onSuccess(Void body) {
+                        result.postValue(true);
+                    }
+                });
+    }
 }

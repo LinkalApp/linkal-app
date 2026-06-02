@@ -2,6 +2,7 @@ package es.miw.tfm.linkal.activities;
 
 import static es.miw.tfm.linkal.activities.EditCampaignActivity.*;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
@@ -17,10 +19,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.adapters.CampaignAdapter;
 import es.miw.tfm.linkal.utils.SessionManager;
+import es.miw.tfm.linkal.viewModel.CampaignViewModel;
 
 public class CampaignDetailActivity extends AppCompatActivity {
 
@@ -38,6 +42,8 @@ public class CampaignDetailActivity extends AppCompatActivity {
 
     private String campaignId, campaignTitle, campaignDescription,
             campaignObjective, campaignRequirements, campaignReward, campaignStatus;
+
+    private CampaignViewModel campaignViewModel;
 
     private final ActivityResultLauncher<Intent> editLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -73,9 +79,12 @@ public class CampaignDetailActivity extends AppCompatActivity {
             return;
         }
 
+        campaignViewModel = new ViewModelProvider(this).get(CampaignViewModel.class);
+
         initView();
         loadExtras();
         refreshViews();
+        observeViewModel();
 
         btnBack.setOnClickListener(v -> finish());
         btnMoreOptions.setOnClickListener(this::showOptionsMenu);
@@ -101,10 +110,25 @@ public class CampaignDetailActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.action_edit_campaign) {
                 openEditCampaign();
                 return true;
+            }else if (item.getItemId() == R.id.action_delete_campaign) {
+                showDeleteAccountDialog();
+                return true;
             }
             return false;
         });
         popup.show();
+    }
+
+    private void showDeleteAccountDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Eliminar campaña")
+                .setMessage("¿Seguro que quieres eliminar \"" + campaignTitle + "\"? Esta acción no se puede deshacer.")
+                .setPositiveButton("Eliminar", (dialog, which) -> {
+                    String token = "Bearer " + SessionManager.getInstance().getToken();
+                    campaignViewModel.delete(token, campaignId);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
     private void openEditCampaign() {
@@ -141,6 +165,22 @@ public class CampaignDetailActivity extends AppCompatActivity {
         txtReward.setText(orEmpty(campaignReward));
         CampaignAdapter.applyStatus(txtStatus, campaignStatus);
     }
+
+    private void observeViewModel() {
+        campaignViewModel.getDeleteResult().observe(this, deleted -> {
+            if (Boolean.TRUE.equals(deleted)) {
+                Toast.makeText(this, "Campaña eliminada", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
+            }
+        });
+        campaignViewModel.getError().observe(this, error -> {
+            if (error != null) {
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
 
     private void setText(int viewId, String value) {
         TextView tv = findViewById(viewId);

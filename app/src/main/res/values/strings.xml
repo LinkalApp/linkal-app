@@ -70,6 +70,8 @@
     <string name="txtCreatedAt">Fecha de creación</string>
     <string name="titleDetailCampaign">Detalle de campaña</string>
     <string name="titleStatusCampaign">Estado de la campaña</string>
+    <string name="titleEditCampaign">Editar campaña</string>
+    <string name="titleDeleteCampaign">Eliminar campaña</string>
 
 
 </resources>

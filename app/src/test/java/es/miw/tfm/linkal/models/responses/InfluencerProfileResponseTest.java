@@ -10,6 +10,13 @@ import static org.junit.Assert.*;
 public class InfluencerProfileResponseTest {
 
     @Test
+    public void getId_returnsCorrectValue() {
+        InfluencerProfileResponse r = new InfluencerProfileResponse();
+        r.setId("4018d4f4-ad33-47db-b6aa-fdfe8a16bd48");
+        assertEquals("4018d4f4-ad33-47db-b6aa-fdfe8a16bd48", r.getId());
+    }
+
+    @Test
     public void getName_returnsCorrectValue() {
         InfluencerProfileResponse r = new InfluencerProfileResponse();
         r.setName("Laura");
@@ -117,6 +124,7 @@ public class InfluencerProfileResponseTest {
     @Test
     public void defaultConstructor_allFieldsAreNull() {
         InfluencerProfileResponse r = new InfluencerProfileResponse();
+        assertNull(r.getId());
         assertNull(r.getName());
         assertNull(r.getEmail());
         assertNull(r.getPhoneNumber());

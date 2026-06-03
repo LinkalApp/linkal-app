@@ -22,6 +22,9 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class CampaignRepositoryTest {
 
@@ -29,10 +32,12 @@ public class CampaignRepositoryTest {
     @Mock private Call<CampaignResponse> mockCreateCall;
     @Mock private Call<CampaignResponse> mockUpdateCall;
     @Mock private Call<Void> mockDeleteCall;
+    @Mock private Call<List<CampaignResponse>> mockGetOpenCall;
     @Mock private ResponseBody mockErrorBody;
     @Mock private MutableLiveData<CampaignResponse> resultLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
     @Mock private MutableLiveData<Boolean> loadingLiveData;
+    @Mock private MutableLiveData<List<CampaignResponse>> openCampaignsLiveData;
 
     private CampaignRepository repository;
     private CreateCampaignRequest createRequest;
@@ -50,6 +55,7 @@ public class CampaignRepositoryTest {
         when(mockApiService.create(anyString(), any())).thenReturn(mockCreateCall);
         when(mockApiService.update(anyString(), anyString(), any())).thenReturn(mockUpdateCall);
         when(mockApiService.delete(anyString(), anyString())).thenReturn(mockDeleteCall);
+        when(mockApiService.getOpenCampaigns(anyString())).thenReturn(mockGetOpenCall);
     }
 
     // Singleton ------------------------------------------------------------------
@@ -494,6 +500,108 @@ public class CampaignRepositoryTest {
         verify(loadingLiveData).postValue(false);
         verify(deleteResult, never()).postValue(any());
     }
+
+    // ─── getOpenCampaigns ─────────────────────────────────────────────────────
+
+    @Test
+    public void getOpenCampaigns_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockGetOpenCall).enqueue(any());
+
+        repository.getOpenCampaigns("Bearer token", openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void getOpenCampaigns_callsApiServiceWithToken() {
+        doAnswer(inv -> null).when(mockGetOpenCall).enqueue(any());
+
+        repository.getOpenCampaigns("Bearer token", openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).getOpenCampaigns(eq("Bearer token"));
+    }
+
+    @Test
+    public void getOpenCampaigns_onSuccess_postsListToResult() {
+        List<CampaignResponse> list = Arrays.asList(buildCampaignResponse(), buildCampaignResponse());
+
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetOpenCall, Response.success(list));
+            return null;
+        }).when(mockGetOpenCall).enqueue(any());
+
+        repository.getOpenCampaigns("Bearer token", openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        verify(openCampaignsLiveData).postValue(list);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getOpenCampaigns_onSuccessEmptyList_postsEmptyList() {
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetOpenCall, Response.success(Arrays.asList()));
+            return null;
+        }).when(mockGetOpenCall).enqueue(any());
+
+        repository.getOpenCampaigns("Bearer token", openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        verify(openCampaignsLiveData).postValue(Arrays.asList());
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getOpenCampaigns_on401Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetOpenCall, Response.error(401, mockErrorBody));
+            return null;
+        }).when(mockGetOpenCall).enqueue(any());
+
+        repository.getOpenCampaigns("Bearer expired", openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("401"));
+        verify(loadingLiveData).postValue(false);
+        verify(openCampaignsLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getOpenCampaigns_on403Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetOpenCall, Response.error(403, mockErrorBody));
+            return null;
+        }).when(mockGetOpenCall).enqueue(any());
+
+        repository.getOpenCampaigns("Bearer token", openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("403"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getOpenCampaigns_onNetworkFailure_postsConnectionErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onFailure(mockGetOpenCall, new RuntimeException("timeout"));
+            return null;
+        }).when(mockGetOpenCall).enqueue(any());
+
+        repository.getOpenCampaigns("Bearer token", openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("timeout"));
+        verify(loadingLiveData).postValue(false);
+        verify(openCampaignsLiveData, never()).postValue(any());
+    }
+
 
     // helpers -------------------------------------------------------------------
 

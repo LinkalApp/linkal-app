@@ -1,11 +1,14 @@
 package es.miw.tfm.linkal.data.api;
 
+import java.util.List;
+
 import es.miw.tfm.linkal.models.requests.CreateCampaignRequest;
 import es.miw.tfm.linkal.models.requests.UpdateCampaignRequest;
 import es.miw.tfm.linkal.models.responses.CampaignResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -25,4 +28,7 @@ public interface CampaignApiService {
 
     @DELETE(base + "/{id}")
     Call<Void> delete(@Header("Authorization") String token, @Path("id") String campaignId);
+
+    @GET(base + "/open")
+    Call<List<CampaignResponse>> getOpenCampaigns(@Header("Authorization") String token);
 }

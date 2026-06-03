@@ -4,6 +4,8 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.List;
+
 import es.miw.tfm.linkal.data.api.ApiClient;
 import es.miw.tfm.linkal.data.api.CampaignApiService;
 import es.miw.tfm.linkal.models.requests.CreateCampaignRequest;
@@ -72,6 +74,20 @@ public class CampaignRepository extends BaseRepository{
                     @Override
                     protected void onSuccess(Void body) {
                         result.postValue(true);
+                    }
+                });
+    }
+
+    public void getOpenCampaigns(String token,
+                                 MutableLiveData<List<CampaignResponse>> result,
+                                 MutableLiveData<String> error,
+                                 MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.getOpenCampaigns(token).enqueue(
+                new ApiCallback<List<CampaignResponse>>(loading, error) {
+                    @Override
+                    protected void onSuccess(List<CampaignResponse> body) {
+                        result.postValue(body);
                     }
                 });
     }

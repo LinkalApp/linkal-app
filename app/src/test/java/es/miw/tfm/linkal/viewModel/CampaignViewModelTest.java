@@ -18,6 +18,7 @@ import es.miw.tfm.linkal.models.requests.UpdateCampaignRequestTest;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -51,9 +52,9 @@ public class CampaignViewModelTest {
     @Test
     public void deleteResult_initialValue_isNull() { assertNull(viewModel.getDeleteResult().getValue()); }
     @Test
-    public void campaigns_initialValue_isNull() {
-        assertNull(viewModel.getCampaigns().getValue());
-    }
+    public void campaigns_initialValue_isNull() { assertNull(viewModel.getCampaigns().getValue()); }
+    @Test
+    public void openCampaigns_initialValue_isNull() { assertNull(viewModel.getOpenCampaigns().getValue()); }
     @Test
     public void errorMessage_initialValue_isNull() {
         assertNull(viewModel.getError().getValue());
@@ -77,6 +78,8 @@ public class CampaignViewModelTest {
     public void getCampaigns_returnsLiveData() {
         assertNotNull(viewModel.getCampaigns());
     }
+    @Test
+    public void getOpenCampaigns_returnsLiveData() { assertNotNull(viewModel.getOpenCampaigns()); }
     @Test
     public void getErrorMessage_returnsLiveData() {
         assertNotNull(viewModel.getError());
@@ -126,6 +129,36 @@ public class CampaignViewModelTest {
         viewModel.loadByBusiness("Bearer token", "other-business-id");
 
         verify(mockBusinessRepository).getCampaigns(eq("Bearer token"), eq("other-business-id"), any(), any(), any());
+    }
+
+    // loadOpenCampaigns -----------------------------------------------------------------
+
+    @Test
+    public void loadOpenCampaigns_delegatesToCampaignRepository() {
+        viewModel.loadOpenCampaigns("Bearer token");
+
+        verify(mockCampaignRepository).getOpenCampaigns(eq("Bearer token"), any(), any(), any());
+    }
+
+    @Test
+    public void loadOpenCampaigns_withDifferentToken_passesItToRepository() {
+        viewModel.loadOpenCampaigns("Bearer other-token");
+
+        verify(mockCampaignRepository).getOpenCampaigns(eq("Bearer other-token"), any(), any(), any());
+    }
+
+    @Test
+    public void loadOpenCampaigns_doesNotCallCreate() {
+        viewModel.loadOpenCampaigns("Bearer token");
+
+        verify(mockCampaignRepository, never()).create(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void loadOpenCampaigns_doesNotCallDelete() {
+        viewModel.loadOpenCampaigns("Bearer token");
+
+        verify(mockCampaignRepository, never()).delete(any(), any(), any(), any(), any());
     }
 
     // update ---------------------------------------------------------------------

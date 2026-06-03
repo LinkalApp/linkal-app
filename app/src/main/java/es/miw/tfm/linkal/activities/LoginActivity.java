@@ -83,9 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                 if ("BUSINESS".equals(role)) {
                     intent = new Intent(this, ExploreInfluencersActivity.class);
                 } else {
-                    // TODO: sustituir por la Activity del home de Influencer
-                    Log.i("LoginActivity", "Usuario con rol " + role + ", redirigiendo a InfluencerProfileActivity");
-                    intent = new Intent(this, InfluencerProfileActivity.class);
+                    intent = new Intent(this, ExploreCampaignsActivity.class);
                 }
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

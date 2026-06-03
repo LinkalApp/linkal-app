@@ -17,6 +17,13 @@ public class CampaignResponseTest {
         assertNull(r.getStatus());
         assertNull(r.getCreationDate());
         assertNull(r.getBusinessId());
+        assertNull(r.getBusinessName());
+        assertNull(r.getBusinessCategory());
+        assertNull(r.getBusinessDescription());
+        assertNull(r.getBusinessWebsite());
+        assertNull(r.getBusinessProvince());
+        assertNull(r.getBusinessAddress());
+        assertNull(r.getBusinessVerified());
     }
 
     @Test
@@ -113,5 +120,76 @@ public class CampaignResponseTest {
         assertNull(r.getDescription());
         assertNull(r.getReward());
         assertNull(r.getStatus());
+    }
+
+    // Campos de negocio (open campaigns) -------------------------------------
+
+    @Test
+    public void getBusinessName_returnsCorrectValue() {
+        CampaignResponse r = new CampaignResponse();
+        r.setBusinessName("Mi Tienda");
+        assertEquals("Mi Tienda", r.getBusinessName());
+    }
+
+    @Test
+    public void getBusinessCategory_returnsCorrectValue() {
+        CampaignResponse r = new CampaignResponse();
+        r.setBusinessCategory("Moda y Ropa");
+        assertEquals("Moda y Ropa", r.getBusinessCategory());
+    }
+
+    @Test
+    public void getBusinessDescription_returnsCorrectValue() {
+        CampaignResponse r = new CampaignResponse();
+        r.setBusinessDescription("Tienda de ropa sostenible");
+        assertEquals("Tienda de ropa sostenible", r.getBusinessDescription());
+    }
+
+    @Test
+    public void getBusinessWebsite_returnsCorrectValue() {
+        CampaignResponse r = new CampaignResponse();
+        r.setBusinessWebsite("https://mitienda.es");
+        assertEquals("https://mitienda.es", r.getBusinessWebsite());
+    }
+
+    @Test
+    public void getBusinessProvince_returnsCorrectValue() {
+        CampaignResponse r = new CampaignResponse();
+        r.setBusinessProvince("Madrid");
+        assertEquals("Madrid", r.getBusinessProvince());
+    }
+
+    @Test
+    public void getBusinessAddress_returnsCorrectValue() {
+        CampaignResponse r = new CampaignResponse();
+        r.setBusinessAddress("Calle Gran Vía 1");
+        assertEquals("Calle Gran Vía 1", r.getBusinessAddress());
+    }
+
+    @Test
+    public void getBusinessVerified_returnsTrueWhenVerified() {
+        CampaignResponse r = new CampaignResponse();
+        r.setBusinessVerified(true);
+        assertTrue(r.getBusinessVerified());
+    }
+
+    @Test
+    public void getBusinessVerified_returnsFalseWhenNotVerified() {
+        CampaignResponse r = new CampaignResponse();
+        r.setBusinessVerified(false);
+        assertFalse(r.getBusinessVerified());
+    }
+
+    @Test
+    public void businessFields_areIndependentFromCampaignFields() {
+        CampaignResponse r = new CampaignResponse();
+        r.setTitle("Campaña Verano");
+        r.setBusinessName("Mi Tienda");
+        r.setBusinessCategory("Moda");
+        assertEquals("Campaña Verano", r.getTitle());
+        assertEquals("Mi Tienda", r.getBusinessName());
+        assertEquals("Moda", r.getBusinessCategory());
+        assertNull(r.getDescription());
+        assertNull(r.getBusinessWebsite());
     }
 }

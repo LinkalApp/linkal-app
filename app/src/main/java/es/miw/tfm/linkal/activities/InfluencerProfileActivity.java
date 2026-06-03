@@ -145,8 +145,8 @@ public class InfluencerProfileActivity extends AppCompatActivity {
             if (id == R.id.nav_profile) {
                 return true;
             } else if (id == R.id.nav_home) {
-                // TODO: navegar a pantalla de inicio
-                Toast.makeText(this, "Inicio (próximamente)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, ExploreCampaignsActivity.class));
+                finish();
                 return true;
             } else if (id == R.id.nav_matches) {
                 // TODO: navegar a pantalla de matches

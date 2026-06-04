@@ -57,6 +57,14 @@ public class InfluencerViewModel extends ViewModel {
         influencerRepository.getAll(token, influencers, errorMessage, isLoading);
     }
 
+    public void loadByInterests(String token, List<String> interests) {
+        if (interests == null || interests.isEmpty()) {
+            loadAll(token);
+        } else {
+            influencerRepository.getByInterests(token, interests, influencers, errorMessage, isLoading);
+        }
+    }
+
     public LiveData<Boolean> getIsLoading() { return isLoading; }
     public LiveData<Boolean> getRegisterSuccess() { return registerSuccess; }
     public LiveData<String>  getErrorMessage() { return errorMessage; }

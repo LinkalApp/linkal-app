@@ -102,4 +102,19 @@ public class InfluencerRepository extends BaseRepository {
                     }
                 });
     }
+
+    public void getByInterests(String token,
+                               List<String> interests,
+                               MutableLiveData<List<InfluencerProfileResponse>> result,
+                               MutableLiveData<String> error,
+                               MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.getByInterests(token, interests).enqueue(
+                new ApiCallback<List<InfluencerProfileResponse>>(loading, error) {
+                    @Override
+                    protected void onSuccess(List<InfluencerProfileResponse> body) {
+                        result.postValue(body);
+                    }
+                });
+    }
 }

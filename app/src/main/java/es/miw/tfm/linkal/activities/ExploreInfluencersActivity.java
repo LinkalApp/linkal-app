@@ -1,7 +1,10 @@
 package es.miw.tfm.linkal.activities;
 
+import static es.miw.tfm.linkal.utils.AppConstants.INTERESTS;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,8 +19,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.adapters.InfluencerAdapter;
@@ -28,6 +34,7 @@ public class ExploreInfluencersActivity extends AppCompatActivity {
 
     private RecyclerView recyclerInfluencers;
     private TextView txtEmpty, txtError;
+    private ChipGroup chipGroupInterests;
     private BottomNavigationView bottomNavigation;
 
     private InfluencerViewModel influencerViewModel;
@@ -51,12 +58,13 @@ public class ExploreInfluencersActivity extends AppCompatActivity {
             finish();
             return;
         }
+        influencerViewModel = new ViewModelProvider(this).get(InfluencerViewModel.class);
 
         initViews();
         setupRecycler();
+        setupInterestChips();
         setupNavigation();
 
-        influencerViewModel = new ViewModelProvider(this).get(InfluencerViewModel.class);
         observeViewModel();
 
         influencerViewModel.loadAll(SessionManager.getInstance().getBearerToken());
@@ -66,6 +74,7 @@ public class ExploreInfluencersActivity extends AppCompatActivity {
         recyclerInfluencers = findViewById(R.id.recyclerInfluencers);
         txtEmpty = findViewById(R.id.txtEmpty);
         txtError = findViewById(R.id.txtError);
+        chipGroupInterests = findViewById(R.id.chipGroupInterests);
         bottomNavigation = findViewById(R.id.bottomNavigation);
     }
 
@@ -99,6 +108,40 @@ public class ExploreInfluencersActivity extends AppCompatActivity {
         });
     }
 
+    private void setupInterestChips() {
+        for (String interest : INTERESTS) {
+            Chip chip = new Chip(this);
+            chip.setText(interest);
+            chip.setCheckable(true);
+            chip.setCheckedIconVisible(true);
+            chipGroupInterests.addView(chip);
+        }
+
+        chipGroupInterests.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            List<String> selected = new ArrayList<>();
+            for (int id : checkedIds) {
+                Chip chip = group.findViewById(id);
+                if (chip != null) selected.add(chip.getText().toString());
+            }
+            String selectedStr = selected.isEmpty() ? "ninguna" : String.join(", ", selected);
+            Log.d("ExploreInfluencers", "Intereses seleccionados: " + selectedStr);
+
+            influencerViewModel.loadByInterests(
+                    SessionManager.getInstance().getBearerToken(), selected);
+        });
+    }
+
+    private List<String> getSelectedInterests() {
+        List<String> selected = new ArrayList<>();
+        for (int i = 0; i < chipGroupInterests.getChildCount(); i++) {
+            Chip chip = (Chip) chipGroupInterests.getChildAt(i);
+            if (chip.isChecked()) {
+                selected.add(chip.getText().toString());
+            }
+        }
+        return selected;
+    }
+
     private void observeViewModel() {
         influencerViewModel.getInfluencers().observe(this, influencers -> {
             if (influencers == null || influencers.isEmpty()) {
@@ -122,6 +165,7 @@ public class ExploreInfluencersActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        influencerViewModel.loadAll(SessionManager.getInstance().getBearerToken());
+        List<String> selected = getSelectedInterests();
+        influencerViewModel.loadByInterests(SessionManager.getInstance().getBearerToken(), selected);
     }
 }

@@ -10,9 +10,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import es.miw.tfm.linkal.data.repositories.InfluencerRepository;
 import es.miw.tfm.linkal.models.requests.RegisterInfluencerRequest;
@@ -202,5 +207,48 @@ public class InfluencerViewModelTest {
     @Test
     public void influencers_initialValue_isNull() {
         assertNull(viewModel.getInfluencers().getValue());
+    }
+
+    // loadByInterests -----------------------------------------------------
+
+    @Test
+    public void loadByInterests_withInterests_delegatesToRepository() {
+        List<String> interests = Arrays.asList("Moda", "Belleza");
+
+        viewModel.loadByInterests("Bearer token", interests);
+
+        verify(mockRepository).getByInterests(eq("Bearer token"), eq(interests), any(), any(), any());
+    }
+
+    @Test
+    public void loadByInterests_withDifferentToken_passesItToRepository() {
+        List<String> interests = Arrays.asList("Moda");
+
+        viewModel.loadByInterests("Bearer other-token", interests);
+
+        verify(mockRepository).getByInterests(eq("Bearer other-token"), eq(interests), any(), any(), any());
+    }
+
+    @Test
+    public void loadByInterests_withEmptyList_callsLoadAll() {
+        viewModel.loadByInterests("Bearer token", Collections.emptyList());
+
+        verify(mockRepository).getAll(eq("Bearer token"), any(), any(), any());
+        verify(mockRepository, never()).getByInterests(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void loadByInterests_withNullList_callsLoadAll() {
+        viewModel.loadByInterests("Bearer token", null);
+
+        verify(mockRepository).getAll(eq("Bearer token"), any(), any(), any());
+        verify(mockRepository, never()).getByInterests(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void loadByInterests_doesNotCallGetAll_whenInterestsPresent() {
+        viewModel.loadByInterests("Bearer token", Arrays.asList("Viajes"));
+
+        verify(mockRepository, never()).getAll(any(), any(), any(), any());
     }
 }

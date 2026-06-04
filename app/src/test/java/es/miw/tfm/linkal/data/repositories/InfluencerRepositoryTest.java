@@ -38,6 +38,7 @@ public class InfluencerRepositoryTest {
     @Mock private Call<InfluencerProfileResponse> mockUpdateCall;
     @Mock private Call<Void> mockDeleteCall;
     @Mock private Call<List<InfluencerProfileResponse>> mockGetAllCall;
+    @Mock private Call<List<InfluencerProfileResponse>> mockGetByInterestsCall;
     @Mock private ResponseBody mockErrorBody;
     @Mock private MutableLiveData<Boolean> successLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
@@ -68,6 +69,7 @@ public class InfluencerRepositoryTest {
         when(mockApiService.updateProfile(anyString(), any())).thenReturn(mockUpdateCall);
         when(mockApiService.deleteAccount(anyString())).thenReturn(mockDeleteCall);
         when(mockApiService.getAll(anyString())).thenReturn(mockGetAllCall);
+        when(mockApiService.getByInterests(anyString(), any())).thenReturn(mockGetByInterestsCall);
     }
 
     // Singleton -------------------------------------------------------------
@@ -473,6 +475,116 @@ public class InfluencerRepositoryTest {
         }).when(mockGetAllCall).enqueue(any());
 
         repository.getAll("Bearer token", influencersLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("timeout"));
+        verify(loadingLiveData).postValue(false);
+        verify(influencersLiveData, never()).postValue(any());
+    }
+
+    // ─── getByInterests ───────────────────────────────────────────────────────
+
+    @Test
+    public void getByInterests_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockGetByInterestsCall).enqueue(any());
+
+        repository.getByInterests("Bearer token", Arrays.asList("Moda"),
+                influencersLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void getByInterests_callsApiServiceWithTokenAndInterests() {
+        doAnswer(inv -> null).when(mockGetByInterestsCall).enqueue(any());
+        List<String> interests = Arrays.asList("Moda", "Belleza");
+
+        repository.getByInterests("Bearer token", interests,
+                influencersLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).getByInterests(eq("Bearer token"), eq(interests));
+    }
+
+    @Test
+    public void getByInterests_onSuccess_postsFilteredListToResult() {
+        List<InfluencerProfileResponse> filtered = Arrays.asList(
+                buildInfluencerResponse("Laura"), buildInfluencerResponse("Carmen"));
+
+        doAnswer(invocation -> {
+            Callback<List<InfluencerProfileResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetByInterestsCall, Response.success(filtered));
+            return null;
+        }).when(mockGetByInterestsCall).enqueue(any());
+
+        repository.getByInterests("Bearer token", Arrays.asList("Moda"),
+                influencersLiveData, errorLiveData, loadingLiveData);
+
+        verify(influencersLiveData).postValue(filtered);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getByInterests_onSuccessEmptyList_postsEmptyList() {
+        doAnswer(invocation -> {
+            Callback<List<InfluencerProfileResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetByInterestsCall, Response.success(Arrays.asList()));
+            return null;
+        }).when(mockGetByInterestsCall).enqueue(any());
+
+        repository.getByInterests("Bearer token", Arrays.asList("Gaming"),
+                influencersLiveData, errorLiveData, loadingLiveData);
+
+        verify(influencersLiveData).postValue(Arrays.asList());
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getByInterests_on401Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<InfluencerProfileResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetByInterestsCall, Response.error(401, mockErrorBody));
+            return null;
+        }).when(mockGetByInterestsCall).enqueue(any());
+
+        repository.getByInterests("Bearer expired", Arrays.asList("Moda"),
+                influencersLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("401"));
+        verify(loadingLiveData).postValue(false);
+        verify(influencersLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getByInterests_on403Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<InfluencerProfileResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetByInterestsCall, Response.error(403, mockErrorBody));
+            return null;
+        }).when(mockGetByInterestsCall).enqueue(any());
+
+        repository.getByInterests("Bearer token", Arrays.asList("Moda"),
+                influencersLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("403"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getByInterests_onNetworkFailure_postsConnectionErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<InfluencerProfileResponse>> cb = invocation.getArgument(0);
+            cb.onFailure(mockGetByInterestsCall, new RuntimeException("timeout"));
+            return null;
+        }).when(mockGetByInterestsCall).enqueue(any());
+
+        repository.getByInterests("Bearer token", Arrays.asList("Moda"),
+                influencersLiveData, errorLiveData, loadingLiveData);
 
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(errorLiveData).postValue(captor.capture());

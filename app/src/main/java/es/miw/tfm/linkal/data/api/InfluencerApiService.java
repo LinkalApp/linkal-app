@@ -12,6 +12,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Query;
 
 public interface InfluencerApiService {
     // RUTA DEL CONTROLADOR INFLUENCER
@@ -24,6 +25,10 @@ public interface InfluencerApiService {
 
     @GET(base)
     Call<List<InfluencerProfileResponse>> getAll(@Header("Authorization") String token);
+
+    @GET(base)
+    Call<List<InfluencerProfileResponse>> getByInterests(@Header("Authorization") String token,
+                                                         @Query("interests") List<String> interests);
 
     @PUT(base + "/me")
     Call<InfluencerProfileResponse> updateProfile(@Header("Authorization") String token,

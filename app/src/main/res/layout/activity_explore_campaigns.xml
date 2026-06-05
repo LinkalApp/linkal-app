@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Campañas disponibles"
+            android:text="@string/txtAvailableCampaign"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/neutral_dark"/>
@@ -31,10 +31,45 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Colabora con negocios que buscan influencers"
+            android:text="@string/txtCollabWithCampaign"
             android:textSize="13sp"
             android:textColor="@color/neutral_medium"
             android:layout_marginTop="4dp"/>
+
+    </LinearLayout>
+
+    <!-- Filtros: categoría y provincia -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp">
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleLine="true"
+                app:singleSelection="true"
+                app:selectionRequired="false"/>
+
+        </HorizontalScrollView>
+
+        <Spinner
+            android:id="@+id/spinnerProvince"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"/>
 
     </LinearLayout>
 

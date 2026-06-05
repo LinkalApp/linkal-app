@@ -91,4 +91,20 @@ public class CampaignRepository extends BaseRepository{
                     }
                 });
     }
+
+    public void getOpenCampaignsByFilters(String token,
+                                          String category,
+                                          String province,
+                                          MutableLiveData<List<CampaignResponse>> result,
+                                          MutableLiveData<String> error,
+                                          MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.getOpenCampaignsByFilters(token, category, province).enqueue(
+                new ApiCallback<List<CampaignResponse>>(loading, error) {
+                    @Override
+                    protected void onSuccess(List<CampaignResponse> body) {
+                        result.postValue(body);
+                    }
+                });
+    }
 }

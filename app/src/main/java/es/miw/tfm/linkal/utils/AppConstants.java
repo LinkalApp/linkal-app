@@ -10,15 +10,14 @@ public class AppConstants {
             "Selecciona una provincia",
             "Álava", "Albacete", "Alicante", "Almería", "Asturias",
             "Ávila", "Badajoz", "Barcelona", "Burgos", "Cáceres",
-            "Cádiz", "Cantabria", "Castellón", "Ciudad Real", "Córdoba",
+            "Cádiz", "Cantabria", "Castellón", "Ceuta", "Ciudad Real", "Córdoba",
             "Cuenca", "Girona", "Granada", "Guadalajara", "Guipúzcoa",
             "Huelva", "Huesca", "Islas Baleares", "Jaén", "La Coruña",
             "La Rioja", "Las Palmas", "León", "Lleida", "Lugo",
-            "Madrid", "Málaga", "Murcia", "Navarra", "Ourense",
+            "Madrid", "Málaga", "Melilla", "Murcia", "Navarra", "Ourense",
             "Palencia", "Pontevedra", "Salamanca", "Santa Cruz de Tenerife",
             "Segovia", "Sevilla", "Soria", "Tarragona", "Teruel",
-            "Toledo", "Valencia", "Valladolid", "Vizcaya", "Zamora",
-            "Zaragoza", "Ceuta", "Melilla"
+            "Toledo", "Valencia", "Valladolid", "Vizcaya", "Zamora", "Zaragoza"
     };
 
     // ─── CATEGORÍAS DE NEGOCIO ───────────────────────────────────────────────

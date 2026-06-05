@@ -13,6 +13,7 @@ import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface CampaignApiService {
     // RUTA DEL CONTROLADOR CAMPAIGN
@@ -31,4 +32,8 @@ public interface CampaignApiService {
 
     @GET(base + "/open")
     Call<List<CampaignResponse>> getOpenCampaigns(@Header("Authorization") String token);
+
+    @GET(base + "/open")
+    Call<List<CampaignResponse>> getOpenCampaignsByFilters( @Header("Authorization") String token,
+            @Query("category") String category, @Query("province") String province);
 }

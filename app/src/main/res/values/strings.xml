@@ -77,6 +77,8 @@
     <string name="txtDiscoverInfluencers">Descubre los creadores de contenido disponibles</string>
     <string name="titleContactInfo">Contacto</string>
     <string name="txtBusiness">NEGOCIO</string>
+    <string name="txtAvailableCampaign">Campañas disponibles</string>
+    <string name="txtCollabWithCampaign">Colabora con negocios que buscan influencers</string>
 
 
 </resources>

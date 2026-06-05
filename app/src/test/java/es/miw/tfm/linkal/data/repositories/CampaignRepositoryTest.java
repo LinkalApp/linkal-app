@@ -33,6 +33,7 @@ public class CampaignRepositoryTest {
     @Mock private Call<CampaignResponse> mockUpdateCall;
     @Mock private Call<Void> mockDeleteCall;
     @Mock private Call<List<CampaignResponse>> mockGetOpenCall;
+    @Mock private Call<List<CampaignResponse>> mockGetOpenByFiltersCall;
     @Mock private ResponseBody mockErrorBody;
     @Mock private MutableLiveData<CampaignResponse> resultLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
@@ -56,6 +57,7 @@ public class CampaignRepositoryTest {
         when(mockApiService.update(anyString(), anyString(), any())).thenReturn(mockUpdateCall);
         when(mockApiService.delete(anyString(), anyString())).thenReturn(mockDeleteCall);
         when(mockApiService.getOpenCampaigns(anyString())).thenReturn(mockGetOpenCall);
+        when(mockApiService.getOpenCampaignsByFilters(anyString(), any(), any())).thenReturn(mockGetOpenByFiltersCall);
     }
 
     // Singleton ------------------------------------------------------------------
@@ -594,6 +596,114 @@ public class CampaignRepositoryTest {
         }).when(mockGetOpenCall).enqueue(any());
 
         repository.getOpenCampaigns("Bearer token", openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("timeout"));
+        verify(loadingLiveData).postValue(false);
+        verify(openCampaignsLiveData, never()).postValue(any());
+    }
+
+    // getOpenCampaignsByFilters -------------------------------------------------------------------------
+
+    @Test
+    public void getOpenCampaignsByFilters_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockGetOpenByFiltersCall).enqueue(any());
+
+        repository.getOpenCampaignsByFilters("Bearer token", "Tecnología", "Madrid",
+                openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void getOpenCampaignsByFilters_callsApiServiceWithTokenCategoryAndProvince() {
+        doAnswer(inv -> null).when(mockGetOpenByFiltersCall).enqueue(any());
+
+        repository.getOpenCampaignsByFilters("Bearer token", "Tecnología", "Madrid",
+                openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).getOpenCampaignsByFilters(eq("Bearer token"), eq("Tecnología"), eq("Madrid"));
+    }
+
+    @Test
+    public void getOpenCampaignsByFilters_onSuccess_postsFilteredListToResult() {
+        List<CampaignResponse> filtered = Arrays.asList(buildCampaignResponse(), buildCampaignResponse());
+
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetOpenByFiltersCall, Response.success(filtered));
+            return null;
+        }).when(mockGetOpenByFiltersCall).enqueue(any());
+
+        repository.getOpenCampaignsByFilters("Bearer token", "Tecnología", "Madrid",
+                openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        verify(openCampaignsLiveData).postValue(filtered);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getOpenCampaignsByFilters_onSuccessEmptyList_postsEmptyList() {
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetOpenByFiltersCall, Response.success(Arrays.asList()));
+            return null;
+        }).when(mockGetOpenByFiltersCall).enqueue(any());
+
+        repository.getOpenCampaignsByFilters("Bearer token", "Gaming", null,
+                openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        verify(openCampaignsLiveData).postValue(Arrays.asList());
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getOpenCampaignsByFilters_on401Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetOpenByFiltersCall, Response.error(401, mockErrorBody));
+            return null;
+        }).when(mockGetOpenByFiltersCall).enqueue(any());
+
+        repository.getOpenCampaignsByFilters("Bearer expired", "Tecnología", "Madrid",
+                openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("401"));
+        verify(loadingLiveData).postValue(false);
+        verify(openCampaignsLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getOpenCampaignsByFilters_on403Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockGetOpenByFiltersCall, Response.error(403, mockErrorBody));
+            return null;
+        }).when(mockGetOpenByFiltersCall).enqueue(any());
+
+        repository.getOpenCampaignsByFilters("Bearer token", "Tecnología", "Madrid",
+                openCampaignsLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("403"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getOpenCampaignsByFilters_onNetworkFailure_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<CampaignResponse>> cb = invocation.getArgument(0);
+            cb.onFailure(mockGetOpenByFiltersCall, new RuntimeException("timeout"));
+            return null;
+        }).when(mockGetOpenByFiltersCall).enqueue(any());
+
+        repository.getOpenCampaignsByFilters("Bearer token", "Tecnología", "Madrid",
+                openCampaignsLiveData, errorLiveData, loadingLiveData);
 
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(errorLiveData).postValue(captor.capture());

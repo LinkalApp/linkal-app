@@ -49,6 +49,17 @@ public class CampaignViewModel extends ViewModel {
         campaignRepository.getOpenCampaigns(token, openCampaigns, errorMessage, isLoading);
     }
 
+    public void loadOpenCampaignsByFilters(String token, String category, String province) {
+        boolean hasFilter = (category != null && !category.isEmpty())
+                || (province != null && !province.isEmpty());
+        if (hasFilter) {
+            campaignRepository.getOpenCampaignsByFilters(
+                    token, category, province, openCampaigns, errorMessage, isLoading);
+        } else {
+            loadOpenCampaigns(token);
+        }
+    }
+
     public void update(String token, String campaignId, UpdateCampaignRequest request) {
         campaignRepository.update(token, campaignId, request, updateResult, errorMessage, isLoading);
     }

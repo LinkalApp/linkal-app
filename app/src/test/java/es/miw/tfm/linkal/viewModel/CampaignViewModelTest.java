@@ -18,6 +18,7 @@ import es.miw.tfm.linkal.models.requests.UpdateCampaignRequestTest;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -159,6 +160,64 @@ public class CampaignViewModelTest {
         viewModel.loadOpenCampaigns("Bearer token");
 
         verify(mockCampaignRepository, never()).delete(any(), any(), any(), any(), any());
+    }
+
+    // loadOpenCampaignsByFilters -----------------------------------------------------------------
+
+    @Test
+    public void loadOpenCampaignsByFilters_withBothFilters_delegatesToRepository() {
+        viewModel.loadOpenCampaignsByFilters("Bearer token", "Tecnología", "Madrid");
+
+        verify(mockCampaignRepository).getOpenCampaignsByFilters(
+                eq("Bearer token"), eq("Tecnología"), eq("Madrid"), any(), any(), any());
+    }
+
+    @Test
+    public void loadOpenCampaignsByFilters_withOnlyCategory_delegatesToRepository() {
+        viewModel.loadOpenCampaignsByFilters("Bearer token", "Moda y Ropa", null);
+
+        verify(mockCampaignRepository).getOpenCampaignsByFilters(
+                eq("Bearer token"), eq("Moda y Ropa"), isNull(), any(), any(), any());
+    }
+
+    @Test
+    public void loadOpenCampaignsByFilters_withOnlyProvince_delegatesToRepository() {
+        viewModel.loadOpenCampaignsByFilters("Bearer token", null, "Barcelona");
+
+        verify(mockCampaignRepository).getOpenCampaignsByFilters(
+                eq("Bearer token"), isNull(), eq("Barcelona"), any(), any(), any());
+    }
+
+    @Test
+    public void loadOpenCampaignsByFilters_withBothNull_callsLoadOpenCampaigns() {
+        viewModel.loadOpenCampaignsByFilters("Bearer token", null, null);
+
+        verify(mockCampaignRepository).getOpenCampaigns(eq("Bearer token"), any(), any(), any());
+        verify(mockCampaignRepository, never()).getOpenCampaignsByFilters(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void loadOpenCampaignsByFilters_withBothEmpty_callsLoadOpenCampaigns() {
+        viewModel.loadOpenCampaignsByFilters("Bearer token", "", "");
+
+        verify(mockCampaignRepository).getOpenCampaigns(eq("Bearer token"), any(), any(), any());
+        verify(mockCampaignRepository, never()).getOpenCampaignsByFilters(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void loadOpenCampaignsByFilters_withOtras_delegatesToRepository() {
+        viewModel.loadOpenCampaignsByFilters("Bearer token", "Otras", null);
+
+        verify(mockCampaignRepository).getOpenCampaignsByFilters(
+                eq("Bearer token"), eq("Otras"), isNull(), any(), any(), any());
+    }
+
+    @Test
+    public void loadOpenCampaignsByFilters_withDifferentToken_passesItToRepository() {
+        viewModel.loadOpenCampaignsByFilters("Bearer other-token", "Tecnología", "Madrid");
+
+        verify(mockCampaignRepository).getOpenCampaignsByFilters(
+                eq("Bearer other-token"), any(), any(), any(), any(), any());
     }
 
     // update ---------------------------------------------------------------------

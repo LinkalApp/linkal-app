@@ -35,4 +35,8 @@ public class ApiClient {
     public static CampaignApiService getCampaignApiService() {
         return getInstance().create(CampaignApiService.class);
     }
+
+    public static MatchApiService getMatchApiService() {
+        return getInstance().create(MatchApiService.class);
+    }
 }

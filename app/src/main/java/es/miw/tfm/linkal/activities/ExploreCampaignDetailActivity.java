@@ -2,19 +2,24 @@ package es.miw.tfm.linkal.activities;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.adapters.CampaignAdapter;
+import es.miw.tfm.linkal.utils.SessionManager;
+import es.miw.tfm.linkal.viewModel.MatchViewModel;
 
 public class ExploreCampaignDetailActivity extends AppCompatActivity {
     public static final String EXTRA_ID = "open_campaign_id";
@@ -38,6 +43,9 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
     private TextView txtBusinessInitials, txtBusinessName, txtBusinessCategory, txtBusinessDescription, txtBusinessWebsite, txtBusinessProvince, txtBusinessAddress;
     private LinearLayout rowProvince, rowAddress, rowWebsite;
     private ImageView imgBusinessVerified;
+    private Button btnInterested;
+
+    private MatchViewModel matchViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,15 +60,20 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
             return insets;
         });
 
+        matchViewModel = new ViewModelProvider(this).get(MatchViewModel.class);
+
         initViews();
 
         btnBack.setOnClickListener(v -> finish());
 
         populateFromExtras();
+        setupMatchButton();
+        observeViewModel();
     }
 
    private void initViews(){
         btnBack = findViewById(R.id.btnBack);
+        btnInterested = findViewById(R.id.btnInterested);
         txtTitle = findViewById(R.id.txtTitle);
         txtStatus = findViewById(R.id.txtStatus);
         txtCreationDate = findViewById(R.id.txtCreationDate);
@@ -80,6 +93,46 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
         rowAddress = findViewById(R.id.rowBusinessAddress);
         rowWebsite = findViewById(R.id.rowBusinessWebsite);
    }
+
+   private void observeViewModel(){
+       matchViewModel.getExistingMatch().observe(this, match -> {
+           if (match == null) return;
+           blockButton(match.getStatus());
+       });
+
+       matchViewModel.getMatchNotFound().observe(this, notFound -> { });
+
+       matchViewModel.getMatchResult().observe(this, match -> {
+           if (match == null) return;
+           if ("COMPLETED".equals(match.getStatus())) {
+               Toast.makeText(this, "¡Es un match! Hay interés mutuo.", Toast.LENGTH_LONG).show();
+           } else {
+               Toast.makeText(this, "Interés registrado. Esperando al comercio.", Toast.LENGTH_LONG).show();
+           }
+           blockButton(match.getStatus());
+       });
+
+       // Errores del POST
+       matchViewModel.getError().observe(this, error -> {
+           if (error == null) return;
+           if (error.contains("409")) {
+               Toast.makeText(this, "Ya has expresado interés en esta campaña anteriormente.", Toast.LENGTH_LONG).show();
+               blockButton("PENDING");
+           } else {
+               Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+               btnInterested.setEnabled(true);
+           }
+       });
+   }
+
+    private void blockButton(String status) {
+        btnInterested.setEnabled(false);
+        if ("COMPLETED".equals(status)) {
+            btnInterested.setText("¡Match realizado!");
+        } else {
+            btnInterested.setText("Ya has mostrado interés");
+        }
+    }
 
    private void populateFromExtras(){
        Bundle e = getIntent().getExtras();
@@ -130,6 +183,17 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
        txtRequirements.setText(e.getString(EXTRA_REQUIREMENTS, ""));
        txtReward.setText(e.getString(EXTRA_REWARD, ""));
    }
+
+    private void setupMatchButton() {
+        String campaignId = getIntent().getStringExtra(EXTRA_ID);
+        Button btnMeInteresa = findViewById(R.id.btnInterested);
+
+        btnMeInteresa.setOnClickListener(v -> {
+            String token = SessionManager.getInstance().getBearerToken();
+            btnMeInteresa.setEnabled(false);
+            matchViewModel.createByInfluencer(token, campaignId);
+        });
+    }
 
     /**
      * Muestra texto en txtViewId y (opcionalmente) hace visible rowViewId.

@@ -28,6 +28,10 @@ public class MatchViewModel extends ViewModel {
         matchRepository.createByInfluencer(token, campaignId, matchResult, errorMessage, loading);
     }
 
+    public void createByBusiness(String token, String influencerId, String campaignId) {
+        matchRepository.createByBusiness(token, influencerId, campaignId, matchResult, errorMessage, loading);
+    }
+
     public void findByInfluencer(String token, String campaignId) {
         matchRepository.findByInfluencer(token, campaignId, existingMatch, matchNotFound);
     }

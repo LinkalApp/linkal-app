@@ -1,18 +1,23 @@
 package es.miw.tfm.linkal.activities;
 
+import android.app.AlertDialog;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.chip.Chip;
@@ -20,6 +25,10 @@ import com.google.android.material.chip.Chip;
 import java.util.List;
 
 import es.miw.tfm.linkal.R;
+import es.miw.tfm.linkal.models.responses.CampaignResponse;
+import es.miw.tfm.linkal.utils.SessionManager;
+import es.miw.tfm.linkal.viewModel.CampaignViewModel;
+import es.miw.tfm.linkal.viewModel.MatchViewModel;
 
 public class InfluencerDetailActivity extends AppCompatActivity {
 
@@ -38,7 +47,11 @@ public class InfluencerDetailActivity extends AppCompatActivity {
     private ImageView imgVerifiedBadge;
     private ImageButton btnBack;
     private FlexboxLayout tagsContainer;
+    private Button btnColaboration;
     private LinearLayout sectionInterests, sectionSocial, rowInstagram, rowTiktok, rowYoutube, sectionContact, rowEmail;
+
+    private MatchViewModel matchViewModel;
+    private CampaignViewModel campaignViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +68,14 @@ public class InfluencerDetailActivity extends AppCompatActivity {
 
         initViews();
 
+        matchViewModel = new ViewModelProvider(this).get(MatchViewModel.class);
+        campaignViewModel = new ViewModelProvider(this).get(CampaignViewModel.class);
+
         btnBack.setOnClickListener(v -> finish());
+
         populateFromExtras();
+        setupButton();
+        observeViewModel();
     }
 
     private void initViews(){
@@ -78,6 +97,7 @@ public class InfluencerDetailActivity extends AppCompatActivity {
         sectionContact = findViewById(R.id.sectionContact);
         rowEmail = findViewById(R.id.rowEmail);
         btnBack = findViewById(R.id.btnBack);
+        btnColaboration = findViewById(R.id.btnColaboration);
     }
 
     private void populateFromExtras() {
@@ -119,6 +139,81 @@ public class InfluencerDetailActivity extends AppCompatActivity {
 
         boolean hasContact = showRow(rowEmail, txtEmail, email);
         if (hasContact) sectionContact.setVisibility(View.VISIBLE);
+    }
+
+    private void setupButton() {
+        String influencerId = getIntent().getStringExtra(EXTRA_ID);
+        String token        = SessionManager.getInstance().getBearerToken();
+        String businessId   = SessionManager.getInstance().getUserId();
+
+        btnColaboration.setOnClickListener(v -> {
+            btnColaboration.setEnabled(false);
+            campaignViewModel.loadByBusiness(token, businessId);
+
+            campaignViewModel.getCampaigns().observe(this, campaigns -> {
+                if (campaigns == null) return;
+                List<CampaignResponse> open = new java.util.ArrayList<>();
+                for (CampaignResponse c : campaigns) {
+                    if ("OPEN".equals(c.getStatus())) open.add(c);
+                }
+                if (open.isEmpty()) {
+                    Toast.makeText(this, "No tienes campañas abiertas.", Toast.LENGTH_SHORT).show();
+                    btnColaboration.setEnabled(true);
+                    return;
+                }
+                showCampaignPickerDialog(open, influencerId, token);
+            });
+        });
+    }
+
+    private void showCampaignPickerDialog(List<CampaignResponse> campaigns,
+                                          String influencerId,
+                                          String token) {
+        String[] titles = campaigns.stream()
+                .map(CampaignResponse::getTitle)
+                .toArray(String[]::new);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Selecciona una campaña")
+                .setItems(titles, (dialog, which) -> {
+                    String campaignId = campaigns.get(which).getId();
+                    matchViewModel.createByBusiness(token, influencerId, campaignId);
+                })
+                .setNegativeButton("Cancelar", (d, w) -> btnColaboration.setEnabled(true))
+                .setOnCancelListener(d -> btnColaboration.setEnabled(true))
+                .show();
+    }
+
+    private void observeViewModel() {
+        matchViewModel.getMatchResult().observe(this, match -> {
+            if (match == null) return;
+            if ("COMPLETED".equals(match.getStatus())) {
+                Toast.makeText(this, "¡Es un match! El influencer también está interesado.", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Interés registrado. Esperando al influencer.", Toast.LENGTH_LONG).show();
+            }
+            blockButton(match.getStatus());
+        });
+
+        matchViewModel.getError().observe(this, error -> {
+            if (error == null) return;
+            if (error.contains("409")) {
+                Toast.makeText(this, "Ya has propuesto una colaboración a este influencer.", Toast.LENGTH_LONG).show();
+                blockButton("PENDING");
+            } else {
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                btnColaboration.setEnabled(true);
+            }
+        });
+    }
+
+    private void blockButton(String status) {
+        btnColaboration.setEnabled(false);
+        if ("COMPLETED".equals(status)) {
+            btnColaboration.setText("¡Match realizado!");
+        } else {
+            btnColaboration.setText("Colaboración propuesta");
+        }
     }
 
     // Helpers

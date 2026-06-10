@@ -15,6 +15,11 @@ public interface MatchApiService {
     Call<MatchResponse> createByInfluencer(@Header("Authorization") String token,
                                            @Path("campaignId") String campaignId);
 
+    @POST(base + "/influencers/{influencerId}/campaigns/{campaignId}")
+    Call<MatchResponse> createByBusiness(@Header("Authorization") String token,
+                                         @Path("influencerId") String influencerId,
+                                         @Path("campaignId") String campaignId);
+
     @GET(base + "/campaigns/{campaignId}/influencer")
     Call<MatchResponse> findByInfluencer(@Header("Authorization") String token,
                                          @Path("campaignId") String campaignId);

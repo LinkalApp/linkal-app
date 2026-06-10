@@ -42,6 +42,21 @@ public class MatchRepository extends BaseRepository{
                 });
     }
 
+    public void createByBusiness(String token,
+                                 String influencerId,
+                                 String campaignId,
+                                 MutableLiveData<MatchResponse> result,
+                                 MutableLiveData<String> error,
+                                 MutableLiveData<Boolean> loading) {
+        apiService.createByBusiness(token, influencerId, campaignId).enqueue(
+                new ApiCallback<MatchResponse>(loading, error) {
+                    @Override
+                    protected void onSuccess(MatchResponse body) {
+                        result.postValue(body);
+                    }
+                });
+    }
+
     public void findByInfluencer(String token,
                                  String campaignId,
                                  MutableLiveData<MatchResponse> result,

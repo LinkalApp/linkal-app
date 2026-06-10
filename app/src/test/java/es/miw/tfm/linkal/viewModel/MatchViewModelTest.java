@@ -107,6 +107,46 @@ public class MatchViewModelTest {
         verify(mockMatchRepository, never()).findByInfluencer(any(), any(), any(), any());
     }
 
+    // createByBusiness → MatchRepository --------------------------------------------------------------
+
+    @Test
+    public void createByBusiness_delegatesToRepository() {
+        viewModel.createByBusiness("Bearer token", "influencer-id", "campaign-id");
+
+        verify(mockMatchRepository).createByBusiness(
+                eq("Bearer token"), eq("influencer-id"), eq("campaign-id"), any(), any(), any());
+    }
+
+    @Test
+    public void createByBusiness_withDifferentInfluencerId_passesItToRepository() {
+        viewModel.createByBusiness("Bearer token", "other-influencer-id", "campaign-id");
+
+        verify(mockMatchRepository).createByBusiness(
+                eq("Bearer token"), eq("other-influencer-id"), eq("campaign-id"), any(), any(), any());
+    }
+
+    @Test
+    public void createByBusiness_withDifferentCampaignId_passesItToRepository() {
+        viewModel.createByBusiness("Bearer token", "influencer-id", "other-campaign-id");
+
+        verify(mockMatchRepository).createByBusiness(
+                eq("Bearer token"), eq("influencer-id"), eq("other-campaign-id"), any(), any(), any());
+    }
+
+    @Test
+    public void createByBusiness_doesNotCallCreateByInfluencer() {
+        viewModel.createByBusiness("Bearer token", "influencer-id", "campaign-id");
+
+        verify(mockMatchRepository, never()).createByInfluencer(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void createByBusiness_doesNotCallFind() {
+        viewModel.createByBusiness("Bearer token", "influencer-id", "campaign-id");
+
+        verify(mockMatchRepository, never()).findByInfluencer(any(), any(), any(), any());
+    }
+
     // findByInfluencer → MatchRepository ------------------------------------------------
 
     @Test

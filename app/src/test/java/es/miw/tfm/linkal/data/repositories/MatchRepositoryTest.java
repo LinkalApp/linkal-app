@@ -26,6 +26,7 @@ public class MatchRepositoryTest {
     @Mock private MatchApiService mockApiService;
     @Mock private Call<MatchResponse> mockCreateCall;
     @Mock private Call<MatchResponse> mockFindCall;
+    @Mock private Call<MatchResponse> mockBusinessCall;
     @Mock private MutableLiveData<MatchResponse> resultLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
     @Mock private MutableLiveData<Boolean> loadingLiveData;
@@ -39,6 +40,7 @@ public class MatchRepositoryTest {
         repository = new MatchRepository(mockApiService);
         doReturn(mockCreateCall).when(mockApiService).createByInfluencer(anyString(), anyString());
         doReturn(mockFindCall).when(mockApiService).findByInfluencer(anyString(), anyString());
+        doReturn(mockBusinessCall).when(mockApiService).createByBusiness(anyString(), anyString(), anyString());
     }
 
     // Singleton -----------------------------------------------------------------------
@@ -151,6 +153,122 @@ public class MatchRepositoryTest {
         }).when(mockCreateCall).enqueue(any());
 
         repository.createByInfluencer("Bearer token", "campaign-id", resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("timeout"));
+        verify(resultLiveData, never()).postValue(any());
+        verify(loadingLiveData).postValue(false);
+    }
+
+    // createByBusiness: llamada a API ------------------------------------------------------
+
+    @Test
+    public void createByBusiness_callsApiWithCorrectParams() {
+        doAnswer(inv -> null).when(mockBusinessCall).enqueue(any());
+
+        repository.createByBusiness("Bearer token", "influencer-id", "campaign-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).createByBusiness("Bearer token", "influencer-id", "campaign-id");
+    }
+
+    @Test
+    public void createByBusiness_callsEnqueue() {
+        doAnswer(inv -> null).when(mockBusinessCall).enqueue(any());
+
+        repository.createByBusiness("Bearer token", "influencer-id", "campaign-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockBusinessCall).enqueue(any());
+    }
+
+    // createByBusiness: respuesta exitosa -------------------------------------------------------------
+
+    @Test
+    public void createByBusiness_onSuccess_postsMatchToResult() {
+        MatchResponse match = buildMatchResponse("PENDING");
+
+        doAnswer(inv -> {
+            Callback<MatchResponse> cb = inv.getArgument(0);
+            cb.onResponse(mockBusinessCall, Response.success(match));
+            return null;
+        }).when(mockBusinessCall).enqueue(any());
+
+        repository.createByBusiness("Bearer token", "influencer-id", "campaign-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(resultLiveData).postValue(match);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void createByBusiness_onSuccessCompleted_postsMutualMatch() {
+        MatchResponse match = buildMatchResponse("COMPLETED");
+
+        doAnswer(inv -> {
+            Callback<MatchResponse> cb = inv.getArgument(0);
+            cb.onResponse(mockBusinessCall, Response.success(match));
+            return null;
+        }).when(mockBusinessCall).enqueue(any());
+
+        repository.createByBusiness("Bearer token", "influencer-id", "campaign-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(resultLiveData).postValue(match);
+        verify(loadingLiveData).postValue(false);
+    }
+
+    // createByBusiness: error HTTP -------------------------------------------------------------
+
+    @Test
+    public void createByBusiness_on409_postsErrorWithCode() {
+        doAnswer(inv -> {
+            Callback<MatchResponse> cb = inv.getArgument(0);
+            cb.onResponse(mockBusinessCall, Response.error(409, mockErrorBody));
+            return null;
+        }).when(mockBusinessCall).enqueue(any());
+
+        repository.createByBusiness("Bearer token", "influencer-id", "campaign-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("409"));
+        verify(resultLiveData, never()).postValue(any());
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void createByBusiness_on403_postsErrorMessage() {
+        doAnswer(inv -> {
+            Callback<MatchResponse> cb = inv.getArgument(0);
+            cb.onResponse(mockBusinessCall, Response.error(403, mockErrorBody));
+            return null;
+        }).when(mockBusinessCall).enqueue(any());
+
+        repository.createByBusiness("Bearer token", "influencer-id", "campaign-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("403"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    // createByBusiness: fallo de red -----------------------------------------------------
+
+    @Test
+    public void createByBusiness_onNetworkFailure_postsErrorMessage() {
+        doAnswer(inv -> {
+            Callback<MatchResponse> cb = inv.getArgument(0);
+            cb.onFailure(mockBusinessCall, new RuntimeException("timeout"));
+            return null;
+        }).when(mockBusinessCall).enqueue(any());
+
+        repository.createByBusiness("Bearer token", "influencer-id", "campaign-id",
+                resultLiveData, errorLiveData, loadingLiveData);
 
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(errorLiveData).postValue(captor.capture());

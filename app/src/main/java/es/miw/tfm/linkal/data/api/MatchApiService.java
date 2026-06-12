@@ -1,5 +1,7 @@
 package es.miw.tfm.linkal.data.api;
 
+import java.util.List;
+
 import es.miw.tfm.linkal.models.responses.MatchResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -23,4 +25,7 @@ public interface MatchApiService {
     @GET(base + "/campaigns/{campaignId}/influencer")
     Call<MatchResponse> findByInfluencer(@Header("Authorization") String token,
                                          @Path("campaignId") String campaignId);
+
+    @GET(base + "/pending")
+    Call<List<MatchResponse>> getPending(@Header("Authorization") String token);
 }

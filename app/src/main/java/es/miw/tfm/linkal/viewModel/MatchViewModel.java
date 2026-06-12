@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.List;
+
 import es.miw.tfm.linkal.data.repositories.MatchRepository;
 import es.miw.tfm.linkal.models.responses.MatchResponse;
 
@@ -13,6 +15,7 @@ public class MatchViewModel extends ViewModel {
     private final MutableLiveData<MatchResponse> existingMatch  = new MutableLiveData<>();
     private final MutableLiveData<Boolean> matchNotFound = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loading  = new MutableLiveData<>(false);
+    private final MutableLiveData<List<MatchResponse>> pendingMatches = new MutableLiveData<>();
 
     private final MatchRepository matchRepository;
 
@@ -36,8 +39,13 @@ public class MatchViewModel extends ViewModel {
         matchRepository.findByInfluencer(token, campaignId, existingMatch, matchNotFound);
     }
 
+    public void loadPending(String token) {
+        matchRepository.getPending(token, pendingMatches, errorMessage, loading);
+    }
+
     public LiveData<MatchResponse> getMatchResult() { return matchResult; }
     public LiveData<MatchResponse> getExistingMatch() { return existingMatch; }
     public LiveData<Boolean> getMatchNotFound() { return matchNotFound; }
     public LiveData<String> getError() { return errorMessage; }
+    public LiveData<List<MatchResponse>> getPendingMatches() { return pendingMatches; }
 }

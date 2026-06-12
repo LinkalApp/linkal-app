@@ -2,6 +2,8 @@ package es.miw.tfm.linkal.data.repositories;
 
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.List;
+
 import es.miw.tfm.linkal.data.api.ApiClient;
 import es.miw.tfm.linkal.data.api.MatchApiService;
 import es.miw.tfm.linkal.models.responses.MatchResponse;
@@ -76,5 +78,19 @@ public class MatchRepository extends BaseRepository{
                 notFound.postValue(true);
             }
         });
+    }
+
+    public void getPending(String token,
+                           MutableLiveData<List<MatchResponse>> result,
+                           MutableLiveData<String> error,
+                           MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.getPending(token).enqueue(
+                new ApiCallback<List<MatchResponse>>(loading, error) {
+                    @Override
+                    protected void onSuccess(List<MatchResponse> body) {
+                        result.postValue(body);
+                    }
+                });
     }
 }

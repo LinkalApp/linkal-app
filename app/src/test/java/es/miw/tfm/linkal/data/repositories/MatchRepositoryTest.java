@@ -20,6 +20,8 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
+
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class MatchRepositoryTest {
 
@@ -27,8 +29,10 @@ public class MatchRepositoryTest {
     @Mock private Call<MatchResponse> mockCreateCall;
     @Mock private Call<MatchResponse> mockFindCall;
     @Mock private Call<MatchResponse> mockBusinessCall;
+    @Mock private Call<List<MatchResponse>> mockPendingCall;
     @Mock private MutableLiveData<MatchResponse> resultLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
+    @Mock private MutableLiveData<List<MatchResponse>> pendingLiveData;
     @Mock private MutableLiveData<Boolean> loadingLiveData;
     @Mock private MutableLiveData<Boolean> notFoundLiveData;
     @Mock private ResponseBody mockErrorBody;
@@ -41,6 +45,7 @@ public class MatchRepositoryTest {
         doReturn(mockCreateCall).when(mockApiService).createByInfluencer(anyString(), anyString());
         doReturn(mockFindCall).when(mockApiService).findByInfluencer(anyString(), anyString());
         doReturn(mockBusinessCall).when(mockApiService).createByBusiness(anyString(), anyString(), anyString());
+        doReturn(mockPendingCall).when(mockApiService).getPending(anyString());
     }
 
     // Singleton -----------------------------------------------------------------------
@@ -334,6 +339,100 @@ public class MatchRepositoryTest {
 
         verify(notFoundLiveData).postValue(true);
         verify(resultLiveData, never()).postValue(any());
+    }
+
+    // getPending: llamada a API -----------------------------------------------
+
+    @Test
+    public void getPending_callsApiWithToken() {
+        doAnswer(inv -> null).when(mockPendingCall).enqueue(any());
+
+        repository.getPending("Bearer token", pendingLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).getPending("Bearer token");
+    }
+
+    @Test
+    public void getPending_setsLoadingTrue() {
+        doAnswer(inv -> null).when(mockPendingCall).enqueue(any());
+
+        repository.getPending("Bearer token", pendingLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    // getPending: respuesta exitosa ------------------------------------------
+
+    @Test
+    public void getPending_onSuccess_postsListToResult() {
+        java.util.List<MatchResponse> matches = java.util.Arrays.asList(
+                buildMatchResponse("PENDING"), buildMatchResponse("PENDING"));
+
+        doAnswer(inv -> {
+            Callback<java.util.List<MatchResponse>> cb = inv.getArgument(0);
+            cb.onResponse(mockPendingCall, Response.success(matches));
+            return null;
+        }).when(mockPendingCall).enqueue(any());
+
+        repository.getPending("Bearer token", pendingLiveData, errorLiveData, loadingLiveData);
+
+        verify(pendingLiveData).postValue(matches);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getPending_onSuccess_postsEmptyList() {
+        java.util.List<MatchResponse> empty = java.util.Collections.emptyList();
+
+        doAnswer(inv -> {
+            Callback<java.util.List<MatchResponse>> cb = inv.getArgument(0);
+            cb.onResponse(mockPendingCall, Response.success(empty));
+            return null;
+        }).when(mockPendingCall).enqueue(any());
+
+        repository.getPending("Bearer token", pendingLiveData, errorLiveData, loadingLiveData);
+
+        verify(pendingLiveData).postValue(empty);
+        verify(loadingLiveData).postValue(false);
+    }
+
+    // getPending: error HTTP -----------------------------------------------------
+
+    @Test
+    public void getPending_on401_postsErrorMessage() {
+        doAnswer(inv -> {
+            Callback<java.util.List<MatchResponse>> cb = inv.getArgument(0);
+            cb.onResponse(mockPendingCall, Response.error(401, mockErrorBody));
+            return null;
+        }).when(mockPendingCall).enqueue(any());
+
+        repository.getPending("Bearer expired", pendingLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("401"));
+        verify(pendingLiveData, never()).postValue(any());
+        verify(loadingLiveData).postValue(false);
+    }
+
+    // getPending: fallo de red --------------------------------------------------------
+
+    @Test
+    public void getPending_onNetworkFailure_postsErrorMessage() {
+        doAnswer(inv -> {
+            Callback<java.util.List<MatchResponse>> cb = inv.getArgument(0);
+            cb.onFailure(mockPendingCall, new RuntimeException("sin red"));
+            return null;
+        }).when(mockPendingCall).enqueue(any());
+
+        repository.getPending("Bearer token", pendingLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("sin red"));
+        verify(pendingLiveData, never()).postValue(any());
+        verify(loadingLiveData).postValue(false);
     }
 
     // helpers ----------------------------------------------------------

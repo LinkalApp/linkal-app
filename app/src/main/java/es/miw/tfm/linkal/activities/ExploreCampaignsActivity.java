@@ -147,8 +147,8 @@ public class ExploreCampaignsActivity extends AppCompatActivity {
             } else if (id == R.id.nav_home) {
                 return true;
             } else if (id == R.id.nav_matches) {
-                // TODO: navegar a pantalla de matches
-                Toast.makeText(this, "Matches (próximamente)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, MatchesActivity.class));
+                finish();
                 return true;
             } else if (id == R.id.nav_chat) {
                 // TODO: navegar a pantalla de chat

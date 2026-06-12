@@ -42,6 +42,8 @@ public class InfluencerDetailActivity extends AppCompatActivity {
     public static final String EXTRA_YOUTUBE = "influencer_youtube";
     public static final String EXTRA_VERIFIED = "influencer_verified";
     public static final String EXTRA_INTERESTS = "influencer_interests";
+    public static final String EXTRA_INTEREST_ALREADY_EXISTS = "match_interest_exists";
+
 
     private TextView txtInitials, txtName, txtArtisticName, txtDescription, txtEmail, txtInstagram, txtTiktok, txtYoutube;
     private ImageView imgVerifiedBadge;
@@ -142,6 +144,12 @@ public class InfluencerDetailActivity extends AppCompatActivity {
     }
 
     private void setupButton() {
+        boolean alreadyExists = getIntent().getBooleanExtra(EXTRA_INTEREST_ALREADY_EXISTS, false);
+        if (alreadyExists) {
+            btnColaboration.setVisibility(View.GONE);
+            return;
+        }
+
         String influencerId = getIntent().getStringExtra(EXTRA_ID);
         String token        = SessionManager.getInstance().getBearerToken();
         String businessId   = SessionManager.getInstance().getUserId();

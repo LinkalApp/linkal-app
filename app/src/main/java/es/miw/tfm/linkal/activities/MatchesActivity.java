@@ -93,6 +93,15 @@ public class MatchesActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
+        boolean isBusiness = "BUSINESS".equals(SessionManager.getInstance().getRole());
+
+        bottomNavigation.getMenu().clear();
+        if(isBusiness){
+            bottomNavigation.inflateMenu(R.menu.nav_business_menu);
+        }else{
+            bottomNavigation.inflateMenu(R.menu.nav_influencer_menu);
+        }
+
         bottomNavigation.setSelectedItemId(R.id.nav_matches);
 
         bottomNavigation.setOnItemSelectedListener(item -> {
@@ -100,11 +109,19 @@ public class MatchesActivity extends AppCompatActivity {
             if (id == R.id.nav_matches) {
                 return true;
             } else if (id == R.id.nav_home) {
-                startActivity(new Intent(this, ExploreCampaignsActivity.class));
+                startActivity(new Intent(this, isBusiness
+                        ? ExploreInfluencersActivity.class
+                        : ExploreCampaignsActivity.class));
                 finish();
                 return true;
             } else if (id == R.id.nav_profile) {
-                startActivity(new Intent(this, InfluencerProfileActivity.class));
+                startActivity(new Intent(this, isBusiness
+                        ? BusinessProfileActivity.class
+                        : InfluencerProfileActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_campaigns) {
+                startActivity(new Intent(this, CampaignsActivity.class));
                 finish();
                 return true;
             } else if (id == R.id.nav_chat) {
@@ -117,6 +134,15 @@ public class MatchesActivity extends AppCompatActivity {
     }
 
     private void onMatchClick(MatchResponse match) {
+        boolean isBusiness = "BUSINESS".equals(SessionManager.getInstance().getRole());
+        if (isBusiness) {
+            openInfluencerDetail(match);
+        } else {
+            openCampaignDetail(match);
+        }
+    }
+
+    private void openCampaignDetail(MatchResponse match) {
         Intent intent = new Intent(this, ExploreCampaignDetailActivity.class);
         intent.putExtra(ExploreCampaignDetailActivity.EXTRA_ID, orEmpty(match.getCampaignId()));
         intent.putExtra(ExploreCampaignDetailActivity.EXTRA_TITLE, orEmpty(match.getCampaignTitle()));
@@ -134,7 +160,26 @@ public class MatchesActivity extends AppCompatActivity {
         intent.putExtra(ExploreCampaignDetailActivity.EXTRA_BUSINESS_ADDRESS, orEmpty(match.getBusinessAddress()));
         intent.putExtra(ExploreCampaignDetailActivity.EXTRA_BUSINESS_VERIFIED,
                 Boolean.TRUE.equals(match.getBusinessVerified()));
-        intent.putExtra(ExploreCampaignDetailActivity.EXTRA_MATCH_ALREADY_EXISTS, true);
+        intent.putExtra(ExploreCampaignDetailActivity.EXTRA_INTEREST_ALREADY_EXISTS, true);
+        startActivity(intent);
+    }
+
+    private void openInfluencerDetail(MatchResponse match) {
+        Intent intent = new Intent(this, InfluencerDetailActivity.class);
+        intent.putExtra(InfluencerDetailActivity.EXTRA_ID, orEmpty(match.getInfluencerId()));
+        intent.putExtra(InfluencerDetailActivity.EXTRA_NAME, orEmpty(match.getInfluencerName()));
+        intent.putExtra(InfluencerDetailActivity.EXTRA_ARTISTIC_NAME, orEmpty(match.getInfluencerArtisticName()));
+        intent.putExtra(InfluencerDetailActivity.EXTRA_DESCRIPTION, orEmpty(match.getInfluencerDescription()));
+        intent.putExtra(InfluencerDetailActivity.EXTRA_EMAIL, orEmpty(match.getInfluencerEmail()));
+        intent.putExtra(InfluencerDetailActivity.EXTRA_INSTAGRAM, orEmpty(match.getInfluencerInstagram()));
+        intent.putExtra(InfluencerDetailActivity.EXTRA_TIKTOK, orEmpty(match.getInfluencerTiktok()));
+        intent.putExtra(InfluencerDetailActivity.EXTRA_YOUTUBE, orEmpty(match.getInfluencerYoutube()));
+        intent.putExtra(InfluencerDetailActivity.EXTRA_VERIFIED, Boolean.TRUE.equals(match.getInfluencerVerified()));
+        if (match.getInfluencerInterests() != null) {
+            intent.putStringArrayListExtra(InfluencerDetailActivity.EXTRA_INTERESTS,
+                    new java.util.ArrayList<>(match.getInfluencerInterests()));
+        }
+        intent.putExtra(InfluencerDetailActivity.EXTRA_INTEREST_ALREADY_EXISTS, true);
         startActivity(intent);
     }
 

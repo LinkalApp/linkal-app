@@ -37,7 +37,7 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
     public static final String EXTRA_BUSINESS_PROVINCE = "open_campaign_business_province";
     public static final String EXTRA_BUSINESS_ADDRESS = "open_campaign_business_address";
     public static final String EXTRA_BUSINESS_VERIFIED = "open_campaign_business_verified";
-    public static final String EXTRA_MATCH_ALREADY_EXISTS = "match_already_exists";
+    public static final String EXTRA_INTEREST_ALREADY_EXISTS = "match_interest_exists";
 
 
     private ImageButton btnBack;
@@ -187,7 +187,7 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
    }
 
     private void setupMatchButton() {
-        boolean alreadyExists = getIntent().getBooleanExtra(EXTRA_MATCH_ALREADY_EXISTS, false);
+        boolean alreadyExists = getIntent().getBooleanExtra(EXTRA_INTEREST_ALREADY_EXISTS, false);
         if (alreadyExists) {
             btnInterested.setVisibility(View.GONE);
             return;

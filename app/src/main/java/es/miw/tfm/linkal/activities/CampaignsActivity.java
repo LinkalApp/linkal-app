@@ -93,7 +93,8 @@ public class CampaignsActivity extends AppCompatActivity {
                 finish();
                 return true;
             } else if (id == R.id.nav_matches) {
-                Toast.makeText(this, "Matches (próximamente)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, MatchesActivity.class));
+                finish();
                 return true;
             } else if (id == R.id.nav_chat) {
                 android.widget.Toast.makeText(this, "Chat (próximamente)", android.widget.Toast.LENGTH_SHORT).show();

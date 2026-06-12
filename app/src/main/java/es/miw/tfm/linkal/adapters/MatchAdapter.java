@@ -50,9 +50,15 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder>{
         holder.txtCampaignTitle.setText(orEmpty(m.getCampaignTitle()));
 
         if (role == Role.INFLUENCER) {
+            holder.txtCampaignTitle.setText(orEmpty(m.getCampaignTitle()));
             String business = m.getBusinessName();
             holder.txtCounterpart.setText(business != null && !business.isEmpty()
                     ? "Comercio: " + business : "");
+        } else {
+            String name = m.getInfluencerName();
+            holder.txtCampaignTitle.setText(name != null ? name : "");
+            String subtitle = orEmpty(m.getCampaignTitle());
+            holder.txtCounterpart.setText(subtitle);
         }
 
         String date = m.getCreatedAt();

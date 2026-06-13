@@ -28,4 +28,7 @@ public interface MatchApiService {
 
     @GET(base + "/pending")
     Call<List<MatchResponse>> getPending(@Header("Authorization") String token);
+
+    @GET(base + "/completed")
+    Call<List<MatchResponse>> getCompleted(@Header("Authorization") String token);
 }

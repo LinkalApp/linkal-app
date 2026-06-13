@@ -93,4 +93,18 @@ public class MatchRepository extends BaseRepository{
                     }
                 });
     }
+
+    public void getCompleted(String token,
+                           MutableLiveData<List<MatchResponse>> result,
+                           MutableLiveData<String> error,
+                           MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.getCompleted(token).enqueue(
+                new ApiCallback<List<MatchResponse>>(loading, error) {
+                    @Override
+                    protected void onSuccess(List<MatchResponse> body) {
+                        result.postValue(body);
+                    }
+                });
+    }
 }

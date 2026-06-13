@@ -15,7 +15,7 @@ public class MatchViewModel extends ViewModel {
     private final MutableLiveData<MatchResponse> existingMatch  = new MutableLiveData<>();
     private final MutableLiveData<Boolean> matchNotFound = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loading  = new MutableLiveData<>(false);
-    private final MutableLiveData<List<MatchResponse>> pendingMatches = new MutableLiveData<>();
+    private final MutableLiveData<List<MatchResponse>> matches = new MutableLiveData<>();
 
     private final MatchRepository matchRepository;
 
@@ -40,12 +40,16 @@ public class MatchViewModel extends ViewModel {
     }
 
     public void loadPending(String token) {
-        matchRepository.getPending(token, pendingMatches, errorMessage, loading);
+        matchRepository.getPending(token, matches, errorMessage, loading);
+    }
+
+    public void loadCompleted(String token) {
+        matchRepository.getCompleted(token, matches, errorMessage, loading);
     }
 
     public LiveData<MatchResponse> getMatchResult() { return matchResult; }
     public LiveData<MatchResponse> getExistingMatch() { return existingMatch; }
     public LiveData<Boolean> getMatchNotFound() { return matchNotFound; }
     public LiveData<String> getError() { return errorMessage; }
-    public LiveData<List<MatchResponse>> getPendingMatches() { return pendingMatches; }
+    public LiveData<List<MatchResponse>> getMatches() { return matches; }
 }

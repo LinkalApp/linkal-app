@@ -3,6 +3,8 @@ package es.miw.tfm.linkal.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.adapters.MatchAdapter;
@@ -28,9 +31,15 @@ import es.miw.tfm.linkal.viewModel.MatchViewModel;
 
 public class MatchesActivity extends AppCompatActivity {
 
+    private static final String STATUS_PENDING   = "Pendientes";
+    private static final String STATUS_COMPLETED = "Confirmados";
+
     private RecyclerView recyclerMatches;
     private TextView txtEmpty;
+    private AutoCompleteTextView spinnerStatus;
     private BottomNavigationView bottomNavigation;
+
+    private String currentStatus = STATUS_PENDING;
 
     private MatchAdapter adapter;
     private MatchViewModel matchViewModel;
@@ -56,6 +65,7 @@ public class MatchesActivity extends AppCompatActivity {
                 : MatchAdapter.Role.BUSINESS;
 
         setupRecycler(adapterRole);
+        setupStatusDropdown();
 
         matchViewModel = new ViewModelProvider(this).get(MatchViewModel.class);
         observeViewModel();
@@ -64,11 +74,14 @@ public class MatchesActivity extends AppCompatActivity {
         matchViewModel.loadPending(token);
 
         setupBottomNavigation();
+
+        loadCurrentStatus();
     }
 
     private void initView(){
         txtEmpty = findViewById(R.id.txtEmpty);
         recyclerMatches = findViewById(R.id.recyclerMatches);
+        spinnerStatus = findViewById(R.id.spinnerStatus);
         bottomNavigation = findViewById(R.id.bottomNavigation);
     }
 
@@ -78,18 +91,43 @@ public class MatchesActivity extends AppCompatActivity {
         recyclerMatches.setAdapter(adapter);
     }
 
-    private void observeViewModel() {
-        matchViewModel.getPendingMatches().observe(this, matches -> {
-            if (matches == null) return;
-            if (matches.isEmpty()) {
-                recyclerMatches.setVisibility(View.GONE);
-                txtEmpty.setVisibility(View.VISIBLE);
-            } else {
-                recyclerMatches.setVisibility(View.VISIBLE);
-                txtEmpty.setVisibility(View.GONE);
-                adapter.updateData(matches);
-            }
+    private void setupStatusDropdown() {
+        List<String> options = List.of(STATUS_PENDING, STATUS_COMPLETED);
+        ArrayAdapter<String> dropdownAdapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_dropdown_item_1line, options);
+        spinnerStatus.setAdapter(dropdownAdapter);
+        spinnerStatus.setText(STATUS_PENDING, false);
+
+        spinnerStatus.setOnItemClickListener((parent, view, position, id) -> {
+            currentStatus = options.get(position);
+            adapter.updateData(new ArrayList<>());
+            loadCurrentStatus();
         });
+    }
+
+    private void loadCurrentStatus(){
+        String token = SessionManager.getInstance().getBearerToken();
+        if (STATUS_COMPLETED.equals(currentStatus)) {
+            matchViewModel.loadCompleted(token);
+        } else {
+            matchViewModel.loadPending(token);
+        }
+    }
+
+    private void observeViewModel() {
+        matchViewModel.getMatches().observe(this, this::showMatches);
+    }
+
+    private void showMatches(List<MatchResponse> matches) {
+        if (matches == null) return;
+        if (matches.isEmpty()) {
+            recyclerMatches.setVisibility(View.GONE);
+            txtEmpty.setVisibility(View.VISIBLE);
+        } else {
+            recyclerMatches.setVisibility(View.VISIBLE);
+            txtEmpty.setVisibility(View.GONE);
+            adapter.updateData(matches);
+        }
     }
 
     private void setupBottomNavigation() {

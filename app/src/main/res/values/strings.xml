@@ -81,8 +81,10 @@
     <string name="txtCollabWithCampaign">Colabora con negocios que buscan influencers</string>
     <string name="txtInterested">Me interesa</string>
     <string name="txtColaboration">Proponer colaboración</string>
-    <string name="titleMatches">Mis intereses pendientes</string>
-    <string name="txtNoInterests">No tienes intereses pendientes</string>
+    <string name="titleMatches">Mis matches</string>
+    <string name="txtNoInterests">No tienes intereses con este estado</string>
+    <string name="txtPending">Pendientes</string>
+    <string name="txtState">Estado</string>
 
 
 </resources>

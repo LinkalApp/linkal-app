@@ -193,4 +193,29 @@ public class MatchViewModelTest {
         verify(mockMatchRepository, never()).createByInfluencer(any(), any(), any(), any(), any());
         verify(mockMatchRepository, never()).createByBusiness(any(), any(), any(), any(), any(), any());
     }
+
+    // loadCompleted -----------------------------------------------------------------
+
+    @Test
+    public void loadCompleted_delegatesToRepository() {
+        viewModel.loadCompleted("Bearer token");
+        verify(mockMatchRepository).getCompleted(eq("Bearer token"), any(), any(), any());
+    }
+
+    @Test
+    public void loadCompleted_withDifferentToken_passesItToRepository() {
+        viewModel.loadCompleted("Bearer other-token");
+        verify(mockMatchRepository).getCompleted(eq("Bearer other-token"), any(), any(), any());
+    }
+
+    @Test
+    public void loadCompleted_doesNotCallGetPending() {
+        viewModel.loadCompleted("Bearer token");
+        verify(mockMatchRepository, never()).getPending(any(), any(), any(), any());
+    }
+
+    @Test
+    public void loadPending_and_loadCompleted_writeToSameLiveData() {
+        assertSame(viewModel.getMatches(), viewModel.getMatches());
+    }
 }

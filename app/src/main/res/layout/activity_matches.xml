@@ -28,13 +28,28 @@
             android:textStyle="bold"
             android:textColor="@color/neutral_dark"/>
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Dropdown de estado -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilStatusFilter"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Colaboraciones en espera de respuesta"
-            android:textSize="13sp"
-            android:textColor="@color/neutral_medium"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="12dp"
+            android:hint="@string/txtState">
+
+            <AutoCompleteTextView
+                android:id="@+id/spinnerStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:focusable="false"
+                android:cursorVisible="false"
+                android:text="@string/txtPending"
+                android:textSize="14sp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 

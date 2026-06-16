@@ -47,4 +47,14 @@ public class AppConstants {
 
     //  ─── ESTADO DE LAS CAMPAÑAS ─────────────────────────────────────────────
     public static final String[] STATUS_CAMPAIGN_OPTIONS = {"OPEN", "IN_PROGRESS", "CLOSED"};
+
+    //  ─── COLOR DEL AVATAR ─────────────────────────────────────────────
+    public static final int[][] AVATAR_COLORS = {
+            {0xFFEDE9FF, 0xFF7B6CF6},
+            {0xFFD6F5EE, 0xFF1A9E7E},
+            {0xFFFFEBD6, 0xFFE07A2F},
+            {0xFFD6EEFF, 0xFF2878C8},
+            {0xFFFFD6E7, 0xFFD63B6E},
+            {0xFFFFF3CC, 0xFFB08800},
+    };
 }

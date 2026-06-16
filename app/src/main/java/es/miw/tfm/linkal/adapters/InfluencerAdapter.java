@@ -1,5 +1,7 @@
 package es.miw.tfm.linkal.adapters;
 
+import static es.miw.tfm.linkal.utils.AppConstants.AVATAR_COLORS;
+
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
@@ -103,16 +105,6 @@ public class InfluencerAdapter extends RecyclerView.Adapter<InfluencerAdapter.Vi
             txtInterests     = itemView.findViewById(R.id.txtInfluencerInterests);
         }
     }
-
-    // Colores de avatar ------------------------------------------------
-    private static final int[][] AVATAR_COLORS = {
-            {0xFFEDE9FF, 0xFF7B6CF6}, // morado
-            {0xFFD6F5EE, 0xFF1A9E7E}, // verde
-            {0xFFFFEBD6, 0xFFE07A2F}, // naranja
-            {0xFFD6EEFF, 0xFF2878C8}, // azul
-            {0xFFFFD6E7, 0xFFD63B6E}, // rosa
-            {0xFFFFF3CC, 0xFFB08800}, // amarillo
-    };
 
     private void applyAvatarColor(TextView avatar, int position) {
         int[] colors = AVATAR_COLORS[position % AVATAR_COLORS.length];

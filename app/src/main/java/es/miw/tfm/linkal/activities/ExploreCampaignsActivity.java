@@ -151,8 +151,8 @@ public class ExploreCampaignsActivity extends AppCompatActivity {
                 finish();
                 return true;
             } else if (id == R.id.nav_chat) {
-                // TODO: navegar a pantalla de chat
-                Toast.makeText(this, "Chat (próximamente)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, ChatListActivity.class));
+                finish();
                 return true;
             }
             return false;

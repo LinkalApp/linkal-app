@@ -85,6 +85,8 @@
     <string name="txtNoInterests">No tienes intereses con este estado</string>
     <string name="txtPending">Pendientes</string>
     <string name="txtState">Estado</string>
+    <string name="txtWriteMessage">Escribe un mensaje...</string>
+    <string name="txtSend">Enviar</string>
 
 
 </resources>

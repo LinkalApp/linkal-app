@@ -18,10 +18,20 @@ import es.miw.tfm.linkal.models.responses.ChatResponse;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
 
+    public interface OnChatClickListener {
+        void onChatClick(ChatResponse chat);
+    }
+
     private List<ChatResponse> items;
+    private OnChatClickListener    listener;
 
     public ChatAdapter(List<ChatResponse> items) {
-        this.items = items;
+        this.items    = items;
+        this.listener = null;
+    }
+
+    public void setOnChatClickListener(OnChatClickListener listener) {
+        this.listener = listener;
     }
 
     public void updateData(List<ChatResponse> newItems) {
@@ -48,6 +58,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
         holder.txtLastMessage.setText(chat.getLastMessage() != null
                 ? chat.getLastMessage() : "Sin mensajes");
         holder.txtTime.setText(formatTime(chat.getLastMessageAt()));
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onChatClick(chat);
+        });
     }
 
     @Override

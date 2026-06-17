@@ -68,6 +68,7 @@ public class ChatListActivity extends AppCompatActivity {
 
     private void setupRecycler(){
         adapter = new ChatAdapter(new ArrayList<>());
+        adapter.setOnChatClickListener(this::onChatClick);
         recyclerChats.setLayoutManager(new LinearLayoutManager(this));
         recyclerChats.setAdapter(adapter);
     }
@@ -137,6 +138,14 @@ public class ChatListActivity extends AppCompatActivity {
 
     private void loadChats() {
         chatViewModel.loadChats(SessionManager.getInstance().getBearerToken());
+    }
+
+    private void onChatClick(ChatResponse chat) {
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra(ChatActivity.EXTRA_CHAT_ID,        chat.getId());
+        intent.putExtra(ChatActivity.EXTRA_COUNTERPART,    chat.getDisplayName());
+        intent.putExtra(ChatActivity.EXTRA_CAMPAIGN_TITLE, chat.getCampaignTitle());
+        startActivity(intent);
     }
 
 }

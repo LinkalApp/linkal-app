@@ -15,6 +15,7 @@ import java.util.List;
 
 import es.miw.tfm.linkal.data.repositories.ChatRepository;
 import es.miw.tfm.linkal.models.responses.ChatResponse;
+import es.miw.tfm.linkal.models.responses.MessageResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,17 +29,15 @@ public class ChatViewModelTest {
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
-    @Mock private ChatRepository            mockRepository;
-    @Mock private Call<List<ChatResponse>>  mockChatsCall;
+    @Mock
+    private ChatRepository mockRepository;
+
     private ChatViewModel viewModel;
 
     @Before
     public void setUp() {
         viewModel = new ChatViewModel(mockRepository);
-        doReturn(mockChatsCall).when(mockRepository).findAllByUser(anyString());
     }
-
-    // Estado inicial ------------------------------------------------------------
 
     @Test
     public void chats_initialValue_isNull() {
@@ -46,11 +45,16 @@ public class ChatViewModelTest {
     }
 
     @Test
+    public void messageSent_initialValue_isNull() {
+        assertNull(viewModel.getMessageSent().getValue());
+    }
+
+    @Test
     public void error_initialValue_isNull() {
         assertNull(viewModel.getError().getValue());
     }
 
-    // Getters LiveData -----------------------------------------------------------
+    // ── Getters LiveData ──────────────────────────────────────────────────────
 
     @Test
     public void getChats_returnsLiveData() {
@@ -58,147 +62,73 @@ public class ChatViewModelTest {
     }
 
     @Test
+    public void getMessageSent_returnsLiveData() {
+        assertNotNull(viewModel.getMessageSent());
+    }
+
+    @Test
     public void getError_returnsLiveData() {
         assertNotNull(viewModel.getError());
     }
 
-    // ─── loadChats — delegación ───────────────────────────────────────────────
+    // loadChats -------------------------------------------------------------------
 
     @Test
     public void loadChats_delegatesToRepository() {
         viewModel.loadChats("Bearer token");
-        verify(mockRepository).findAllByUser("Bearer token");
+
+        verify(mockRepository).findAllByUser(eq("Bearer token"), any(), any(), any());
     }
 
     @Test
     public void loadChats_withDifferentToken_passesItToRepository() {
         viewModel.loadChats("Bearer other-token");
-        verify(mockRepository).findAllByUser("Bearer other-token");
+
+        verify(mockRepository).findAllByUser(eq("Bearer other-token"), any(), any(), any());
     }
 
-    // loadChats — éxito ---------------------------------------------------
-
     @Test
-    public void loadChats_onSuccess_updatesChatsLiveData() {
-        List<ChatResponse> chats = Arrays.asList(
-                buildChat("Nike Spain", "Campaña Verano"),
-                buildChat("Adidas", "Colección Otoño"));
-
-        doAnswer(inv -> {
-            ((Callback<List<ChatResponse>>) inv.getArgument(0))
-                    .onResponse(mockChatsCall, Response.success(chats));
-            return null;
-        }).when(mockChatsCall).enqueue(any());
-
+    public void loadChats_doesNotCallSendMessage() {
         viewModel.loadChats("Bearer token");
 
-        assertNotNull(viewModel.getChats().getValue());
-        assertEquals(2, viewModel.getChats().getValue().size());
+        verify(mockRepository, never()).sendMessage(any(), any(), any(), any(), any(), any());
+    }
+
+    // sendMessage ----------------------------------------------------------------------
+
+    @Test
+    public void sendMessage_delegatesToRepository() {
+        viewModel.sendMessage("Bearer token", "chat-uuid", "Hola!");
+
+        verify(mockRepository).sendMessage(eq("Bearer token"), eq("chat-uuid"), eq("Hola!"), any(), any(), any());
     }
 
     @Test
-    public void loadChats_onSuccess_chatsContainDisplayNameAndCampaignTitle() {
-        List<ChatResponse> chats = Collections.singletonList(
-                buildChat("Nike Spain", "Campaña Verano 2025"));
+    public void sendMessage_withDifferentToken_passesItToRepository() {
+        viewModel.sendMessage("Bearer other", "chat-uuid", "Hola!");
 
-        doAnswer(inv -> {
-            ((Callback<List<ChatResponse>>) inv.getArgument(0))
-                    .onResponse(mockChatsCall, Response.success(chats));
-            return null;
-        }).when(mockChatsCall).enqueue(any());
-
-        viewModel.loadChats("Bearer token");
-
-        ChatResponse first = viewModel.getChats().getValue().get(0);
-        assertEquals("Nike Spain", first.getDisplayName());
-        assertEquals("Campaña Verano 2025", first.getCampaignTitle());
+        verify(mockRepository).sendMessage(eq("Bearer other"), eq("chat-uuid"), eq("Hola!"), any(), any(), any());
     }
 
     @Test
-    public void loadChats_onSuccessWithEmptyList_updatesChatsLiveData() {
-        doAnswer(inv -> {
-            ((Callback<List<ChatResponse>>) inv.getArgument(0))
-                    .onResponse(mockChatsCall, Response.success(Collections.emptyList()));
-            return null;
-        }).when(mockChatsCall).enqueue(any());
+    public void sendMessage_withDifferentChatId_passesItToRepository() {
+        viewModel.sendMessage("Bearer token", "other-chat", "Hola!");
 
-        viewModel.loadChats("Bearer token");
-
-        assertNotNull(viewModel.getChats().getValue());
-        assertTrue(viewModel.getChats().getValue().isEmpty());
+        verify(mockRepository).sendMessage(eq("Bearer token"), eq("other-chat"), eq("Hola!"), any(), any(), any());
     }
 
     @Test
-    public void loadChats_onSuccess_doesNotSetError() {
-        doAnswer(inv -> {
-            ((Callback<List<ChatResponse>>) inv.getArgument(0))
-                    .onResponse(mockChatsCall, Response.success(Collections.emptyList()));
-            return null;
-        }).when(mockChatsCall).enqueue(any());
+    public void sendMessage_withDifferentText_passesItToRepository() {
+        viewModel.sendMessage("Bearer token", "chat-uuid", "Adios!");
 
-        viewModel.loadChats("Bearer token");
-
-        assertNull(viewModel.getError().getValue());
-    }
-
-    // loadChats — error HTTP ----------------------------------------------------
-
-    @Test
-    public void loadChats_on401_setsErrorLiveData() {
-        doAnswer(inv -> {
-            ((Callback<List<ChatResponse>>) inv.getArgument(0))
-                    .onResponse(mockChatsCall,
-                            Response.error(401, okhttp3.ResponseBody.create(null, "")));
-            return null;
-        }).when(mockChatsCall).enqueue(any());
-
-        viewModel.loadChats("Bearer expired");
-
-        assertNotNull(viewModel.getError().getValue());
-        assertTrue(viewModel.getError().getValue().contains("401"));
+        verify(mockRepository).sendMessage(eq("Bearer token"), eq("chat-uuid"), eq("Adios!"), any(), any(), any());
     }
 
     @Test
-    public void loadChats_on401_doesNotUpdateChats() {
-        doAnswer(inv -> {
-            ((Callback<List<ChatResponse>>) inv.getArgument(0))
-                    .onResponse(mockChatsCall,
-                            Response.error(401, okhttp3.ResponseBody.create(null, "")));
-            return null;
-        }).when(mockChatsCall).enqueue(any());
+    public void sendMessage_doesNotCallLoadChats() {
+        viewModel.sendMessage("Bearer token", "chat-uuid", "Hola!");
 
-        viewModel.loadChats("Bearer expired");
-
-        assertNull(viewModel.getChats().getValue());
-    }
-
-    // loadChats — fallo de red ----------------------------------------------------------
-
-    @Test
-    public void loadChats_onNetworkFailure_setsErrorLiveData() {
-        doAnswer(inv -> {
-            ((Callback<List<ChatResponse>>) inv.getArgument(0))
-                    .onFailure(mockChatsCall, new RuntimeException("sin conexión"));
-            return null;
-        }).when(mockChatsCall).enqueue(any());
-
-        viewModel.loadChats("Bearer token");
-
-        assertNotNull(viewModel.getError().getValue());
-        assertTrue(viewModel.getError().getValue().contains("sin conexión"));
-    }
-
-    @Test
-    public void loadChats_onNetworkFailure_doesNotUpdateChats() {
-        doAnswer(inv -> {
-            ((Callback<List<ChatResponse>>) inv.getArgument(0))
-                    .onFailure(mockChatsCall, new RuntimeException("timeout"));
-            return null;
-        }).when(mockChatsCall).enqueue(any());
-
-        viewModel.loadChats("Bearer token");
-
-        assertNull(viewModel.getChats().getValue());
+        verify(mockRepository, never()).findAllByUser(any(), any(), any(), any());
     }
 
     // helpers -------------------------------------------------------------------
@@ -209,5 +139,13 @@ public class ChatViewModelTest {
         c.setDisplayName(displayName);
         c.setCampaignTitle(campaignTitle);
         return c;
+    }
+
+    private MessageResponse buildMessage(String text) {
+        MessageResponse m = new MessageResponse();
+        m.setId("msg-uuid");
+        m.setText(text);
+        m.setSenderId("sender-uuid");
+        return m;
     }
 }

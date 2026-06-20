@@ -33,6 +33,15 @@
 
     </androidx.appcompat.widget.Toolbar>
 
+    <!-- Lista de mensajes -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerMessages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="12dp"
+        android:clipToPadding="false"/>
+
     <!-- Input -->
     <LinearLayout
         android:layout_width="match_parent"

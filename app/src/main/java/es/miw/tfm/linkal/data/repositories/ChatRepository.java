@@ -61,4 +61,18 @@ public class ChatRepository extends BaseRepository{
                     }
                 });
     }
+
+    public void getMessages(String token, String chatId,
+                            MutableLiveData<List<MessageResponse>> messagesLiveData,
+                            MutableLiveData<String> errorLiveData,
+                            MutableLiveData<Boolean> loadingLiveData) {
+        loadingLiveData.setValue(true);
+        api.getMessages(token, chatId).enqueue(
+                new ApiCallback<List<MessageResponse>>(loadingLiveData, errorLiveData) {
+                    @Override
+                    protected void onSuccess(List<MessageResponse> body) {
+                        messagesLiveData.postValue(body);
+                    }
+                });
+    }
 }

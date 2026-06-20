@@ -50,11 +50,16 @@ public class ChatViewModelTest {
     }
 
     @Test
+    public void messages_initialValue_isNull() {
+        assertNull(viewModel.getMessages().getValue());
+    }
+
+    @Test
     public void error_initialValue_isNull() {
         assertNull(viewModel.getError().getValue());
     }
 
-    // ── Getters LiveData ──────────────────────────────────────────────────────
+    // Getters LiveData ---------------------------------------------------------------
 
     @Test
     public void getChats_returnsLiveData() {
@@ -64,6 +69,11 @@ public class ChatViewModelTest {
     @Test
     public void getMessageSent_returnsLiveData() {
         assertNotNull(viewModel.getMessageSent());
+    }
+
+    @Test
+    public void getMessages_returnsLiveData() {
+        assertNotNull(viewModel.getMessages());
     }
 
     @Test
@@ -129,6 +139,36 @@ public class ChatViewModelTest {
         viewModel.sendMessage("Bearer token", "chat-uuid", "Hola!");
 
         verify(mockRepository, never()).findAllByUser(any(), any(), any(), any());
+    }
+
+    // loadMessages ----------------------------------------------------------------------------
+
+    @Test
+    public void loadMessages_delegatesToRepository() {
+        viewModel.loadMessages("Bearer token", "chat-uuid");
+
+        verify(mockRepository).getMessages(eq("Bearer token"), eq("chat-uuid"), any(), any(), any());
+    }
+
+    @Test
+    public void loadMessages_withDifferentToken_passesItToRepository() {
+        viewModel.loadMessages("Bearer other", "chat-uuid");
+
+        verify(mockRepository).getMessages(eq("Bearer other"), eq("chat-uuid"), any(), any(), any());
+    }
+
+    @Test
+    public void loadMessages_withDifferentChatId_passesItToRepository() {
+        viewModel.loadMessages("Bearer token", "other-chat");
+
+        verify(mockRepository).getMessages(eq("Bearer token"), eq("other-chat"), any(), any(), any());
+    }
+
+    @Test
+    public void loadMessages_doesNotCallSendMessage() {
+        viewModel.loadMessages("Bearer token", "chat-uuid");
+
+        verify(mockRepository, never()).sendMessage(any(), any(), any(), any(), any(), any());
     }
 
     // helpers -------------------------------------------------------------------

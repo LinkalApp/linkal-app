@@ -28,11 +28,14 @@ import androidx.lifecycle.MutableLiveData;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ChatRepositoryTest {
-    @Mock private ChatApiService                   mockApiService;
+    @Mock private ChatApiService mockApiService;
     @Mock private Call<List<ChatResponse>> mockChatsCall;
     @Mock private Call<MessageResponse> mockSendCall;
+    @Mock private Call<List<MessageResponse>> mockMessagesCall;
+
     @Mock private MutableLiveData<List<ChatResponse>> chatsLiveData;
     @Mock private MutableLiveData<Boolean> messageSentLiveData;
+    @Mock private MutableLiveData<List<MessageResponse>> messagesLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
     @Mock private MutableLiveData<Boolean> loadingLiveData;
     @Mock private ResponseBody mockErrorBody;
@@ -44,6 +47,7 @@ public class ChatRepositoryTest {
         repository = new ChatRepository(mockApiService);
         doReturn(mockChatsCall).when(mockApiService).findAllByUser(anyString());
         doReturn(mockSendCall).when(mockApiService).sendMessage(anyString(), anyString(), any());
+        doReturn(mockMessagesCall).when(mockApiService).getMessages(anyString(), anyString());
     }
 
 
@@ -333,6 +337,116 @@ public class ChatRepositoryTest {
 
         verify(errorLiveData).postValue(any());
         verify(loadingLiveData).postValue(false);
+    }
+
+    // getMessages --------------------------------------------------------------------------------------------
+
+    @Test
+    public void getMessages_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockMessagesCall).enqueue(any());
+
+        repository.getMessages("Bearer token", "chat-uuid", messagesLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void getMessages_callsApiWithTokenAndChatId() {
+        doAnswer(inv -> null).when(mockMessagesCall).enqueue(any());
+
+        repository.getMessages("Bearer token", "chat-uuid", messagesLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).getMessages("Bearer token", "chat-uuid");
+    }
+
+    @Test
+    public void getMessages_withDifferentChatId_passesItToApi() {
+        doAnswer(inv -> null).when(mockMessagesCall).enqueue(any());
+
+        repository.getMessages("Bearer token", "other-chat-uuid", messagesLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).getMessages("Bearer token", "other-chat-uuid");
+    }
+
+    @Test
+    public void getMessages_onSuccess_postsMessagesOrderedToResult() {
+        List<MessageResponse> messages = Arrays.asList(
+                buildMessage("Hola!"), buildMessage("Todo bien?"));
+        doAnswer(invocation -> {
+            ((Callback<List<MessageResponse>>) invocation.getArgument(0))
+                    .onResponse(mockMessagesCall, Response.success(messages));
+            return null;
+        }).when(mockMessagesCall).enqueue(any());
+
+        repository.getMessages("Bearer token", "chat-uuid", messagesLiveData, errorLiveData, loadingLiveData);
+
+        verify(messagesLiveData).postValue(messages);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getMessages_onSuccessWithEmptyList_postsEmptyList() {
+        doAnswer(invocation -> {
+            ((Callback<List<MessageResponse>>) invocation.getArgument(0))
+                    .onResponse(mockMessagesCall, Response.success(Collections.emptyList()));
+            return null;
+        }).when(mockMessagesCall).enqueue(any());
+
+        repository.getMessages("Bearer token", "chat-uuid", messagesLiveData, errorLiveData, loadingLiveData);
+
+        verify(messagesLiveData).postValue(Collections.emptyList());
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getMessages_on403_postsErrorMessage() {
+        doAnswer(invocation -> {
+            ((Callback<List<MessageResponse>>) invocation.getArgument(0))
+                    .onResponse(mockMessagesCall, Response.error(403, mockErrorBody));
+            return null;
+        }).when(mockMessagesCall).enqueue(any());
+
+        repository.getMessages("Bearer token", "chat-uuid", messagesLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue("Debe contener el código 403", captor.getValue().contains("403"));
+        verify(loadingLiveData).postValue(false);
+        verify(messagesLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getMessages_on404_postsErrorMessage() {
+        doAnswer(invocation -> {
+            ((Callback<List<MessageResponse>>) invocation.getArgument(0))
+                    .onResponse(mockMessagesCall, Response.error(404, mockErrorBody));
+            return null;
+        }).when(mockMessagesCall).enqueue(any());
+
+        repository.getMessages("Bearer token", "chat-uuid", messagesLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue("Debe contener el código 404", captor.getValue().contains("404"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getMessages_onNetworkFailure_postsErrorMessage() {
+        doAnswer(invocation -> {
+            ((Callback<List<MessageResponse>>) invocation.getArgument(0))
+                    .onFailure(mockMessagesCall, new RuntimeException("sin conexion"));
+            return null;
+        }).when(mockMessagesCall).enqueue(any());
+
+        repository.getMessages("Bearer token", "chat-uuid", messagesLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue("Debe contener el texto del error", captor.getValue().contains("sin conexion"));
+        verify(loadingLiveData).postValue(false);
+        verify(messagesLiveData, never()).postValue(any());
     }
 
     // helpers ------------------------------------------------------------------------------------

@@ -21,6 +21,7 @@ public class ChatViewModel extends ViewModel {
     private final MutableLiveData<List<ChatResponse>> chats = new MutableLiveData<>();
     private final MutableLiveData<String> error = new MutableLiveData<>();
     private final MutableLiveData<Boolean> messageSent = new MutableLiveData<>();
+    private final MutableLiveData<List<MessageResponse>> messages = new MutableLiveData<>();
 
     public ChatViewModel() {
         this.repository = new ChatRepository();
@@ -38,7 +39,13 @@ public class ChatViewModel extends ViewModel {
         repository.sendMessage(token, chatId, text, messageSent, error, isLoading);
     }
 
+    public void loadMessages(String token, String chatId) {
+        repository.getMessages(token, chatId, messages, error, isLoading);
+    }
+
     public LiveData<List<ChatResponse>> getChats() { return chats; }
     public LiveData<String> getError() { return error; }
     public LiveData<Boolean> getMessageSent() { return messageSent; }
+    public LiveData<List<MessageResponse>> getMessages() { return messages; }
+
 }

@@ -22,4 +22,8 @@ public interface ChatApiService {
     Call<MessageResponse> sendMessage(@Header("Authorization") String token,
                                       @Path("chatId") String chatId,
                                       @Body SendMessageRequest request);
+
+    @GET(base + "/{chatId}/messages")
+    Call<List<MessageResponse>> getMessages(@Header("Authorization") String token,
+                                            @Path("chatId") String chatId);
 }

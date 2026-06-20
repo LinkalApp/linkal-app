@@ -1,6 +1,8 @@
 package es.miw.tfm.linkal.activities;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -15,24 +17,44 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 import es.miw.tfm.linkal.R;
+import es.miw.tfm.linkal.adapters.MessageAdapter;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.ChatViewModel;
 
 public class ChatActivity extends AppCompatActivity {
 
     public static final String EXTRA_CHAT_ID = "chat_id";
-    public static final String EXTRA_CHAT_NAME = "chat_name";
     public static final String EXTRA_COUNTERPART = "counterpart";
     public static final String EXTRA_CAMPAIGN_TITLE = "campaign_title";
+
+    private static final long POLL_INTERVAL_MS = 3000L;
+
 
     private String chatId;
     private TextView txtSubtitle;
     private EditText edtMessage;
     private ImageButton btnSend;
     private Toolbar toolbar;
+    private RecyclerView recyclerMessages;
+    private MessageAdapter messageAdapter;
     private ChatViewModel chatViewModel;
+    private int lastMessageCount = -1;
+
+
+    private final Handler pollHandler  = new Handler(Looper.getMainLooper());
+    private final Runnable pollRunnable = new Runnable() {
+        @Override
+        public void run() {
+            loadMessages();
+            pollHandler.postDelayed(this, POLL_INTERVAL_MS);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +71,7 @@ public class ChatActivity extends AppCompatActivity {
 
         initView();
         setupToolbar();
+        setupRecycler();
 
         chatId = getIntent().getStringExtra(EXTRA_CHAT_ID);
 
@@ -61,6 +84,8 @@ public class ChatActivity extends AppCompatActivity {
         observeViewModel();
 
         btnSend.setOnClickListener(v -> sendMessage());
+
+        loadMessages();
     }
 
     private void initView(){
@@ -68,6 +93,7 @@ public class ChatActivity extends AppCompatActivity {
         edtMessage = findViewById(R.id.edtMessage);
         txtSubtitle = findViewById(R.id.txtChatSubtitle);
         btnSend = findViewById(R.id.btnSend);
+        recyclerMessages = findViewById(R.id.recyclerMessages);
     }
 
     private void setupToolbar(){
@@ -79,14 +105,36 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    private void setupRecycler(){
+        String currentUserId = SessionManager.getInstance().getUserId();
+        messageAdapter = new MessageAdapter(new ArrayList<>(), currentUserId);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        recyclerMessages.setLayoutManager(layoutManager);
+        recyclerMessages.setAdapter(messageAdapter);
+    }
+
     private void observeViewModel() {
         chatViewModel.getMessageSent().observe(this, sent -> {
             if (!Boolean.TRUE.equals(sent)) return;
             edtMessage.setText("");
             edtMessage.setEnabled(true);
             btnSend.setEnabled(true);
-            Toast.makeText(this, "Mensaje enviado", Toast.LENGTH_SHORT).show();
+            loadMessages();
+            loadChats();
         });
+
+        chatViewModel.getMessages().observe(this, messages -> {
+            if (messages == null) return;
+            boolean hasNewMessages = messages.size() > lastMessageCount;
+            lastMessageCount = messages.size();
+            messageAdapter.updateData(messages);
+            if (hasNewMessages && !messages.isEmpty()) {
+                scrollToBottom();
+            }
+        });
+
         chatViewModel.getError().observe(this, msg -> {
             edtMessage.setEnabled(true);
             btnSend.setEnabled(true);
@@ -106,6 +154,37 @@ public class ChatActivity extends AppCompatActivity {
     private void setInputEnabled(boolean enabled) {
         edtMessage.setEnabled(enabled);
         btnSend.setEnabled(enabled);
+    }
+
+    private void loadMessages() {
+        chatViewModel.loadMessages(
+                SessionManager.getInstance().getBearerToken(), chatId);
+    }
+
+    private void loadChats() {
+        chatViewModel.loadChats(SessionManager.getInstance().getBearerToken());
+    }
+
+    private void scrollToBottom() {
+        recyclerMessages.post(() -> {
+            int lastPosition = messageAdapter.getItemCount() - 1;
+            if (lastPosition >= 0) {
+                recyclerMessages.scrollToPosition(lastPosition);
+            }
+        });
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        pollHandler.postDelayed(pollRunnable, POLL_INTERVAL_MS);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        pollHandler.removeCallbacks(pollRunnable);
     }
 
     @Override

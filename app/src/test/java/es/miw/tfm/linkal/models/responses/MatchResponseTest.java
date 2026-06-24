@@ -285,6 +285,20 @@ public class MatchResponseTest {
     }
 
     @Test
+    public void getAlreadyRatedBusiness_returnsTrue() {
+        MatchResponse r = new MatchResponse();
+        r.setAlreadyRatedBusiness(true);
+        assertTrue(r.getAlreadyRatedBusiness());
+    }
+
+    @Test
+    public void getAlreadyReatedBusiness_returnsFalse() {
+        MatchResponse r = new MatchResponse();
+        r.setAlreadyRatedBusiness(false);
+        assertFalse(r.getAlreadyRatedBusiness());
+    }
+
+    @Test
     public void twoInstances_areIndependent() {
         MatchResponse r1 = new MatchResponse();
         MatchResponse r2 = new MatchResponse();

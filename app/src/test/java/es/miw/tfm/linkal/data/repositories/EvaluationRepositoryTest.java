@@ -28,6 +28,7 @@ public class EvaluationRepositoryTest {
     private EvaluationApiService mockApiService;
     @Mock
     private Call<EvaluationResponse> mockCreateCall;
+    @Mock private Call<EvaluationResponse> mockByInfluencerCall;
     @Mock
     private MutableLiveData<EvaluationResponse> resultLiveData;
     @Mock
@@ -43,6 +44,7 @@ public class EvaluationRepositoryTest {
     public void setUp() {
         repository = new EvaluationRepository(mockApiService);
         when(mockApiService.create(anyString(), anyString(), any())).thenReturn(mockCreateCall);
+        when(mockApiService.createByInfluencer(anyString(), anyString(), any())).thenReturn(mockByInfluencerCall);
     }
 
     // Singleton ---------------------------------------------------------------------
@@ -211,6 +213,93 @@ public class EvaluationRepositoryTest {
 
         verify(errorLiveData).postValue(any());
         verify(loadingLiveData).postValue(false);
+    }
+
+    // createByInfluencer --------------------------------------------------------------------
+
+    @Test
+    public void createByInfluencer_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockByInfluencerCall).enqueue(any());
+
+        repository.createByInfluencer("Bearer token", "match-id", buildRequest(5), resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void createByInfluencer_callsApiServiceWithCorrectParams() {
+        doAnswer(inv -> null).when(mockByInfluencerCall).enqueue(any());
+        EvaluationRequest request = buildRequest(4);
+
+        repository.createByInfluencer("Bearer token", "match-id-123", request, resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).createByInfluencer(eq("Bearer token"), eq("match-id-123"), eq(request));
+    }
+
+
+    @Test
+    public void createByInfluencer_onSuccess_postsResponseBodyToResult() {
+        EvaluationResponse responseBody = buildResponse("eval-2", 4);
+
+        doAnswer(invocation -> {
+            Callback<EvaluationResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockByInfluencerCall, Response.success(responseBody));
+            return null;
+        }).when(mockByInfluencerCall).enqueue(any());
+
+        repository.createByInfluencer("Bearer token", "match-id", buildRequest(4), resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(resultLiveData).postValue(responseBody);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void createByInfluencer_on403Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<EvaluationResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockByInfluencerCall, Response.error(403, mockErrorBody));
+            return null;
+        }).when(mockByInfluencerCall).enqueue(any());
+
+        repository.createByInfluencer("Bearer token", "match-id", buildRequest(4), resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("403"));
+        verify(loadingLiveData).postValue(false);
+        verify(resultLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void createByInfluencer_on409Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<EvaluationResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockByInfluencerCall, Response.error(409, mockErrorBody));
+            return null;
+        }).when(mockByInfluencerCall).enqueue(any());
+
+        repository.createByInfluencer("Bearer token", "match-id", buildRequest(4), resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("409"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void createByInfluencer_onNetworkFailure_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<EvaluationResponse> cb = invocation.getArgument(0);
+            cb.onFailure(mockByInfluencerCall, new RuntimeException("timeout"));
+            return null;
+        }).when(mockByInfluencerCall).enqueue(any());
+
+        repository.createByInfluencer("Bearer token", "match-id", buildRequest(4), resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(errorLiveData).postValue(any());
+        verify(loadingLiveData).postValue(false);
+        verify(resultLiveData, never()).postValue(any());
     }
 
     // helpers ------------------------------------------------------------------

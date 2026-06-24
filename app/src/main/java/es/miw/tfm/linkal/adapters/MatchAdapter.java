@@ -35,6 +35,16 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder>{
         notifyDataSetChanged();
     }
 
+    public void markAsRated(String matchId) {
+        for (int i = 0; i < items.size(); i++) {
+            if (matchId.equals(items.get(i).getId())) {
+                items.get(i).setAlreadyRatedBusiness(true);
+                notifyItemChanged(i);
+                break;
+            }
+        }
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -65,6 +75,12 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder>{
         holder.txtDate.setText(date != null && date.length() >= 10
                 ? "Enviado el " + date.substring(0, 10) : "");
 
+        boolean showBadge = role == Role.INFLUENCER
+                && "COMPLETED".equals(m.getStatus())
+                && "CLOSED".equals(m.getCampaignStatus())
+                && !Boolean.TRUE.equals(m.getAlreadyRatedBusiness());
+        holder.badgeRate.setVisibility(showBadge ? View.VISIBLE : View.GONE);
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onMatchClick(m);
         });
@@ -83,12 +99,14 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder>{
         TextView txtCampaignTitle;
         TextView txtCounterpart;
         TextView txtDate;
+        TextView badgeRate;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             txtCampaignTitle = itemView.findViewById(R.id.txtMatchCampaignTitle);
-            txtCounterpart   = itemView.findViewById(R.id.txtMatchCounterpart);
-            txtDate          = itemView.findViewById(R.id.txtMatchDate);
+            txtCounterpart = itemView.findViewById(R.id.txtMatchCounterpart);
+            txtDate = itemView.findViewById(R.id.txtMatchDate);
+            badgeRate = itemView.findViewById(R.id.badgeRate);
         }
     }
 }

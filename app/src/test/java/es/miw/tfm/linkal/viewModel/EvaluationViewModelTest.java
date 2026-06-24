@@ -14,6 +14,7 @@ import es.miw.tfm.linkal.data.repositories.EvaluationRepository;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -105,6 +106,47 @@ public class EvaluationViewModelTest {
         viewModel.create("Bearer token", "match-id", 5);
 
         verify(mockEvaluationRepository).create(
+                any(), any(), any(), any(), any(), any());
+    }
+
+    // createByInfluencer ------------------------------------------------
+
+    @Test
+    public void createByInfluencer_delegatesToRepository() {
+        viewModel.createByInfluencer("Bearer token", "match-id-123", 4);
+
+        verify(mockEvaluationRepository).createByInfluencer(
+                eq("Bearer token"), eq("match-id-123"), any(), any(), any(), any());
+    }
+
+    @Test
+    public void createByInfluencer_withDifferentToken_passesItToRepository() {
+        viewModel.createByInfluencer("Bearer other-token", "match-id-123", 4);
+
+        verify(mockEvaluationRepository).createByInfluencer(
+                eq("Bearer other-token"), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void createByInfluencer_withDifferentMatchId_passesItToRepository() {
+        viewModel.createByInfluencer("Bearer token", "other-match-id", 4);
+
+        verify(mockEvaluationRepository).createByInfluencer(
+                any(), eq("other-match-id"), any(), any(), any(), any());
+    }
+
+    @Test
+    public void createByInfluencer_doesNotCallCreate() {
+        viewModel.createByInfluencer("Bearer token", "match-id", 4);
+
+        verify(mockEvaluationRepository, never()).create(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void createByInfluencer_withMinScore_delegatesToRepository() {
+        viewModel.createByInfluencer("Bearer token", "match-id", 1);
+
+        verify(mockEvaluationRepository).createByInfluencer(
                 any(), any(), any(), any(), any(), any());
     }
 }

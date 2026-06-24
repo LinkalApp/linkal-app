@@ -55,6 +55,11 @@ public class MatchViewModelTest {
         assertNull(viewModel.getError().getValue());
     }
 
+    @Test
+    public void campaignMatches_initialValue_isNull() {
+        assertNull(viewModel.getCampaignMatches().getValue());
+    }
+
     // Getters LiveData -------------------------------------------------
 
     @Test
@@ -76,6 +81,9 @@ public class MatchViewModelTest {
     public void getErrorMessage_returnsLiveData() {
         assertNotNull(viewModel.getError());
     }
+
+    @Test
+    public void getCampaignMatches_returnsLiveData() { assertNotNull(viewModel.getCampaignMatches()); }
 
     // createByInfluencer → MatchRepository -------------------------------------------------
 
@@ -217,5 +225,40 @@ public class MatchViewModelTest {
     @Test
     public void loadPending_and_loadCompleted_writeToSameLiveData() {
         assertSame(viewModel.getMatches(), viewModel.getMatches());
+    }
+
+    // loadMatchesByCampaign ------------------------------------------------------------
+
+    @Test
+    public void loadMatchesByCampaign_delegatesToRepository() {
+        viewModel.loadMatchesByCampaign("Bearer token", "campaign-id-123");
+        verify(mockMatchRepository).getMatchesByCampaign(
+                eq("Bearer token"), eq("campaign-id-123"), any(), any(), any());
+    }
+
+    @Test
+    public void loadMatchesByCampaign_withDifferentToken_passesItToRepository() {
+        viewModel.loadMatchesByCampaign("Bearer other-token", "campaign-id-123");
+        verify(mockMatchRepository).getMatchesByCampaign(
+                eq("Bearer other-token"), eq("campaign-id-123"), any(), any(), any());
+    }
+
+    @Test
+    public void loadMatchesByCampaign_withDifferentCampaignId_passesItToRepository() {
+        viewModel.loadMatchesByCampaign("Bearer token", "other-campaign-id");
+        verify(mockMatchRepository).getMatchesByCampaign(
+                eq("Bearer token"), eq("other-campaign-id"), any(), any(), any());
+    }
+
+    @Test
+    public void loadMatchesByCampaign_doesNotCallGetPending() {
+        viewModel.loadMatchesByCampaign("Bearer token", "campaign-id");
+        verify(mockMatchRepository, never()).getPending(any(), any(), any(), any());
+    }
+
+    @Test
+    public void loadMatchesByCampaign_doesNotCallGetCompleted() {
+        viewModel.loadMatchesByCampaign("Bearer token", "campaign-id");
+        verify(mockMatchRepository, never()).getCompleted(any(), any(), any(), any());
     }
 }

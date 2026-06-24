@@ -263,6 +263,58 @@ public class CampaignViewModelTest {
         verify(mockCampaignRepository).delete(eq("Bearer token"), eq("other-campaign-id"), any(), any(), any());
     }
 
+    // startWithInfluencer ------------------------------------------------------------------------
+
+    @Test
+    public void startWithInfluencer_delegatesToRepository() {
+        viewModel.startWithInfluencer("Bearer token", "campaign-id-123", "match-id-456");
+
+        verify(mockCampaignRepository).startWithInfluencer(
+                eq("Bearer token"), eq("campaign-id-123"), eq("match-id-456"), any(), any(), any());
+    }
+
+    @Test
+    public void startWithInfluencer_withDifferentToken_passesItToRepository() {
+        viewModel.startWithInfluencer("Bearer other-token", "campaign-id", "match-id");
+
+        verify(mockCampaignRepository).startWithInfluencer(
+                eq("Bearer other-token"), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void startWithInfluencer_withDifferentCampaignId_passesItToRepository() {
+        viewModel.startWithInfluencer("Bearer token", "other-campaign-id", "match-id");
+
+        verify(mockCampaignRepository).startWithInfluencer(
+                any(), eq("other-campaign-id"), any(), any(), any(), any());
+    }
+
+    @Test
+    public void startWithInfluencer_withDifferentMatchId_passesItToRepository() {
+        viewModel.startWithInfluencer("Bearer token", "campaign-id", "other-match-id");
+
+        verify(mockCampaignRepository).startWithInfluencer(
+                any(), any(), eq("other-match-id"), any(), any(), any());
+    }
+
+    @Test
+    public void startWithInfluencer_doesNotCallCreate() {
+        viewModel.startWithInfluencer("Bearer token", "campaign-id", "match-id");
+
+        verify(mockCampaignRepository, never()).create(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void getStartResult_returnsLiveData() {
+        assertNotNull(viewModel.getStartResult());
+    }
+
+    @Test
+    public void startResult_initialValue_isNull() {
+        assertNull(viewModel.getStartResult().getValue());
+    }
+
+
     // helpers ----------------------------------------------------------
 
     private CreateCampaignRequest buildCreateRequest() {

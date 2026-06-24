@@ -33,6 +33,7 @@ public class MatchRepositoryTest {
     @Mock private Call<MatchResponse> mockBusinessCall;
     @Mock private Call<List<MatchResponse>> mockPendingCall;
     @Mock private Call<List<MatchResponse>> mockCompletedCall;
+    @Mock private Call<List<MatchResponse>> mockCampaignMatchesCall;
     @Mock private MutableLiveData<MatchResponse> resultLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
     @Mock private MutableLiveData<List<MatchResponse>> pendingLiveData;
@@ -52,6 +53,7 @@ public class MatchRepositoryTest {
         doReturn(mockBusinessCall).when(mockApiService).createByBusiness(anyString(), anyString(), anyString());
         doReturn(mockPendingCall).when(mockApiService).getPending(anyString());
         doReturn(mockCompletedCall).when(mockApiService).getCompleted(anyString());
+        doReturn(mockCampaignMatchesCall).when(mockApiService).getMatchesByCampaign(anyString(), anyString());
     }
 
     // Singleton -----------------------------------------------------------------------
@@ -501,6 +503,135 @@ public class MatchRepositoryTest {
         verify(errorLiveData).postValue(captor.capture());
         assertTrue(captor.getValue().contains("sin red"));
         verify(completedLiveData, never()).postValue(any());
+    }
+
+    // getMatchesByCampaign -------------------------------------------------------------------------
+
+    @Mock private MutableLiveData<List<MatchResponse>> campaignMatchesLiveData;
+
+    @Test
+    public void getMatchesByCampaign_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockCampaignMatchesCall).enqueue(any());
+
+        repository.getMatchesByCampaign("Bearer token", "campaign-id-123",
+                campaignMatchesLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void getMatchesByCampaign_callsApiServiceWithTokenAndCampaignId() {
+        doAnswer(inv -> null).when(mockCampaignMatchesCall).enqueue(any());
+
+        repository.getMatchesByCampaign("Bearer token", "campaign-id-123",
+                campaignMatchesLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).getMatchesByCampaign(eq("Bearer token"), eq("campaign-id-123"));
+    }
+
+    @Test
+    public void getMatchesByCampaign_onSuccess_postsListToResult() {
+        List<MatchResponse> matches = Arrays.asList(
+                buildMatchResponse("COMPLETED"), buildMatchResponse("COMPLETED"));
+
+        doAnswer(invocation -> {
+            Callback<List<MatchResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockCampaignMatchesCall, Response.success(matches));
+            return null;
+        }).when(mockCampaignMatchesCall).enqueue(any());
+
+        repository.getMatchesByCampaign("Bearer token", "campaign-id-123",
+                campaignMatchesLiveData, errorLiveData, loadingLiveData);
+
+        verify(campaignMatchesLiveData).postValue(matches);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getMatchesByCampaign_onSuccessEmptyList_postsEmptyList() {
+        doAnswer(invocation -> {
+            Callback<List<MatchResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockCampaignMatchesCall, Response.success(Arrays.asList()));
+            return null;
+        }).when(mockCampaignMatchesCall).enqueue(any());
+
+        repository.getMatchesByCampaign("Bearer token", "campaign-id-123",
+                campaignMatchesLiveData, errorLiveData, loadingLiveData);
+
+        verify(campaignMatchesLiveData).postValue(Arrays.asList());
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getMatchesByCampaign_on401Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<MatchResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockCampaignMatchesCall, Response.error(401, mockErrorBody));
+            return null;
+        }).when(mockCampaignMatchesCall).enqueue(any());
+
+        repository.getMatchesByCampaign("Bearer expired", "campaign-id-123",
+                campaignMatchesLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("401"));
+        verify(loadingLiveData).postValue(false);
+        verify(campaignMatchesLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getMatchesByCampaign_on403Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<MatchResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockCampaignMatchesCall, Response.error(403, mockErrorBody));
+            return null;
+        }).when(mockCampaignMatchesCall).enqueue(any());
+
+        repository.getMatchesByCampaign("Bearer token", "campaign-id-123",
+                campaignMatchesLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("403"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void getMatchesByCampaign_on404Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<MatchResponse>> cb = invocation.getArgument(0);
+            cb.onResponse(mockCampaignMatchesCall, Response.error(404, mockErrorBody));
+            return null;
+        }).when(mockCampaignMatchesCall).enqueue(any());
+
+        repository.getMatchesByCampaign("Bearer token", "campaign-id-123",
+                campaignMatchesLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("404"));
+        verify(loadingLiveData).postValue(false);
+        verify(campaignMatchesLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void getMatchesByCampaign_onNetworkFailure_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<List<MatchResponse>> cb = invocation.getArgument(0);
+            cb.onFailure(mockCampaignMatchesCall, new RuntimeException("timeout"));
+            return null;
+        }).when(mockCampaignMatchesCall).enqueue(any());
+
+        repository.getMatchesByCampaign("Bearer token", "campaign-id-123",
+                campaignMatchesLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("timeout"));
+        verify(loadingLiveData).postValue(false);
+        verify(campaignMatchesLiveData, never()).postValue(any());
     }
 
     // helpers ----------------------------------------------------------

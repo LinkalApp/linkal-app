@@ -107,4 +107,19 @@ public class MatchRepository extends BaseRepository{
                     }
                 });
     }
+
+    public void getMatchesByCampaign(String token,
+                                     String campaignId,
+                                     MutableLiveData<List<MatchResponse>> result,
+                                     MutableLiveData<String> error,
+                                     MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.getMatchesByCampaign(token, campaignId).enqueue(
+                new ApiCallback<List<MatchResponse>>(loading, error) {
+                    @Override
+                    protected void onSuccess(List<MatchResponse> body) {
+                        result.postValue(body);
+                    }
+                });
+    }
 }

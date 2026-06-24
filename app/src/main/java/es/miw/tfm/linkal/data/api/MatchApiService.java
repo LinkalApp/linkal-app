@@ -31,4 +31,8 @@ public interface MatchApiService {
 
     @GET(base + "/completed")
     Call<List<MatchResponse>> getCompleted(@Header("Authorization") String token);
+
+    @GET(base + "/campaigns/{campaignId}")
+    Call<List<MatchResponse>> getMatchesByCampaign(@Header("Authorization") String token,
+                                                   @Path("campaignId") String campaignId);
 }

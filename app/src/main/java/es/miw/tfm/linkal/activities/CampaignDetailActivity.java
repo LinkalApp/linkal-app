@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,10 +22,16 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.util.List;
+
 import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.adapters.CampaignAdapter;
+import es.miw.tfm.linkal.models.requests.UpdateCampaignRequest;
+import es.miw.tfm.linkal.models.responses.MatchResponse;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.CampaignViewModel;
+import es.miw.tfm.linkal.viewModel.EvaluationViewModel;
+import es.miw.tfm.linkal.viewModel.MatchViewModel;
 
 public class CampaignDetailActivity extends AppCompatActivity {
 
@@ -44,6 +51,8 @@ public class CampaignDetailActivity extends AppCompatActivity {
             campaignObjective, campaignRequirements, campaignReward, campaignStatus;
 
     private CampaignViewModel campaignViewModel;
+    private MatchViewModel matchViewModel;
+    private EvaluationViewModel evaluationViewModel;
 
     private final ActivityResultLauncher<Intent> editLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -80,6 +89,8 @@ public class CampaignDetailActivity extends AppCompatActivity {
         }
 
         campaignViewModel = new ViewModelProvider(this).get(CampaignViewModel.class);
+        matchViewModel = new ViewModelProvider(this).get(MatchViewModel.class);
+        evaluationViewModel = new ViewModelProvider(this).get(EvaluationViewModel.class);
 
         initView();
         loadExtras();
@@ -106,20 +117,118 @@ public class CampaignDetailActivity extends AppCompatActivity {
     private void showOptionsMenu(View anchor) {
         PopupMenu popup = new PopupMenu(this, anchor);
         popup.getMenuInflater().inflate(R.menu.menu_campaign_options, popup.getMenu());
+
+        popup.getMenu().findItem(R.id.action_start_campaign)
+                .setVisible("OPEN".equals(campaignStatus));
+        popup.getMenu().findItem(R.id.action_finish_campaign)
+                .setVisible("IN_PROGRESS".equals(campaignStatus));
+
         popup.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.action_edit_campaign) {
-                openEditCampaign();
-                return true;
-            }else if (item.getItemId() == R.id.action_delete_campaign) {
-                showDeleteAccountDialog();
-                return true;
-            }
+            int id = item.getItemId();
+            if (id == R.id.action_edit_campaign)   { openEditCampaign(); return true; }
+            if (id == R.id.action_delete_campaign) { confirmDelete();    return true; }
+            if (id == R.id.action_start_campaign)  { startCampaign();   return true; }
+            if (id == R.id.action_finish_campaign) { confirmFinish();    return true; }
             return false;
         });
         popup.show();
     }
 
-    private void showDeleteAccountDialog() {
+    private void startCampaign() {
+        matchViewModel.getCampaignMatches().observe(this, matches -> {
+            matchViewModel.getCampaignMatches().removeObservers(this);
+            if (matches == null || matches.isEmpty()) {
+                Toast.makeText(this,
+                        "No hay influencers con match completado en esta campaña",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+            showInfluencerSelector(matches);
+        });
+        matchViewModel.loadMatchesByCampaign(
+                SessionManager.getInstance().getBearerToken(), campaignId);
+    }
+
+    private void showInfluencerSelector(List<MatchResponse> matches) {
+        String[] names = new String[matches.size()];
+        for (int i = 0; i < matches.size(); i++) {
+            String name    = matches.get(i).getInfluencerName();
+            String artistic = matches.get(i).getInfluencerArtisticName();
+            names[i] = orEmpty(name) +
+                    (artistic != null && !artistic.isEmpty() ? " (" + artistic + ")" : "");
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Selecciona al influencer")
+                .setItems(names, (dialog, which) -> {
+                    String matchId = matches.get(which).getId();
+                    new AlertDialog.Builder(this)
+                            .setTitle("Iniciar campaña")
+                            .setMessage("Al iniciar la campaña con " + names[which] +
+                                    " se eliminarán el resto de matches y chats pendientes. ¿Continuar?")
+                            .setPositiveButton("Iniciar", (d, w) ->
+                                    campaignViewModel.startWithInfluencer(
+                                            SessionManager.getInstance().getBearerToken(),
+                                            campaignId, matchId))
+                            .setNegativeButton("Cancelar", null)
+                            .show();
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void openRatingFlow() {
+        matchViewModel.getCampaignMatches().observe(this, matches -> {
+            matchViewModel.getCampaignMatches().removeObservers(this);
+            if (matches == null || matches.isEmpty()) {
+                Toast.makeText(this, "No se encontró el match de esta campaña", Toast.LENGTH_LONG).show();
+                return;
+            }
+            showRatingDialog(matches.get(0).getId(), matches.get(0).getInfluencerName());
+        });
+        matchViewModel.loadMatchesByCampaign(
+                SessionManager.getInstance().getBearerToken(), campaignId);
+    }
+
+    private void showRatingDialog(String matchId, String influencerName) {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_rate_influencer, null);
+        RatingBar ratingBar = dialogView.findViewById(R.id.ratingBar);
+        TextView txtName = dialogView.findViewById(R.id.txtInfluencerName);
+        if (txtName != null) txtName.setText(orEmpty(influencerName));
+
+        new AlertDialog.Builder(this)
+                .setTitle("Valorar influencer")
+                .setView(dialogView)
+                .setPositiveButton("Enviar", (dialog, which) -> {
+                    int score = (int) ratingBar.getRating();
+                    if (score < 1) {
+                        Toast.makeText(this, "Selecciona al menos 1 estrella", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    evaluationViewModel.create(
+                            SessionManager.getInstance().getBearerToken(), matchId, score);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void confirmFinish() {
+        new AlertDialog.Builder(this)
+                .setTitle("Finalizar campaña")
+                .setMessage("¿Quieres marcar esta campaña como finalizada?")
+                .setPositiveButton("Finalizar", (dialog, which) -> {
+                    UpdateCampaignRequest request = new UpdateCampaignRequest(
+                            campaignTitle, campaignDescription,
+                            campaignRequirements, campaignReward,
+                            campaignObjective, "CLOSED");
+                    campaignViewModel.update(SessionManager.getInstance().getBearerToken(),
+                            campaignId, request);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void confirmDelete() {
         new AlertDialog.Builder(this)
                 .setTitle("Eliminar campaña")
                 .setMessage("¿Seguro que quieres eliminar \"" + campaignTitle + "\"? Esta acción no se puede deshacer.")
@@ -176,6 +285,39 @@ public class CampaignDetailActivity extends AppCompatActivity {
         });
         campaignViewModel.getError().observe(this, error -> {
             if (error != null) {
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        campaignViewModel.getUpdateResult().observe(this, campaign -> {
+            if (campaign == null) return;
+            campaignStatus = campaign.getStatus();
+            refreshViews();
+            if ("CLOSED".equals(campaignStatus)) {
+                openRatingFlow();
+            }
+        });
+
+        campaignViewModel.getStartResult().observe(this, campaign -> {
+            if (campaign == null) return;
+            campaignStatus = campaign.getStatus();
+            refreshViews();
+            Toast.makeText(this, "¡Campaña iniciada!", Toast.LENGTH_SHORT).show();
+        });
+
+        evaluationViewModel.getEvaluationResult().observe(this, eval -> {
+            if (eval == null) return;
+            Toast.makeText(this, "¡Valoración enviada!", Toast.LENGTH_SHORT).show();
+        });
+
+        evaluationViewModel.getErrorMessage().observe(this, error -> {
+            if (error != null && !error.isEmpty()) {
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        matchViewModel.getError().observe(this, error -> {
+            if (error != null && !error.isEmpty()) {
                 Toast.makeText(this, error, Toast.LENGTH_LONG).show();
             }
         });

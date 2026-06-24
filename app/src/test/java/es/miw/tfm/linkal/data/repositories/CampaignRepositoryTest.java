@@ -34,6 +34,7 @@ public class CampaignRepositoryTest {
     @Mock private Call<Void> mockDeleteCall;
     @Mock private Call<List<CampaignResponse>> mockGetOpenCall;
     @Mock private Call<List<CampaignResponse>> mockGetOpenByFiltersCall;
+    @Mock private Call<CampaignResponse> mockStartCall;
     @Mock private ResponseBody mockErrorBody;
     @Mock private MutableLiveData<CampaignResponse> resultLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
@@ -58,6 +59,7 @@ public class CampaignRepositoryTest {
         when(mockApiService.delete(anyString(), anyString())).thenReturn(mockDeleteCall);
         when(mockApiService.getOpenCampaigns(anyString())).thenReturn(mockGetOpenCall);
         when(mockApiService.getOpenCampaignsByFilters(anyString(), any(), any())).thenReturn(mockGetOpenByFiltersCall);
+        when(mockApiService.startWithInfluencer(anyString(), anyString(), anyString())).thenReturn(mockStartCall);
     }
 
     // Singleton ------------------------------------------------------------------
@@ -710,6 +712,147 @@ public class CampaignRepositoryTest {
         assertTrue(captor.getValue().contains("timeout"));
         verify(loadingLiveData).postValue(false);
         verify(openCampaignsLiveData, never()).postValue(any());
+    }
+
+    // startWithInfluencer ----------------------------------------------------------------------------
+
+    @Test
+    public void startWithInfluencer_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockStartCall).enqueue(any());
+
+        repository.startWithInfluencer("Bearer token", "campaign-id", "match-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void startWithInfluencer_callsApiServiceWithCorrectParams() {
+        doAnswer(inv -> null).when(mockStartCall).enqueue(any());
+
+        repository.startWithInfluencer("Bearer token", "campaign-id-123", "match-id-456",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).startWithInfluencer(
+                eq("Bearer token"), eq("campaign-id-123"), eq("match-id-456"));
+    }
+
+    @Test
+    public void startWithInfluencer_onSuccess_postsResponseBodyToResult() {
+        CampaignResponse inProgress = new CampaignResponse();
+        inProgress.setStatus("IN_PROGRESS");
+
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockStartCall, Response.success(inProgress));
+            return null;
+        }).when(mockStartCall).enqueue(any());
+
+        repository.startWithInfluencer("Bearer token", "campaign-id", "match-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(resultLiveData).postValue(inProgress);
+        verify(loadingLiveData).postValue(false);
+        verify(errorLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void startWithInfluencer_on401Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockStartCall, Response.error(401, mockErrorBody));
+            return null;
+        }).when(mockStartCall).enqueue(any());
+
+        repository.startWithInfluencer("Bearer expired", "campaign-id", "match-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("401"));
+        verify(loadingLiveData).postValue(false);
+        verify(resultLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void startWithInfluencer_on403Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockStartCall, Response.error(403, mockErrorBody));
+            return null;
+        }).when(mockStartCall).enqueue(any());
+
+        repository.startWithInfluencer("Bearer token", "campaign-id", "match-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("403"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void startWithInfluencer_on404Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockStartCall, Response.error(404, mockErrorBody));
+            return null;
+        }).when(mockStartCall).enqueue(any());
+
+        repository.startWithInfluencer("Bearer token", "campaign-id", "match-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("404"));
+        verify(loadingLiveData).postValue(false);
+        verify(resultLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void startWithInfluencer_on409Response_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onResponse(mockStartCall, Response.error(409, mockErrorBody));
+            return null;
+        }).when(mockStartCall).enqueue(any());
+
+        repository.startWithInfluencer("Bearer token", "campaign-id", "match-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("409"));
+        verify(loadingLiveData).postValue(false);
+        verify(resultLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void startWithInfluencer_onNetworkFailure_postsErrorMessage() {
+        doAnswer(invocation -> {
+            Callback<CampaignResponse> cb = invocation.getArgument(0);
+            cb.onFailure(mockStartCall, new RuntimeException("sin red"));
+            return null;
+        }).when(mockStartCall).enqueue(any());
+
+        repository.startWithInfluencer("Bearer token", "campaign-id", "match-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(captor.capture());
+        assertTrue(captor.getValue().contains("sin red"));
+        verify(loadingLiveData).postValue(false);
+        verify(resultLiveData, never()).postValue(any());
+    }
+
+    @Test
+    public void startWithInfluencer_doesNotCallCreate() {
+        doAnswer(inv -> null).when(mockStartCall).enqueue(any());
+
+        repository.startWithInfluencer("Bearer token", "campaign-id", "match-id",
+                resultLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService, never()).create(any(), any());
     }
 
 

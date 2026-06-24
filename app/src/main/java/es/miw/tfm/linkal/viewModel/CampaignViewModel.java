@@ -20,7 +20,7 @@ public class CampaignViewModel extends ViewModel {
     private final MutableLiveData<Boolean> deleteResult = new MutableLiveData<>();
     private final MutableLiveData<List<CampaignResponse>> campaigns = new MutableLiveData<>();
     private final MutableLiveData<List<CampaignResponse>> openCampaigns = new MutableLiveData<>();
-
+    private final MutableLiveData<CampaignResponse> startResult = new MutableLiveData<>();
 
     private final CampaignRepository campaignRepository;
     private final BusinessRepository businessRepository;
@@ -68,6 +68,10 @@ public class CampaignViewModel extends ViewModel {
         campaignRepository.delete(token, campaignId, deleteResult, errorMessage, isLoading);
     }
 
+    public void startWithInfluencer(String token, String campaignId, String matchId) {
+        campaignRepository.startWithInfluencer(token, campaignId, matchId, startResult, errorMessage, isLoading);
+    }
+
     public LiveData<Boolean> getIsLoading()    { return isLoading; }
     public LiveData<String> getError() { return errorMessage; }
     public LiveData<CampaignResponse> getCreateResult() { return createResult; }
@@ -75,4 +79,5 @@ public class CampaignViewModel extends ViewModel {
     public LiveData<Boolean> getDeleteResult() { return deleteResult; }
     public LiveData<List<CampaignResponse>> getCampaigns() { return campaigns; }
     public LiveData<List<CampaignResponse>> getOpenCampaigns() { return openCampaigns; }
+    public LiveData<CampaignResponse> getStartResult() { return startResult; }
 }

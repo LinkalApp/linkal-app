@@ -107,4 +107,20 @@ public class CampaignRepository extends BaseRepository{
                     }
                 });
     }
+
+    public void startWithInfluencer(String token,
+                                    String campaignId,
+                                    String matchId,
+                                    MutableLiveData<CampaignResponse> result,
+                                    MutableLiveData<String> error,
+                                    MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.startWithInfluencer(token, campaignId, matchId).enqueue(
+                new ApiCallback<CampaignResponse>(loading, error) {
+                    @Override
+                    protected void onSuccess(CampaignResponse body) {
+                        result.postValue(body);
+                    }
+                });
+    }
 }

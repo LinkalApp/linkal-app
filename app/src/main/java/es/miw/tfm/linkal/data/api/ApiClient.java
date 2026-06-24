@@ -43,4 +43,8 @@ public class ApiClient {
     public static ChatApiService getChatApiService() {
         return getInstance().create(ChatApiService.class);
     }
+
+    public static EvaluationApiService getEvaluationApiService() {
+        return getInstance().create(EvaluationApiService.class);
+    }
 }

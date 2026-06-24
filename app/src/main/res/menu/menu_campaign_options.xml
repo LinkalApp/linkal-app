@@ -6,4 +6,10 @@
     <item
         android:id="@+id/action_delete_campaign"
         android:title="@string/titleDeleteCampaign"/>
+    <item
+        android:id="@+id/action_start_campaign"
+        android:title="Iniciar campaña"/>
+    <item
+        android:id="@+id/action_finish_campaign"
+        android:title="Finalizar campaña"/>
 </menu>

@@ -36,4 +36,9 @@ public interface CampaignApiService {
     @GET(base + "/open")
     Call<List<CampaignResponse>> getOpenCampaignsByFilters( @Header("Authorization") String token,
             @Query("category") String category, @Query("province") String province);
+
+    @PUT(base + "/{campaignId}/start/{matchId}")
+    Call<CampaignResponse> startWithInfluencer(@Header("Authorization") String token,
+                                               @Path("campaignId") String campaignId,
+                                               @Path("matchId") String matchId);
 }

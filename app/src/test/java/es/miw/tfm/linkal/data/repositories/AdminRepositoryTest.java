@@ -29,8 +29,10 @@ public class AdminRepositoryTest {
     @Mock private AdminApiService mockApiService;
     @Mock private Call<List<AdminUserResponse>> mockFindAllCall;
     @Mock private Call<AdminUserResponse> mockFindByIdCall;
+    @Mock private Call<AdminUserResponse> mockVerifyCall;
     @Mock private MutableLiveData<List<AdminUserResponse>> usersLiveData;
     @Mock private MutableLiveData<AdminUserResponse> detailLiveData;
+    @Mock private MutableLiveData<AdminUserResponse> verifyLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
     @Mock private MutableLiveData<Boolean> loadingLiveData;
     @Mock private ResponseBody mockErrorBody;
@@ -42,6 +44,7 @@ public class AdminRepositoryTest {
         repository = new AdminRepository(mockApiService);
         when(mockApiService.findAll(anyString(), any(), any())).thenReturn(mockFindAllCall);
         when(mockApiService.findById(anyString(), anyString())).thenReturn(mockFindByIdCall);
+        when(mockApiService.verifyUser(anyString(), anyString())).thenReturn(mockVerifyCall);
     }
 
     // Singleton --------------------------------------------------------------------
@@ -198,6 +201,76 @@ public class AdminRepositoryTest {
         ArgumentCaptor<String> errorCaptor = ArgumentCaptor.forClass(String.class);
         verify(errorLiveData).postValue(errorCaptor.capture());
         assertTrue(errorCaptor.getValue().contains("Connection refused"));
+    }
+
+    // verifyUser ----------------------------------------------------------------------------
+
+    @Test
+    public void verifyUser_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockVerifyCall).enqueue(any());
+
+        repository.verifyUser("Bearer token", "user-id-123", verifyLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void verifyUser_callsApiServiceWithCorrectParams() {
+        doAnswer(inv -> null).when(mockVerifyCall).enqueue(any());
+
+        repository.verifyUser("Bearer token", "user-id-123", verifyLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).verifyUser(eq("Bearer token"), eq("user-id-123"));
+    }
+
+    @Test
+    public void verifyUser_onSuccess_postsResultAndStopsLoading() {
+        AdminUserResponse user = buildUser("INFLUENCER");
+        user.setVerified(true);
+
+        doAnswer(invocation -> {
+            Callback<AdminUserResponse> callback = invocation.getArgument(0);
+            callback.onResponse(mockVerifyCall, Response.success(user));
+            return null;
+        }).when(mockVerifyCall).enqueue(any());
+
+        repository.verifyUser("Bearer token", "user-id", verifyLiveData, errorLiveData, loadingLiveData);
+
+        verify(verifyLiveData).postValue(user);
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void verifyUser_onHttpError_postsErrorAndStopsLoading() throws Exception {
+        when(mockErrorBody.string()).thenReturn("{\"message\": \"Not found\"}");
+
+        doAnswer(invocation -> {
+            Callback<AdminUserResponse> callback = invocation.getArgument(0);
+            callback.onResponse(mockVerifyCall, Response.error(404, mockErrorBody));
+            return null;
+        }).when(mockVerifyCall).enqueue(any());
+
+        repository.verifyUser("Bearer token", "bad-id", verifyLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> errorCaptor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(errorCaptor.capture());
+        assertTrue(errorCaptor.getValue().contains("404"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void verifyUser_onNetworkFailure_postsError() {
+        doAnswer(invocation -> {
+            Callback<AdminUserResponse> callback = invocation.getArgument(0);
+            callback.onFailure(mockVerifyCall, new RuntimeException("Timeout"));
+            return null;
+        }).when(mockVerifyCall).enqueue(any());
+
+        repository.verifyUser("Bearer token", "user-id", verifyLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> errorCaptor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(errorCaptor.capture());
+        assertTrue(errorCaptor.getValue().contains("Timeout"));
     }
 
     // helpers -----------------------------------------------------------------------------------------------

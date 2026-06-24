@@ -6,6 +6,7 @@ import es.miw.tfm.linkal.models.responses.AdminUserResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.PATCH;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -20,4 +21,8 @@ public interface AdminApiService {
     @GET(base + "/users/{id}")
     Call<AdminUserResponse> findById( @Header("Authorization") String token,
                                       @Path("id") String id);
+
+    @PATCH(base + "/users/{id}/verify")
+    Call<AdminUserResponse> verifyUser( @Header("Authorization") String token,
+                                        @Path("id") String id);
 }

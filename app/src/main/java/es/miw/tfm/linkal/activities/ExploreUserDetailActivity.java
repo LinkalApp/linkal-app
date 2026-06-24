@@ -2,11 +2,13 @@ package es.miw.tfm.linkal.activities;
 
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +16,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
 
@@ -24,19 +28,20 @@ import es.miw.tfm.linkal.viewModel.AdminViewModel;
 
 public class ExploreUserDetailActivity extends AppCompatActivity {
 
-    public static final String EXTRA_ID          = "admin_user_id";
-    public static final String EXTRA_NAME        = "admin_user_name";
-    public static final String EXTRA_EMAIL       = "admin_user_email";
-    public static final String EXTRA_PHONE       = "admin_user_phone";
+    public static final String EXTRA_ID = "admin_user_id";
+    public static final String EXTRA_NAME = "admin_user_name";
+    public static final String EXTRA_EMAIL = "admin_user_email";
+    public static final String EXTRA_PHONE = "admin_user_phone";
     public static final String EXTRA_DESCRIPTION = "admin_user_description";
-    public static final String EXTRA_VERIFIED    = "admin_user_verified";
-    public static final String EXTRA_ROLE        = "admin_user_role";
+    public static final String EXTRA_VERIFIED = "admin_user_verified";
+    public static final String EXTRA_ROLE = "admin_user_role";
 
     private ImageButton btnBack;
     private TextView txtDetailInitials, txtDetailName, txtDetailRole, txtDetailEmail,
             txtDetailPhone, txtDetailDescription;
     private ImageView imgDetailVerified;
-    private LinearLayout rowPhone, rowDescription;
+    private LinearLayout rowPhone, rowDescription, layoutBtnVerify;
+    private MaterialButton btnVerify;
 
     // Campos de rol
     private View cardRoleData;
@@ -101,6 +106,8 @@ public class ExploreUserDetailActivity extends AppCompatActivity {
         txtDetailAddress = findViewById(R.id.txtDetailAddress);
         rowWebsite = findViewById(R.id.rowWebsite);
         txtDetailWebsite = findViewById(R.id.txtDetailWebsite);
+        layoutBtnVerify = findViewById(R.id.layoutBtnVerify);
+        btnVerify = findViewById(R.id.btnVerify);
     }
 
     private void populateBasicFromExtras() {
@@ -118,6 +125,11 @@ public class ExploreUserDetailActivity extends AppCompatActivity {
         imgDetailVerified.setVisibility(verified ? View.VISIBLE : View.GONE);
         applyRoleBadge(role);
 
+        if (!verified) {
+            layoutBtnVerify.setVisibility(View.VISIBLE);
+            btnVerify.setOnClickListener(v -> onVerifyClicked());
+        }
+
         if (phone != null && !phone.isEmpty()) {
             txtDetailPhone.setText(phone);
             rowPhone.setVisibility(View.VISIBLE);
@@ -128,10 +140,29 @@ public class ExploreUserDetailActivity extends AppCompatActivity {
         }
     }
 
+    private void onVerifyClicked() {
+        Log.i("Verificar", "boton pulsado");
+        if (userId == null) return;
+        btnVerify.setEnabled(false);
+        adminViewModel.verifyUser(SessionManager.getInstance().getBearerToken(), userId);
+    }
+
     private void observeViewModel() {
         adminViewModel.getUserDetail().observe(this, user -> {
             if (user == null) return;
             populateRoleSpecific(user);
+        });
+
+        adminViewModel.getVerifyResult().observe(this, user -> {
+            if (user == null) return;
+            imgDetailVerified.setVisibility(View.VISIBLE);
+            layoutBtnVerify.setVisibility(View.GONE);
+            Toast.makeText(this, "Usuario verificado correctamente", Toast.LENGTH_SHORT).show();
+        });
+
+        adminViewModel.getErrorMessage().observe(this, error -> {
+            if (error == null) return;
+            btnVerify.setEnabled(true);
         });
     }
 

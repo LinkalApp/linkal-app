@@ -154,4 +154,10 @@ public class ExploreUsersActivity extends AppCompatActivity {
     }
 
     private String orEmpty(String s) { return s != null ? s : ""; }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadUsers();
+    }
 }

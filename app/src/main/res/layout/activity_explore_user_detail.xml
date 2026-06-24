@@ -427,6 +427,26 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Botón verificar (solo visible si no está verificado) -->
+            <LinearLayout
+                android:id="@+id/layoutBtnVerify"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@color/white"
+                android:visibility="gone">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVerify"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="@string/txtVerifyUser"
+                    android:textColor="@color/black"
+                    android:backgroundTint="@color/primary"/>
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </ScrollView>

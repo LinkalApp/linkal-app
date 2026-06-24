@@ -150,4 +150,46 @@ public class AdminViewModelTest {
 
         verify(mockAdminRepository, never()).findAll(any(), any(), any(), any(), any(), any());
     }
+
+    // verifyUser -------------------------------------------------------------------------------
+
+    @Test
+    public void verifyResult_initialValue_isNull() {
+        assertNull(viewModel.getVerifyResult().getValue());
+    }
+
+    @Test
+    public void getVerifyResult_returnsLiveData() {
+        assertNotNull(viewModel.getVerifyResult());
+    }
+
+    @Test
+    public void verifyUser_delegatesToRepository() {
+        viewModel.verifyUser("Bearer token", "user-id-123");
+
+        verify(mockAdminRepository).verifyUser(
+                eq("Bearer token"), eq("user-id-123"), any(), any(), any());
+    }
+
+    @Test
+    public void verifyUser_withDifferentId_passesIdToRepository() {
+        viewModel.verifyUser("Bearer token", "other-id");
+
+        verify(mockAdminRepository).verifyUser(
+                any(), eq("other-id"), any(), any(), any());
+    }
+
+    @Test
+    public void verifyUser_doesNotCallFindAll() {
+        viewModel.verifyUser("Bearer token", "user-id");
+
+        verify(mockAdminRepository, never()).findAll(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void verifyUser_doesNotCallFindById() {
+        viewModel.verifyUser("Bearer token", "user-id");
+
+        verify(mockAdminRepository, never()).findById(any(), any(), any(), any(), any());
+    }
 }

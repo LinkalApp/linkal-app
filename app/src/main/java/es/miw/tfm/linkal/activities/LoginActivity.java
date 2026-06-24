@@ -82,8 +82,10 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent;
                 if ("BUSINESS".equals(role)) {
                     intent = new Intent(this, ExploreInfluencersActivity.class);
-                } else {
+                } else if ("INFLUENCER".equals(role)){
                     intent = new Intent(this, ExploreCampaignsActivity.class);
+                } else{
+                    intent = new Intent(this, ExploreUsersActivity.class);
                 }
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

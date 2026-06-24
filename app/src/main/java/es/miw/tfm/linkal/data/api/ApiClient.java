@@ -47,4 +47,8 @@ public class ApiClient {
     public static EvaluationApiService getEvaluationApiService() {
         return getInstance().create(EvaluationApiService.class);
     }
+
+    public static AdminApiService getAdminApiService() {
+        return getInstance().create(AdminApiService.class);
+    }
 }

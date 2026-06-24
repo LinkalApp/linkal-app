@@ -58,4 +58,19 @@ public class AdminRepository extends BaseRepository{
                     }
                 });
     }
+
+    public void verifyUser(String token,
+                           String id,
+                           MutableLiveData<AdminUserResponse> result,
+                           MutableLiveData<String> error,
+                           MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.verifyUser(token, id).enqueue(
+                new ApiCallback<AdminUserResponse>(loading, error) {
+                    @Override
+                    protected void onSuccess(AdminUserResponse body) {
+                        result.postValue(body);
+                    }
+                });
+    }
 }

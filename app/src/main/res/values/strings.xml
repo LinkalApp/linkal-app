@@ -89,6 +89,7 @@
     <string name="txtSend">Enviar</string>
     <string name="titleUserManagement">Gestión de usuarios</string>
     <string name="txtNoUsers">No se encontraron usuarios</string>
+    <string name="txtVerifyUser">Verificar usuario</string>
 
 
 </resources>

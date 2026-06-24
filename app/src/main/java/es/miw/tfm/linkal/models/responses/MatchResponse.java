@@ -35,6 +35,8 @@ public class MatchResponse {
     private String influencerYoutube;
     private Boolean influencerVerified;
     private List<String> influencerInterests;
+    private Boolean alreadyRatedBusiness;
+
 
     public String getId() {
         return id;
@@ -77,6 +79,7 @@ public class MatchResponse {
     public String getInfluencerYoutube() { return influencerYoutube; }
     public Boolean getInfluencerVerified() { return influencerVerified; }
     public List<String> getInfluencerInterests() { return influencerInterests; }
+    public Boolean getAlreadyRatedBusiness() { return alreadyRatedBusiness; }
 
 
     public void setId(String id) { this.id = id; }
@@ -108,4 +111,6 @@ public class MatchResponse {
     public void setInfluencerYoutube(String influencerYoutube) { this.influencerYoutube = influencerYoutube; }
     public void setInfluencerVerified(Boolean influencerVerified) { this.influencerVerified = influencerVerified; }
     public void setInfluencerInterests(List<String> influencerInterests) { this.influencerInterests = influencerInterests; }
+    public void setAlreadyRatedBusiness(Boolean v) { this.alreadyRatedBusiness = v; }
+
 }

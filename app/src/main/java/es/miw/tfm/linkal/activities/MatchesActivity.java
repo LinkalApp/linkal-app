@@ -9,6 +9,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -43,6 +45,16 @@ public class MatchesActivity extends AppCompatActivity {
 
     private MatchAdapter adapter;
     private MatchViewModel matchViewModel;
+
+    private final ActivityResultLauncher<Intent> exploreLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    String ratedMatchId = result.getData().getStringExtra("rated_match_id");
+                    if (ratedMatchId != null) {
+                        adapter.markAsRated(ratedMatchId);
+                    }
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,7 +211,10 @@ public class MatchesActivity extends AppCompatActivity {
         intent.putExtra(ExploreCampaignDetailActivity.EXTRA_BUSINESS_VERIFIED,
                 Boolean.TRUE.equals(match.getBusinessVerified()));
         intent.putExtra(ExploreCampaignDetailActivity.EXTRA_INTEREST_ALREADY_EXISTS, true);
-        startActivity(intent);
+        intent.putExtra(ExploreCampaignDetailActivity.EXTRA_MATCH_ID, orEmpty(match.getId()));
+        intent.putExtra("open_already_rated",
+                Boolean.TRUE.equals(match.getAlreadyRatedBusiness()));
+        exploreLauncher.launch(intent);
     }
 
     private void openInfluencerDetail(MatchResponse match) {

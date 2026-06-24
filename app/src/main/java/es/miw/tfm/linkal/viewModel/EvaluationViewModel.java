@@ -28,6 +28,11 @@ public class EvaluationViewModel extends ViewModel {
                 evaluationResult, errorMessage, isLoading);
     }
 
+    public void createByInfluencer(String token, String matchId, int score) {
+        repository.createByInfluencer(token, matchId, new EvaluationRequest(score),
+                evaluationResult, errorMessage, isLoading);
+    }
+
     public LiveData<EvaluationResponse> getEvaluationResult() { return evaluationResult; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
     public LiveData<Boolean> getIsLoading() { return isLoading; }

@@ -15,4 +15,9 @@ public interface EvaluationApiService {
     Call<EvaluationResponse> create(@Header("Authorization") String token,
                                     @Path("matchId") String matchId,
                                     @Body EvaluationRequest request);
+
+    @POST(base + "/matches/{matchId}/influencer")
+    Call<EvaluationResponse> createByInfluencer(@Header("Authorization") String token,
+                                                @Path("matchId") String matchId,
+                                                @Body EvaluationRequest request);
 }

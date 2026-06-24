@@ -41,4 +41,20 @@ public class EvaluationRepository extends BaseRepository{
                     }
                 });
     }
+
+    public void createByInfluencer(String token,
+                                   String matchId,
+                                   EvaluationRequest request,
+                                   MutableLiveData<EvaluationResponse> result,
+                                   MutableLiveData<String> error,
+                                   MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.createByInfluencer(token, matchId, request).enqueue(
+                new ApiCallback<EvaluationResponse>(loading, error) {
+                    @Override
+                    protected void onSuccess(EvaluationResponse body) {
+                        result.postValue(body);
+                    }
+                });
+    }
 }

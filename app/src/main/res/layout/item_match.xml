@@ -52,6 +52,19 @@
                 android:textSize="12sp"
                 android:textColor="@color/neutral_medium"/>
 
+            <TextView
+                android:id="@+id/badgeRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="⭐ ¡Valora al comercio!"
+                android:textSize="12sp"
+                android:textColor="@color/black"
+                android:background="@drawable/bg_badge_in_progress"
+                android:visibility="gone"/>
+
         </LinearLayout>
 
         <!-- Flecha -->

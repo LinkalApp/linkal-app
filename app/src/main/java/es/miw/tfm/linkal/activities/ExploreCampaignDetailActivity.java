@@ -1,11 +1,14 @@
 package es.miw.tfm.linkal.activities;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
 import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.adapters.CampaignAdapter;
 import es.miw.tfm.linkal.utils.SessionManager;
+import es.miw.tfm.linkal.viewModel.EvaluationViewModel;
 import es.miw.tfm.linkal.viewModel.MatchViewModel;
 
 public class ExploreCampaignDetailActivity extends AppCompatActivity {
@@ -38,6 +42,7 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
     public static final String EXTRA_BUSINESS_ADDRESS = "open_campaign_business_address";
     public static final String EXTRA_BUSINESS_VERIFIED = "open_campaign_business_verified";
     public static final String EXTRA_INTEREST_ALREADY_EXISTS = "match_interest_exists";
+    public static final String EXTRA_MATCH_ID = "open_match_id";
 
 
     private ImageButton btnBack;
@@ -45,9 +50,12 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
     private TextView txtBusinessInitials, txtBusinessName, txtBusinessCategory, txtBusinessDescription, txtBusinessWebsite, txtBusinessProvince, txtBusinessAddress;
     private LinearLayout rowProvince, rowAddress, rowWebsite;
     private ImageView imgBusinessVerified;
-    private Button btnInterested;
+    private Button btnInterested,  btnRate;
 
     private MatchViewModel matchViewModel;
+    private EvaluationViewModel evaluationViewModel;
+    private String matchId;
+    private String campaignStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +71,7 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
         });
 
         matchViewModel = new ViewModelProvider(this).get(MatchViewModel.class);
+        evaluationViewModel = new ViewModelProvider(this).get(EvaluationViewModel.class);
 
         initViews();
 
@@ -70,12 +79,14 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
 
         populateFromExtras();
         setupMatchButton();
+        setupRateButton();
         observeViewModel();
     }
 
    private void initViews(){
         btnBack = findViewById(R.id.btnBack);
         btnInterested = findViewById(R.id.btnInterested);
+        btnRate = findViewById(R.id.btnRateBusiness);
         txtTitle = findViewById(R.id.txtTitle);
         txtStatus = findViewById(R.id.txtStatus);
         txtCreationDate = findViewById(R.id.txtCreationDate);
@@ -125,6 +136,21 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
                btnInterested.setEnabled(true);
            }
        });
+
+       evaluationViewModel.getEvaluationResult().observe(this, eval -> {
+           if (eval == null) return;
+           Toast.makeText(this, "¡Valoración enviada!", Toast.LENGTH_SHORT).show();
+           Intent result = new Intent();
+           result.putExtra("rated_match_id", matchId);
+           setResult(RESULT_OK, result);
+           btnRate.setVisibility(View.GONE);
+       });
+
+       evaluationViewModel.getErrorMessage().observe(this, error -> {
+           if (error != null && !error.isEmpty()) {
+               Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+           }
+       });
    }
 
     private void blockButton(String status) {
@@ -139,7 +165,8 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
    private void populateFromExtras(){
        Bundle e = getIntent().getExtras();
        if (e == null) return;
-
+       matchId = e.getString(EXTRA_MATCH_ID, "");
+       campaignStatus = e.getString(EXTRA_STATUS, "");
        txtTitle.setText(e.getString(EXTRA_TITLE, ""));
        CampaignAdapter.applyStatus(txtStatus, e.getString(EXTRA_STATUS, "OPEN"));
        String date = e.getString(EXTRA_CREATION_DATE, "");
@@ -201,6 +228,40 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
             btnMeInteresa.setEnabled(false);
             matchViewModel.createByInfluencer(token, campaignId);
         });
+    }
+
+    private void setupRateButton() {
+        if (btnRate == null) return;
+        boolean alreadyRated = getIntent().getBooleanExtra("open_already_rated", false);
+        if (!alreadyRated && "CLOSED".equals(campaignStatus) && matchId != null && !matchId.isEmpty()) {
+            btnRate.setVisibility(View.VISIBLE);
+            btnRate.setOnClickListener(v -> showRatingDialog());
+        } else {
+            btnRate.setVisibility(View.GONE);
+        }
+    }
+
+    private void showRatingDialog() {
+        String businessName = getIntent().getStringExtra(EXTRA_BUSINESS_NAME);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_rate_influencer, null);
+        RatingBar ratingBar = dialogView.findViewById(R.id.ratingBar);
+        TextView txtName = dialogView.findViewById(R.id.txtInfluencerName);
+        if (txtName != null) txtName.setText(businessName != null ? businessName : "");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Valorar comercio")
+                .setView(dialogView)
+                .setPositiveButton("Enviar", (dialog, which) -> {
+                    int score = (int) ratingBar.getRating();
+                    if (score < 1) {
+                        Toast.makeText(this, "Selecciona al menos 1 estrella", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    evaluationViewModel.createByInfluencer(
+                            SessionManager.getInstance().getBearerToken(), matchId, score);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
     /**

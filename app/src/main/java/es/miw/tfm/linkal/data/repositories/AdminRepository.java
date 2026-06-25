@@ -73,4 +73,19 @@ public class AdminRepository extends BaseRepository{
                     }
                 });
     }
+
+    public void deleteUser(String token,
+                           String id,
+                           MutableLiveData<Boolean> result,
+                           MutableLiveData<String> error,
+                           MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+        apiService.deleteUser(token, id).enqueue(
+                new ApiCallback<Void>(loading, error) {
+                    @Override
+                    protected void onSuccess(Void body) {
+                        result.postValue(true);
+                    }
+                });
+    }
 }

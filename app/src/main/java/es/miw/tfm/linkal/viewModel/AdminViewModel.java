@@ -17,6 +17,7 @@ public class AdminViewModel extends ViewModel {
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading   = new MutableLiveData<>(false);
     private final MutableLiveData<AdminUserResponse> verifyResult  = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> deleteResult  = new MutableLiveData<>();
 
 
     /** Constructor por defecto — usa el singleton de producción. */
@@ -42,10 +43,16 @@ public class AdminViewModel extends ViewModel {
         adminRepository.verifyUser(token, id, verifyResult, errorMessage, isLoading);
     }
 
+    public void deleteUser(String token, String id) {
+        adminRepository.deleteUser(token, id, deleteResult, errorMessage, isLoading);
+    }
+
     public LiveData<List<AdminUserResponse>> getUsersResult() { return usersResult; }
     public LiveData<AdminUserResponse> getUserDetail()  { return userDetail; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
     public LiveData<Boolean> getIsLoading() { return isLoading; }
     public LiveData<AdminUserResponse> getVerifyResult() { return verifyResult; }
+    public LiveData<Boolean> getDeleteResult() { return deleteResult; }
+
 
 }

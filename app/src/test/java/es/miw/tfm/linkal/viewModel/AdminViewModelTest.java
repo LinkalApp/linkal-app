@@ -192,4 +192,61 @@ public class AdminViewModelTest {
 
         verify(mockAdminRepository, never()).findById(any(), any(), any(), any(), any());
     }
+
+    // deleteUser ---------------------------------------------------------------------------------
+
+    @Test
+    public void deleteResult_initialValue_isNull() {
+        assertNull(viewModel.getDeleteResult().getValue());
+    }
+
+    @Test
+    public void getDeleteResult_returnsLiveData() {
+        assertNotNull(viewModel.getDeleteResult());
+    }
+
+    @Test
+    public void deleteUser_delegatesToRepository() {
+        viewModel.deleteUser("Bearer token", "user-id-123");
+
+        verify(mockAdminRepository).deleteUser(
+                eq("Bearer token"), eq("user-id-123"), any(), any(), any());
+    }
+
+    @Test
+    public void deleteUser_withDifferentId_passesIdToRepository() {
+        viewModel.deleteUser("Bearer token", "other-user-id");
+
+        verify(mockAdminRepository).deleteUser(
+                any(), eq("other-user-id"), any(), any(), any());
+    }
+
+    @Test
+    public void deleteUser_withDifferentToken_passesTokenToRepository() {
+        viewModel.deleteUser("Bearer other-token", "user-id-123");
+
+        verify(mockAdminRepository).deleteUser(
+                eq("Bearer other-token"), any(), any(), any(), any());
+    }
+
+    @Test
+    public void deleteUser_doesNotCallFindAll() {
+        viewModel.deleteUser("Bearer token", "user-id-123");
+
+        verify(mockAdminRepository, never()).findAll(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void deleteUser_doesNotCallFindById() {
+        viewModel.deleteUser("Bearer token", "user-id-123");
+
+        verify(mockAdminRepository, never()).findById(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void deleteUser_doesNotCallVerifyUser() {
+        viewModel.deleteUser("Bearer token", "user-id-123");
+
+        verify(mockAdminRepository, never()).verifyUser(any(), any(), any(), any(), any());
+    }
 }

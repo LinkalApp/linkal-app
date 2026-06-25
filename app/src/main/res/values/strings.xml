@@ -90,6 +90,7 @@
     <string name="titleUserManagement">Gestión de usuarios</string>
     <string name="txtNoUsers">No se encontraron usuarios</string>
     <string name="txtVerifyUser">Verificar usuario</string>
+    <string name="txtDeleteAccount">Borrar cuenta</string>
 
 
 </resources>

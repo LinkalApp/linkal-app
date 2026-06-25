@@ -30,11 +30,13 @@ public class AdminRepositoryTest {
     @Mock private Call<List<AdminUserResponse>> mockFindAllCall;
     @Mock private Call<AdminUserResponse> mockFindByIdCall;
     @Mock private Call<AdminUserResponse> mockVerifyCall;
+    @Mock private Call<Void> mockDeleteCall;
     @Mock private MutableLiveData<List<AdminUserResponse>> usersLiveData;
     @Mock private MutableLiveData<AdminUserResponse> detailLiveData;
     @Mock private MutableLiveData<AdminUserResponse> verifyLiveData;
     @Mock private MutableLiveData<String> errorLiveData;
     @Mock private MutableLiveData<Boolean> loadingLiveData;
+    @Mock private MutableLiveData<Boolean> deleteLiveData;
     @Mock private ResponseBody mockErrorBody;
 
     private AdminRepository repository;
@@ -45,6 +47,7 @@ public class AdminRepositoryTest {
         when(mockApiService.findAll(anyString(), any(), any())).thenReturn(mockFindAllCall);
         when(mockApiService.findById(anyString(), anyString())).thenReturn(mockFindByIdCall);
         when(mockApiService.verifyUser(anyString(), anyString())).thenReturn(mockVerifyCall);
+        when(mockApiService.deleteUser(anyString(), anyString())).thenReturn(mockDeleteCall);
     }
 
     // Singleton --------------------------------------------------------------------
@@ -271,6 +274,114 @@ public class AdminRepositoryTest {
         ArgumentCaptor<String> errorCaptor = ArgumentCaptor.forClass(String.class);
         verify(errorLiveData).postValue(errorCaptor.capture());
         assertTrue(errorCaptor.getValue().contains("Timeout"));
+    }
+
+    // deleteUser ------------------------------------------------------------------------
+    @Test
+    public void deleteUser_setsLoadingTrueOnStart() {
+        doAnswer(inv -> null).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteUser("Bearer token", "user-id-123", deleteLiveData, errorLiveData, loadingLiveData);
+
+        verify(loadingLiveData).setValue(true);
+    }
+
+    @Test
+    public void deleteUser_callsApiServiceWithCorrectParams() {
+        doAnswer(inv -> null).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteUser("Bearer token", "user-id-123", deleteLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockApiService).deleteUser(eq("Bearer token"), eq("user-id-123"));
+    }
+
+    @Test
+    public void deleteUser_callsEnqueueOnCall() {
+        doAnswer(inv -> null).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteUser("Bearer token", "user-id-123", deleteLiveData, errorLiveData, loadingLiveData);
+
+        verify(mockDeleteCall).enqueue(any());
+    }
+
+    @Test
+    public void deleteUser_onSuccess_postsTrueAndStopsLoading() {
+        doAnswer(invocation -> {
+            Callback<Void> callback = invocation.getArgument(0);
+            callback.onResponse(mockDeleteCall, Response.success(null));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteUser("Bearer token", "user-id-123", deleteLiveData, errorLiveData, loadingLiveData);
+
+        verify(deleteLiveData).postValue(true);
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void deleteUser_onHttpError_postsErrorAndStopsLoading() throws Exception {
+        when(mockErrorBody.string()).thenReturn("{\"message\": \"Not found\"}");
+
+        doAnswer(invocation -> {
+            Callback<Void> callback = invocation.getArgument(0);
+            callback.onResponse(mockDeleteCall, Response.error(404, mockErrorBody));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteUser("Bearer token", "bad-id", deleteLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> errorCaptor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(errorCaptor.capture());
+        assertTrue(errorCaptor.getValue().contains("404"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void deleteUser_onNetworkFailure_postsErrorAndStopsLoading() {
+        doAnswer(invocation -> {
+            Callback<Void> callback = invocation.getArgument(0);
+            callback.onFailure(mockDeleteCall, new RuntimeException("Timeout"));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteUser("Bearer token", "user-id-123", deleteLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> errorCaptor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(errorCaptor.capture());
+        assertTrue(errorCaptor.getValue().contains("Timeout"));
+        verify(loadingLiveData).postValue(false);
+    }
+
+    @Test
+    public void deleteUser_onForbidden_postsErrorWithCode() throws Exception {
+        when(mockErrorBody.string()).thenReturn("{\"message\": \"Not found\"}");
+
+        doAnswer(invocation -> {
+            Callback<Void> callback = invocation.getArgument(0);
+            callback.onResponse(mockDeleteCall, Response.error(403, mockErrorBody));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteUser("Bearer token", "user-id-123", deleteLiveData, errorLiveData, loadingLiveData);
+
+        ArgumentCaptor<String> errorCaptor = ArgumentCaptor.forClass(String.class);
+        verify(errorLiveData).postValue(errorCaptor.capture());
+        assertTrue(errorCaptor.getValue().contains("403"));
+    }
+
+    @Test
+    public void deleteUser_doesNotPostResultOnError() throws Exception {
+        when(mockErrorBody.string()).thenReturn("{}");
+
+        doAnswer(invocation -> {
+            Callback<Void> callback = invocation.getArgument(0);
+            callback.onResponse(mockDeleteCall, Response.error(500, mockErrorBody));
+            return null;
+        }).when(mockDeleteCall).enqueue(any());
+
+        repository.deleteUser("Bearer token", "user-id-123", deleteLiveData, errorLiveData, loadingLiveData);
+
+        verify(deleteLiveData, never()).postValue(any());
     }
 
     // helpers -----------------------------------------------------------------------------------------------

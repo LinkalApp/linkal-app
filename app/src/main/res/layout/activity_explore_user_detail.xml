@@ -447,6 +447,15 @@
 
             </LinearLayout>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDelete"
+                android:layout_width="335dp"
+                android:layout_height="52dp"
+                android:layout_marginLeft="16dp"
+                android:text="@string/txtDeleteAccount"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/status_closed"/>
+
         </LinearLayout>
 
     </ScrollView>

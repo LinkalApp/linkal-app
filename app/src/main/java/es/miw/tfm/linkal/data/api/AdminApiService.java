@@ -4,6 +4,7 @@ import java.util.List;
 
 import es.miw.tfm.linkal.models.responses.AdminUserResponse;
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.PATCH;
@@ -25,4 +26,8 @@ public interface AdminApiService {
     @PATCH(base + "/users/{id}/verify")
     Call<AdminUserResponse> verifyUser( @Header("Authorization") String token,
                                         @Path("id") String id);
+
+    @DELETE(base + "/users/{id}")
+    Call<Void> deleteUser( @Header("Authorization") String token,
+                           @Path("id") String id);
 }

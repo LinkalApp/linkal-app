@@ -1,5 +1,6 @@
 package es.miw.tfm.linkal.activities;
 
+import android.app.AlertDialog;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,7 +42,7 @@ public class ExploreUserDetailActivity extends AppCompatActivity {
             txtDetailPhone, txtDetailDescription;
     private ImageView imgDetailVerified;
     private LinearLayout rowPhone, rowDescription, layoutBtnVerify;
-    private MaterialButton btnVerify;
+    private MaterialButton btnVerify, btnDelete;
 
     // Campos de rol
     private View cardRoleData;
@@ -52,6 +53,7 @@ public class ExploreUserDetailActivity extends AppCompatActivity {
 
     private AdminViewModel adminViewModel;
     private String userId;
+    private String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,12 +74,15 @@ public class ExploreUserDetailActivity extends AppCompatActivity {
         populateBasicFromExtras();
 
         userId = getIntent().getStringExtra(EXTRA_ID);
+        userName = getIntent().getStringExtra(EXTRA_NAME);
         adminViewModel = new ViewModelProvider(this).get(AdminViewModel.class);
         observeViewModel();
 
         if (userId != null && !userId.isEmpty()) {
             adminViewModel.loadById(SessionManager.getInstance().getBearerToken(), userId);
         }
+
+        btnDelete.setOnClickListener(v -> showDeleteConfirmationDialog());
     }
 
     private void initViews() {
@@ -108,6 +113,7 @@ public class ExploreUserDetailActivity extends AppCompatActivity {
         txtDetailWebsite = findViewById(R.id.txtDetailWebsite);
         layoutBtnVerify = findViewById(R.id.layoutBtnVerify);
         btnVerify = findViewById(R.id.btnVerify);
+        btnDelete = findViewById(R.id.btnDelete);
     }
 
     private void populateBasicFromExtras() {
@@ -141,10 +147,25 @@ public class ExploreUserDetailActivity extends AppCompatActivity {
     }
 
     private void onVerifyClicked() {
-        Log.i("Verificar", "boton pulsado");
         if (userId == null) return;
         btnVerify.setEnabled(false);
         adminViewModel.verifyUser(SessionManager.getInstance().getBearerToken(), userId);
+    }
+
+    private void showDeleteConfirmationDialog() {
+        String name = isBlank(userName) ? "este usuario" : userName;
+        new AlertDialog.Builder(this)
+                .setTitle("Eliminar usuario")
+                .setMessage("¿Estás seguro de que quieres eliminar a " + name + "? Esta acción retirará su acceso a la plataforma de forma inmediata.")
+                .setPositiveButton("Eliminar", (dialog, which) -> onDeleteConfirmed())
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void onDeleteConfirmed() {
+        if (userId == null) return;
+        btnDelete.setEnabled(false);
+        adminViewModel.deleteUser(SessionManager.getInstance().getBearerToken(), userId);
     }
 
     private void observeViewModel() {
@@ -158,6 +179,13 @@ public class ExploreUserDetailActivity extends AppCompatActivity {
             imgDetailVerified.setVisibility(View.VISIBLE);
             layoutBtnVerify.setVisibility(View.GONE);
             Toast.makeText(this, "Usuario verificado correctamente", Toast.LENGTH_SHORT).show();
+        });
+
+        adminViewModel.getDeleteResult().observe(this, success -> {
+            if (!Boolean.TRUE.equals(success)) return;
+            Toast.makeText(this, "Usuario eliminado correctamente", Toast.LENGTH_SHORT).show();
+            setResult(RESULT_OK);
+            finish();
         });
 
         adminViewModel.getErrorMessage().observe(this, error -> {

@@ -2,8 +2,10 @@ package es.miw.tfm.linkal.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,6 +27,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText edtName, edtEmail, edtPassword, edtConfirmPassword, edtPhoneNumber, edtDescription;
     private Button btnContinue;
     private String selectedRole = "";
+    CheckBox btnTogglePassword, btnTogglePassword2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,9 @@ public class RegisterActivity extends AppCompatActivity {
                 validateAndContinue("BUSINESS");
             }
         });
+
+        setupPasswordToggle(findViewById(R.id.btnTogglePassword), edtPassword);
+        setupPasswordToggle(findViewById(R.id.btnTogglePassword2), edtConfirmPassword);
     }
 
     private void initViews(){
@@ -65,6 +71,8 @@ public class RegisterActivity extends AppCompatActivity {
         edtPhoneNumber = findViewById(R.id.edtPhoneNumber);
         edtDescription = findViewById(R.id.edtDescription);
         btnContinue = findViewById(R.id.btnContinue);
+        btnTogglePassword = findViewById(R.id.btnTogglePassword);
+        btnTogglePassword2 = findViewById(R.id.btnTogglePassword2);
     }
 
     private void selectBusiness() {
@@ -170,5 +178,14 @@ public class RegisterActivity extends AppCompatActivity {
 
             startActivity(intent);
         }
+    }
+
+    private void setupPasswordToggle(CheckBox toggle, EditText field) {
+        toggle.setOnCheckedChangeListener((btn, isChecked) -> {
+            field.setInputType(isChecked
+                    ? InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                    : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            field.setSelection(field.getText().length());
+        });
     }
 }

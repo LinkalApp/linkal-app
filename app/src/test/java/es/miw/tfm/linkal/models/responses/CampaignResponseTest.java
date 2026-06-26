@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 public class CampaignResponseTest {
     @Test
     public void defaultConstructor_allFieldsAreNull() {
@@ -24,6 +26,7 @@ public class CampaignResponseTest {
         assertNull(r.getBusinessProvince());
         assertNull(r.getBusinessAddress());
         assertNull(r.getBusinessVerified());
+        assertNull(r.getBusinessAverageRating());
     }
 
     @Test
@@ -101,6 +104,13 @@ public class CampaignResponseTest {
         CampaignResponse r = new CampaignResponse();
         r.setBusinessId("4a7c81f2-2be8-4bac-97c7-33f2ea3ef5f7");
         assertEquals("4a7c81f2-2be8-4bac-97c7-33f2ea3ef5f7", r.getBusinessId());
+    }
+
+    @Test
+    public void getBussinesAverageRating_returnsCorrectValue(){
+        CampaignResponse r = new CampaignResponse();
+        r.setBusinessAverageRating(2.0);
+        assertEquals(2.0 , r.getBusinessAverageRating(), 0.0001);
     }
 
     @Test

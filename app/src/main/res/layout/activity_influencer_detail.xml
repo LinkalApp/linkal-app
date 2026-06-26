@@ -103,6 +103,51 @@
                         android:layout_marginBottom="8dp"
                         android:visibility="gone"/>
 
+                    <!-- Media de valoraciones (5 links) -->
+                    <LinearLayout
+                        android:id="@+id/rowRating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginTop="12dp">
+
+                        <ImageView android:id="@+id/link1"
+                            android:layout_width="24dp" android:layout_height="24dp"
+                            android:layout_marginEnd="3dp"
+                            android:src="@drawable/ic_nav_matches"
+                            android:contentDescription="@null"/>
+                        <ImageView android:id="@+id/link2"
+                            android:layout_width="24dp" android:layout_height="24dp"
+                            android:layout_marginEnd="3dp"
+                            android:src="@drawable/ic_nav_matches"
+                            android:contentDescription="@null"/>
+                        <ImageView android:id="@+id/link3"
+                            android:layout_width="24dp" android:layout_height="24dp"
+                            android:layout_marginEnd="3dp"
+                            android:src="@drawable/ic_nav_matches"
+                            android:contentDescription="@null"/>
+                        <ImageView android:id="@+id/link4"
+                            android:layout_width="24dp" android:layout_height="24dp"
+                            android:layout_marginEnd="3dp"
+                            android:src="@drawable/ic_nav_matches"
+                            android:contentDescription="@null"/>
+                        <ImageView android:id="@+id/link5"
+                            android:layout_width="24dp" android:layout_height="24dp"
+                            android:src="@drawable/ic_nav_matches"
+                            android:contentDescription="@null"/>
+
+                        <TextView
+                            android:id="@+id/txtRatingValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:textSize="18sp"
+                            android:textColor="@color/neutral_medium"/>
+
+                    </LinearLayout>
+
                 </LinearLayout>
             </FrameLayout>
 

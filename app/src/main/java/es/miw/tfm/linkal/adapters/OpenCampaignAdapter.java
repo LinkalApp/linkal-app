@@ -62,6 +62,7 @@ public class OpenCampaignAdapter extends RecyclerView.Adapter<OpenCampaignAdapte
             intent.putExtra(ExploreCampaignDetailActivity.EXTRA_BUSINESS_WEBSITE,     orEmpty(c.getBusinessWebsite()));
             intent.putExtra(ExploreCampaignDetailActivity.EXTRA_BUSINESS_PROVINCE,    orEmpty(c.getBusinessProvince()));
             intent.putExtra(ExploreCampaignDetailActivity.EXTRA_BUSINESS_VERIFIED,    Boolean.TRUE.equals(c.getBusinessVerified()));
+            intent.putExtra(ExploreCampaignDetailActivity.EXTRA_AVERAGE_RATING,       c.getBusinessAverageRating());
             v.getContext().startActivity(intent);
         });
     }

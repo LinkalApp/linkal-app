@@ -18,6 +18,7 @@ public class CampaignResponse {
     private String businessProvince;
     private String businessAddress;
     private Boolean businessVerified;
+    private Double businessAverageRating;
 
     public String getId() {
         return id;
@@ -39,6 +40,7 @@ public class CampaignResponse {
     public String getBusinessProvince() { return businessProvince; }
     public String getBusinessAddress() { return businessAddress; }
     public Boolean getBusinessVerified() { return businessVerified; }
+    public Double getBusinessAverageRating() { return businessAverageRating; }
 
     public void setId(String id) { this.id = id; }
     public void setTitle(String title) { this.title = title; }
@@ -57,4 +59,5 @@ public class CampaignResponse {
     public void setBusinessProvince(String businessProvince) { this.businessProvince = businessProvince; }
     public void setBusinessAddress(String businessAddress) { this.businessAddress = businessAddress; }
     public void setBusinessVerified(Boolean businessVerified) { this.businessVerified = businessVerified; }
+    public void setBusinessAverageRating(Double businessAverageRating) { this.businessAverageRating = businessAverageRating; }
 }

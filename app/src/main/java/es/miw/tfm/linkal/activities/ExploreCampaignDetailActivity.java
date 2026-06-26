@@ -2,6 +2,7 @@ package es.miw.tfm.linkal.activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
+
+import java.util.Locale;
 
 import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.adapters.CampaignAdapter;
@@ -42,14 +45,16 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
     public static final String EXTRA_BUSINESS_ADDRESS = "open_campaign_business_address";
     public static final String EXTRA_BUSINESS_VERIFIED = "open_campaign_business_verified";
     public static final String EXTRA_INTEREST_ALREADY_EXISTS = "match_interest_exists";
+    public static final String EXTRA_AVERAGE_RATING = "campaign_business_average_rating";
     public static final String EXTRA_MATCH_ID = "open_match_id";
 
 
     private ImageButton btnBack;
     private TextView txtTitle, txtStatus, txtCreationDate, txtObjective, txtDescription, txtRequirements, txtReward;
-    private TextView txtBusinessInitials, txtBusinessName, txtBusinessCategory, txtBusinessDescription, txtBusinessWebsite, txtBusinessProvince, txtBusinessAddress;
-    private LinearLayout rowProvince, rowAddress, rowWebsite;
+    private TextView txtBusinessInitials, txtBusinessName, txtBusinessCategory, txtBusinessDescription, txtBusinessWebsite, txtBusinessProvince, txtBusinessAddress, txtRatingValue;
+    private LinearLayout rowProvince, rowAddress, rowWebsite, rowRating;
     private ImageView imgBusinessVerified;
+    private ImageView[] linkIcons;
     private Button btnInterested,  btnRate;
 
     private MatchViewModel matchViewModel;
@@ -105,6 +110,16 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
         rowProvince = findViewById(R.id.rowBusinessProvince);
         rowAddress = findViewById(R.id.rowBusinessAddress);
         rowWebsite = findViewById(R.id.rowBusinessWebsite);
+        rowRating = findViewById(R.id.rowRating);
+        linkIcons = new ImageView[]{
+               findViewById(R.id.link1),
+               findViewById(R.id.link2),
+               findViewById(R.id.link3),
+               findViewById(R.id.link4),
+               findViewById(R.id.link5)
+       };
+       txtRatingValue = findViewById(R.id.txtRatingValue);
+
    }
 
    private void observeViewModel(){
@@ -180,6 +195,7 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
        String businessProvince  = e.getString(EXTRA_BUSINESS_PROVINCE, "");
        String businessAddress   = e.getString(EXTRA_BUSINESS_ADDRESS, "");
        boolean businessVerified = e.getBoolean(EXTRA_BUSINESS_VERIFIED, false);
+       showRating(e.getDouble(EXTRA_AVERAGE_RATING));
 
        txtBusinessInitials.setText(getInitials(businessName));
        txtBusinessName.setText(businessName);
@@ -278,6 +294,23 @@ public class ExploreCampaignDetailActivity extends AppCompatActivity {
             View row = findViewById(rowViewId);
             if (row != null) row.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void showRating(Double avg) {
+        if (avg == null) {
+            avg = 0.0;
+        }
+
+        int filled = (int) Math.round(avg); // 0-5 links encendidos
+        int colorOn  = getColor(R.color.secondary);     // morado
+        int colorOff = getColor(R.color.neutral_light); // gris
+
+        for (int i = 0; i < linkIcons.length; i++) {
+            linkIcons[i].setColorFilter(i < filled ? colorOn : colorOff, PorterDuff.Mode.SRC_IN);
+        }
+
+        txtRatingValue.setText(String.format(Locale.getDefault(), "%.1f / 5", avg));
+        rowRating.setVisibility(View.VISIBLE);
     }
 
     private String getInitials(String name) {

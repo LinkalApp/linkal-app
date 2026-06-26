@@ -195,15 +195,38 @@
                     android:fontFamily="@font/poppins_regular" />
 
                 <!-- PASSWORD -->
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:layout_marginLeft="5dp"
-                    android:text="@string/titlePassword"
-                    android:textColor="#2D3142"
-                    android:textSize="18sp"
-                    android:fontFamily="@font/poppins" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/newPassword"
+                        android:textColor="#2D3142"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/poppins" />
+
+                    <ImageButton
+                        android:id="@+id/btnPasswordInfo"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="6dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_info"
+                        android:contentDescription="@string/txtPasswordRequirements" />
+
+                </LinearLayout>
+
+                <!-- REQUISITOS CONTRASEÑA -->
+                <include
+                    android:id="@+id/cardPasswordRequirements"
+                    layout="@layout/card_password_requirements"
+                    android:visibility="gone"/>
 
                 <RelativeLayout
                     android:layout_width="match_parent"

@@ -91,6 +91,7 @@
     <string name="txtNoUsers">No se encontraron usuarios</string>
     <string name="txtVerifyUser">Verificar usuario</string>
     <string name="txtDeleteAccount">Borrar cuenta</string>
+    <string name="txtPasswordRequirements">Requisitos de contraseña</string>
 
 
 </resources>

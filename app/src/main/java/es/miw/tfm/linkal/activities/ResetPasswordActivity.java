@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import es.miw.tfm.linkal.R;
+import es.miw.tfm.linkal.utils.PasswordRequirementsHelper;
 import es.miw.tfm.linkal.viewModel.UserViewModel;
 
 public class ResetPasswordActivity extends AppCompatActivity {
@@ -52,6 +53,10 @@ public class ResetPasswordActivity extends AppCompatActivity {
         this.observeViewModel();
 
         btnReset.setOnClickListener(v -> attemptReset());
+
+        PasswordRequirementsHelper.attach(edtNewPassword,
+                findViewById(R.id.btnPasswordInfo),
+                findViewById(R.id.cardPasswordRequirements));
 
         setupPasswordToggle(findViewById(R.id.btnTogglePassword), edtNewPassword);
         setupPasswordToggle(findViewById(R.id.btnTogglePassword2), edtConfirmPassword);

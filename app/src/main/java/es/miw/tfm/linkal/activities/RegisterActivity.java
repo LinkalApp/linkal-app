@@ -18,6 +18,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import es.miw.tfm.linkal.R;
+import es.miw.tfm.linkal.utils.PasswordRequirementsHelper;
 import es.miw.tfm.linkal.utils.PasswordValidator;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -54,6 +55,10 @@ public class RegisterActivity extends AppCompatActivity {
                 validateAndContinue("BUSINESS");
             }
         });
+
+        PasswordRequirementsHelper.attach(edtPassword,
+                findViewById(R.id.btnPasswordInfo),
+                findViewById(R.id.cardPasswordRequirements));
 
         setupPasswordToggle(findViewById(R.id.btnTogglePassword), edtPassword);
         setupPasswordToggle(findViewById(R.id.btnTogglePassword2), edtConfirmPassword);

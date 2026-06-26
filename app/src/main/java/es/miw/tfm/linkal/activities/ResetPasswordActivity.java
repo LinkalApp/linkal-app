@@ -2,8 +2,10 @@ package es.miw.tfm.linkal.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -15,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import es.miw.tfm.linkal.R;
+import es.miw.tfm.linkal.utils.PasswordRequirementsHelper;
 import es.miw.tfm.linkal.viewModel.UserViewModel;
 
 public class ResetPasswordActivity extends AppCompatActivity {
@@ -24,6 +27,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private EditText edtCode, edtNewPassword, edtConfirmPassword;
     private Button btnReset;
     private TextView txtError;
+    CheckBox btnTogglePassword, btnTogglePassword2;
 
     private UserViewModel userViewModel;
     private String email;
@@ -49,14 +53,23 @@ public class ResetPasswordActivity extends AppCompatActivity {
         this.observeViewModel();
 
         btnReset.setOnClickListener(v -> attemptReset());
+
+        PasswordRequirementsHelper.attach(edtNewPassword,
+                findViewById(R.id.btnPasswordInfo),
+                findViewById(R.id.cardPasswordRequirements));
+
+        setupPasswordToggle(findViewById(R.id.btnTogglePassword), edtNewPassword);
+        setupPasswordToggle(findViewById(R.id.btnTogglePassword2), edtConfirmPassword);
     }
 
     private void initViews(){
-        edtCode            = findViewById(R.id.edtCode);
-        edtNewPassword     = findViewById(R.id.edtNewPassword);
+        edtCode = findViewById(R.id.edtCode);
+        edtNewPassword = findViewById(R.id.edtNewPassword);
         edtConfirmPassword = findViewById(R.id.edtConfirmPassword);
-        btnReset           = findViewById(R.id.btnReset);
-        txtError           = findViewById(R.id.txtError);
+        btnReset = findViewById(R.id.btnReset);
+        txtError = findViewById(R.id.txtError);
+        btnTogglePassword = findViewById(R.id.btnTogglePassword);
+        btnTogglePassword2 = findViewById(R.id.btnTogglePassword2);
     }
 
     private void observeViewModel() {
@@ -112,5 +125,14 @@ public class ResetPasswordActivity extends AppCompatActivity {
         }
 
         userViewModel.resetPassword(email, code, newPassword);
+    }
+
+    private void setupPasswordToggle(CheckBox toggle, EditText field) {
+        toggle.setOnCheckedChangeListener((btn, isChecked) -> {
+            field.setInputType(isChecked
+                    ? InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                    : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            field.setSelection(field.getText().length());
+        });
     }
 }

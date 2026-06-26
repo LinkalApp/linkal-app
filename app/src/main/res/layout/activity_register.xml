@@ -195,30 +195,71 @@
                     android:fontFamily="@font/poppins_regular" />
 
                 <!-- PASSWORD -->
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:layout_marginLeft="5dp"
-                    android:text="@string/titlePassword"
-                    android:textColor="#2D3142"
-                    android:textSize="18sp"
-                    android:fontFamily="@font/poppins" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                <EditText
-                    android:id="@+id/edtPassword"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/newPassword"
+                        android:textColor="#2D3142"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/poppins" />
+
+                    <ImageButton
+                        android:id="@+id/btnPasswordInfo"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="6dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_info"
+                        android:contentDescription="@string/txtPasswordRequirements" />
+
+                </LinearLayout>
+
+                <!-- REQUISITOS CONTRASEÑA -->
+                <include
+                    android:id="@+id/cardPasswordRequirements"
+                    layout="@layout/card_password_requirements"
+                    android:visibility="gone"/>
+
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="35dp"
+                    android:layout_height="45dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginRight="15dp"
-                    android:background="@drawable/bg_input"
-                    android:hint="••••••••"
-                    android:inputType="textPassword"
-                    android:paddingHorizontal="16dp"
-                    android:textSize="18sp"
-                    android:textColor="#2D3142"
-                    android:textColorHint="#A7ADB8"
-                    android:fontFamily="@font/poppins_regular" />
+                    android:layout_marginRight="15dp">
+
+                    <EditText
+                        android:id="@+id/edtPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_input"
+                        android:hint="••••••••"
+                        android:inputType="textPassword"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="48dp"
+                        android:gravity="center_vertical"
+                        android:textSize="18sp"
+                        android:textColor="#2D3142"
+                        android:textColorHint="#A7ADB8"
+                        android:fontFamily="@font/poppins_regular" />
+
+                    <CheckBox
+                        android:id="@+id/btnTogglePassword"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="4dp"
+                        android:button="@drawable/ic_eye_toggle"
+                        android:background="?attr/selectableItemBackgroundBorderless" />
+
+                </RelativeLayout>
 
                 <!-- CONFIRM PASSWORD -->
                 <TextView
@@ -231,20 +272,38 @@
                     android:textSize="18sp"
                     android:fontFamily="@font/poppins" />
 
-                <EditText
-                    android:id="@+id/edtConfirmPassword"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="35dp"
+                    android:layout_height="45dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginRight="15dp"
-                    android:background="@drawable/bg_input"
-                    android:hint="••••••••"
-                    android:inputType="textPassword"
-                    android:paddingHorizontal="16dp"
-                    android:textSize="18sp"
-                    android:textColor="#2D3142"
-                    android:textColorHint="#A7ADB8"
-                    android:fontFamily="@font/poppins_regular" />
+                    android:layout_marginRight="15dp">
+
+                    <EditText
+                        android:id="@+id/edtConfirmPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_input"
+                        android:hint="••••••••"
+                        android:inputType="textPassword"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="48dp"
+                        android:gravity="center_vertical"
+                        android:textSize="18sp"
+                        android:textColor="#2D3142"
+                        android:textColorHint="#A7ADB8"
+                        android:fontFamily="@font/poppins_regular" />
+
+                    <CheckBox
+                        android:id="@+id/btnTogglePassword2"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="4dp"
+                        android:button="@drawable/ic_eye_toggle"
+                        android:background="?attr/selectableItemBackgroundBorderless" />
+
+                </RelativeLayout>
 
                 <!-- PHONE NUMBER -->
                 <TextView

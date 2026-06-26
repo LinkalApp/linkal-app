@@ -2,9 +2,11 @@ package es.miw.tfm.linkal.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -25,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText edtEmail, edtPassword;
     TextView txtError, txtForgotPassword;
     Button btnLogin;
+    CheckBox btnTogglePassword;
 
     UserViewModel userViewModel;
 
@@ -49,6 +52,15 @@ public class LoginActivity extends AppCompatActivity {
 
         txtForgotPassword.setOnClickListener(v ->
                 startActivity(new Intent(this, ForgotPasswordActivity.class)));
+
+        btnTogglePassword.setOnCheckedChangeListener((btn, isChecked) -> {
+            if (isChecked) {
+                edtPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            } else {
+                edtPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
+            edtPassword.setSelection(edtPassword.getText().length());
+        });
     }
 
     public void initViews(){
@@ -57,6 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         txtError = findViewById(R.id.txtError);
         txtForgotPassword = findViewById(R.id.txtForgotPassword);
         btnLogin = findViewById(R.id.btnLogin);
+        btnTogglePassword = findViewById(R.id.btnTogglePassword);
     }
 
     private void observeViewModel() {

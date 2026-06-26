@@ -66,7 +66,14 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         userViewModel.getError().observe(this, errorMsg -> {
             if (errorMsg != null) {
-                txtError.setText(errorMsg);
+                if(errorMsg.contains("404")) {
+                    txtError.setText("Usuario incorrecto");
+                } else if (errorMsg.contains("400")){
+                    txtError.setText("Se ha producido un error con el código de verificación. Vuelva a intentarlo");
+                    edtConfirmPassword.clearFocus();
+                } else {
+                    txtError.setText(errorMsg);
+                }
                 txtError.setVisibility(View.VISIBLE);
             }
         });

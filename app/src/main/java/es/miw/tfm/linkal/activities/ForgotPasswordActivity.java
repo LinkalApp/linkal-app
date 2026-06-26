@@ -60,7 +60,11 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         userViewModel.getError().observe(this, errorMsg -> {
             if (errorMsg != null) {
-                txtError.setText(errorMsg);
+                if(errorMsg.contains("404")){
+                    txtError.setText("Usuario no encontrado");
+                } else{
+                    txtError.setText(errorMsg);
+                }
                 txtError.setVisibility(View.VISIBLE);
             }
         });

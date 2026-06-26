@@ -2,6 +2,7 @@ package es.miw.tfm.linkal.activities;
 
 import android.app.AlertDialog;
 import android.content.res.ColorStateList;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +24,7 @@ import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.chip.Chip;
 
 import java.util.List;
+import java.util.Locale;
 
 import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.models.responses.CampaignResponse;
@@ -43,14 +45,18 @@ public class InfluencerDetailActivity extends AppCompatActivity {
     public static final String EXTRA_VERIFIED = "influencer_verified";
     public static final String EXTRA_INTERESTS = "influencer_interests";
     public static final String EXTRA_INTEREST_ALREADY_EXISTS = "match_interest_exists";
+    public static final String EXTRA_AVERAGE_RATING = "influencer_average_rating";
 
 
-    private TextView txtInitials, txtName, txtArtisticName, txtDescription, txtEmail, txtInstagram, txtTiktok, txtYoutube;
+    private TextView txtInitials, txtName, txtArtisticName, txtDescription, txtEmail, txtInstagram,
+            txtTiktok, txtYoutube, txtRatingValue;
     private ImageView imgVerifiedBadge;
+    private ImageView[] linkIcons;
     private ImageButton btnBack;
     private FlexboxLayout tagsContainer;
     private Button btnColaboration;
-    private LinearLayout sectionInterests, sectionSocial, rowInstagram, rowTiktok, rowYoutube, sectionContact, rowEmail;
+    private LinearLayout sectionInterests, sectionSocial, rowInstagram, rowTiktok, rowYoutube,
+            sectionContact, rowEmail, rowRating;
 
     private MatchViewModel matchViewModel;
     private CampaignViewModel campaignViewModel;
@@ -100,6 +106,15 @@ public class InfluencerDetailActivity extends AppCompatActivity {
         rowEmail = findViewById(R.id.rowEmail);
         btnBack = findViewById(R.id.btnBack);
         btnColaboration = findViewById(R.id.btnColaboration);
+        rowRating = findViewById(R.id.rowRating);
+        linkIcons = new ImageView[]{
+                findViewById(R.id.link1),
+                findViewById(R.id.link2),
+                findViewById(R.id.link3),
+                findViewById(R.id.link4),
+                findViewById(R.id.link5)
+        };
+        txtRatingValue = findViewById(R.id.txtRatingValue);
     }
 
     private void populateFromExtras() {
@@ -131,6 +146,8 @@ public class InfluencerDetailActivity extends AppCompatActivity {
             addInterestTags(interests);
             sectionInterests.setVisibility(View.VISIBLE);
         }
+
+        showRating(e.getDouble(EXTRA_AVERAGE_RATING));
 
         boolean hasSocial = showRow(rowInstagram, txtInstagram, instagram)
                 | showRow(rowTiktok, txtTiktok, tiktok)
@@ -263,6 +280,23 @@ public class InfluencerDetailActivity extends AppCompatActivity {
             chip.setLayoutParams(lp);
             tagsContainer.addView(chip);
         }
+    }
+
+    private void showRating(Double avg) {
+        if (avg == null) {
+            avg = 0.0;
+        }
+
+        int filled = (int) Math.round(avg); // 0-5 links encendidos
+        int colorOn  = getColor(R.color.secondary);     // morado
+        int colorOff = getColor(R.color.neutral_light); // gris
+
+        for (int i = 0; i < linkIcons.length; i++) {
+            linkIcons[i].setColorFilter(i < filled ? colorOn : colorOff, PorterDuff.Mode.SRC_IN);
+        }
+
+        txtRatingValue.setText(String.format(Locale.getDefault(), "%.1f / 5", avg));
+        rowRating.setVisibility(View.VISIBLE);
     }
 
     private String getInitials(String name) {

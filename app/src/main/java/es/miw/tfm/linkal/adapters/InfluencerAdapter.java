@@ -4,6 +4,7 @@ import static es.miw.tfm.linkal.utils.AppConstants.AVATAR_COLORS;
 
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +81,7 @@ public class InfluencerAdapter extends RecyclerView.Adapter<InfluencerAdapter.Vi
                 intent.putStringArrayListExtra(InfluencerDetailActivity.EXTRA_INTERESTS,
                         new java.util.ArrayList<>(influencer.getInterests()));
             }
+            intent.putExtra(InfluencerDetailActivity.EXTRA_AVERAGE_RATING, influencer.getAverageRating());
             v.getContext().startActivity(intent);
         });
     }

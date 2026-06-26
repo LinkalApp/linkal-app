@@ -66,7 +66,11 @@ public class LoginActivity extends AppCompatActivity {
 
         userViewModel.getError().observe(this, errorMsg -> {
             if (errorMsg != null) {
-                txtError.setText(errorMsg);
+                if(errorMsg.contains("400") || errorMsg.contains("404")){
+                    txtError.setText("Usuario y/o contraseña incorrecta");
+                }else {
+                    txtError.setText(errorMsg);
+                }
                 txtError.setVisibility(View.VISIBLE);
             }
         });

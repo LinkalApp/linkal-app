@@ -122,7 +122,11 @@ public class RegisterBusinessActivity extends AppCompatActivity {
 
         businessViewModel.getErrorMessage().observe(this, error -> {
             if (error != null) {
-                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                if(error.contains("409")){
+                    Toast.makeText(this, "Existe una cuenta con este correo", Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                }
             }
         });
     }

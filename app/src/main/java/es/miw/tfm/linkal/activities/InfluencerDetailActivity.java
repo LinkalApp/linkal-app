@@ -32,7 +32,7 @@ import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.CampaignViewModel;
 import es.miw.tfm.linkal.viewModel.MatchViewModel;
 
-public class InfluencerDetailActivity extends AppCompatActivity {
+public class InfluencerDetailActivity extends BaseActivity {
 
     public static final String EXTRA_ID = "influencer_id";
     public static final String EXTRA_NAME = "influencer_name";

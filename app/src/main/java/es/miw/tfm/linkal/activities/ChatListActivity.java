@@ -26,7 +26,7 @@ import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.ChatViewModel;
 import es.miw.tfm.linkal.viewModel.MatchViewModel;
 
-public class ChatListActivity extends AppCompatActivity {
+public class ChatListActivity extends BaseActivity {
 
     private RecyclerView recyclerChats;
     private TextView txtEmpty;
@@ -38,15 +38,7 @@ public class ChatListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chat_list);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
-            int bottomPadding = Math.max(systemBars.bottom, ime.bottom);
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding);
-            return insets;
-        });
 
         initView();
         setupRecycler();
@@ -90,44 +82,7 @@ public class ChatListActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        boolean isBusiness = "BUSINESS".equals(SessionManager.getInstance().getRole());
-
-        bottomNavigation.getMenu().clear();
-        if(isBusiness){
-            bottomNavigation.inflateMenu(R.menu.nav_business_menu);
-        }else{
-            bottomNavigation.inflateMenu(R.menu.nav_influencer_menu);
-        }
-
-        bottomNavigation.setSelectedItemId(R.id.nav_chat);
-
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_matches) {
-                startActivity(new Intent(this, MatchesActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_home) {
-                startActivity(new Intent(this, isBusiness
-                        ? ExploreInfluencersActivity.class
-                        : ExploreCampaignsActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_profile) {
-                startActivity(new Intent(this, isBusiness
-                        ? BusinessProfileActivity.class
-                        : InfluencerProfileActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_campaigns) {
-                startActivity(new Intent(this, CampaignsActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_chat) {
-                return true;
-            }
-            return false;
-        });
+        setupBottomNavigation(R.id.nav_chat);
     }
 
     @Override

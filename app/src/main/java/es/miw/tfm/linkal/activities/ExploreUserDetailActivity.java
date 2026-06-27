@@ -27,7 +27,7 @@ import es.miw.tfm.linkal.models.responses.AdminUserResponse;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.AdminViewModel;
 
-public class ExploreUserDetailActivity extends AppCompatActivity {
+public class ExploreUserDetailActivity extends BaseActivity {
 
     public static final String EXTRA_ID = "admin_user_id";
     public static final String EXTRA_NAME = "admin_user_name";

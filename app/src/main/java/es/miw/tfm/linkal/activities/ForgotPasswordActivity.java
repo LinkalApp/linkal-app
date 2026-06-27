@@ -17,7 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.viewModel.UserViewModel;
 
-public class ForgotPasswordActivity extends AppCompatActivity {
+public class ForgotPasswordActivity extends BaseActivity {
 
     private EditText edtEmail;
     private Button btnSend;

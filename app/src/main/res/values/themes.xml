@@ -22,10 +22,13 @@
         <item name="android:statusBarColor">@color/primary</item>
 
         <!-- Navigation bar -->
-        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/white</item>
 
         <!-- Text -->
         <item name="android:textColor">@color/neutral_dark</item>
+
+        <!-- Sin animaciones de transición entre Activities -->
+        <item name="android:windowAnimationStyle">@null</item>
 
     </style>
 

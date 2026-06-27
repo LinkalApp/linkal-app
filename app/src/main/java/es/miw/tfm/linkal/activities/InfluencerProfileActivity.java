@@ -34,7 +34,7 @@ import es.miw.tfm.linkal.models.responses.InfluencerProfileResponse;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.InfluencerViewModel;
 
-public class InfluencerProfileActivity extends AppCompatActivity {
+public class InfluencerProfileActivity extends BaseActivity {
 
     TextView txtInitials, txtName, txtArtisticName, txtDescription, txtRatingValue, txtInstagram, txtTiktok, txtYoutube, txtError;
     LinearLayout rowRating, rowInstagram, rowTiktok, rowYoutube;
@@ -56,15 +56,7 @@ public class InfluencerProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_influencer_profile);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
-            int bottomPadding = Math.max(systemBars.bottom, ime.bottom);
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding);
-            return insets;
-        });
 
         if (!SessionManager.getInstance().isLoggedIn()) {
             startActivity(new Intent(this, LoginActivity.class));
@@ -138,27 +130,7 @@ public class InfluencerProfileActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        bottomNavigation.setSelectedItemId(R.id.nav_profile);
-
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_profile) {
-                return true;
-            } else if (id == R.id.nav_home) {
-                startActivity(new Intent(this, ExploreCampaignsActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_matches) {
-                startActivity(new Intent(this, MatchesActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_chat) {
-                startActivity(new Intent(this, ChatListActivity.class));
-                finish();
-                return true;
-            }
-            return false;
-        });
+        setupBottomNavigation(R.id.nav_profile);
     }
 
     private void observeViewModel() {

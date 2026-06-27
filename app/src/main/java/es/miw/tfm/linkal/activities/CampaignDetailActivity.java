@@ -33,7 +33,7 @@ import es.miw.tfm.linkal.viewModel.CampaignViewModel;
 import es.miw.tfm.linkal.viewModel.EvaluationViewModel;
 import es.miw.tfm.linkal.viewModel.MatchViewModel;
 
-public class CampaignDetailActivity extends AppCompatActivity {
+public class CampaignDetailActivity extends BaseActivity {
 
     public static final String EXTRA_ID = "campaign_id";
     public static final String EXTRA_TITLE = "campaign_title";

@@ -28,7 +28,7 @@ import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.EvaluationViewModel;
 import es.miw.tfm.linkal.viewModel.MatchViewModel;
 
-public class ExploreCampaignDetailActivity extends AppCompatActivity {
+public class ExploreCampaignDetailActivity extends BaseActivity {
     public static final String EXTRA_ID = "open_campaign_id";
     public static final String EXTRA_TITLE = "open_campaign_title";
     public static final String EXTRA_DESCRIPTION = "open_campaign_description";

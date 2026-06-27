@@ -20,7 +20,7 @@ import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.utils.PasswordRequirementsHelper;
 import es.miw.tfm.linkal.viewModel.UserViewModel;
 
-public class ResetPasswordActivity extends AppCompatActivity {
+public class ResetPasswordActivity extends BaseActivity {
 
     public static final String EXTRA_EMAIL = "extra_email";
 

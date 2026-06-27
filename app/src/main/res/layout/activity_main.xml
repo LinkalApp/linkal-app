@@ -11,10 +11,10 @@
     <ImageView
         android:id="@+id/imgLogo"
         android:layout_width="463dp"
-        android:layout_height="417dp"
-        android:layout_marginBottom="40dp"
+        android:layout_height="350dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="15dp"
+        android:layout_marginBottom="40dp"
         android:contentDescription="@string/linkal"
         android:src="@drawable/logo_linkal" />
 

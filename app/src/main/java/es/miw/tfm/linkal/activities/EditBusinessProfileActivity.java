@@ -27,7 +27,7 @@ import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.BusinessViewModel;
 import es.miw.tfm.linkal.viewModel.InfluencerViewModel;
 
-public class EditBusinessProfileActivity extends AppCompatActivity {
+public class EditBusinessProfileActivity extends BaseActivity {
 
     EditText edtName, edtPhone, edtDescription, edtAddress, edtWebsite;
     Spinner spinnerProvince;

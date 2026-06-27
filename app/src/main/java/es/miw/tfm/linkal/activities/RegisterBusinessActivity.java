@@ -25,7 +25,7 @@ import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.models.requests.RegisterBusinessRequest;
 import es.miw.tfm.linkal.viewModel.BusinessViewModel;
 
-public class RegisterBusinessActivity extends AppCompatActivity {
+public class RegisterBusinessActivity extends BaseActivity {
 
     private EditText edtAddress, edtWebsite, edtOtherCategory;
     private Spinner spinnerProvincia, spinnerCategory;

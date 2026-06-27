@@ -26,7 +26,7 @@ import es.miw.tfm.linkal.models.responses.AdminUserResponse;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.AdminViewModel;
 
-public class ExploreUsersActivity extends AppCompatActivity {
+public class ExploreUsersActivity extends BaseActivity {
 
     private static final String FILTER_ALL = "Todos";
     private static final String FILTER_INFLUENCER = "Influencer";

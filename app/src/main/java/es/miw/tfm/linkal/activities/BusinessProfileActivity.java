@@ -29,7 +29,7 @@ import es.miw.tfm.linkal.models.responses.BusinessProfileResponse;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.BusinessViewModel;
 
-public class BusinessProfileActivity extends AppCompatActivity {
+public class BusinessProfileActivity extends BaseActivity {
 
     TextView txtInitials, txtName, txtCategory, txtDescription, txtAddress, txtProvince, txtWebsite, txtPhone, txtRatingValue, txtError;
     ImageView imgVerifiedBadge, btnMoreOptions;
@@ -50,16 +50,7 @@ public class BusinessProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_business_profile);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
-            int bottomPadding = Math.max(systemBars.bottom, ime.bottom);
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding);
-            return insets;
-        });
-
         if (!SessionManager.getInstance().isLoggedIn()) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
@@ -133,31 +124,7 @@ public class BusinessProfileActivity extends AppCompatActivity {
 
     //Navegación
     private void setupBottomNavigation() {
-        bottomNavigation.setSelectedItemId(R.id.nav_profile);
-
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_profile) {
-                return true;
-            } else if (id == R.id.nav_home) {
-                startActivity(new Intent(this, ExploreInfluencersActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_campaigns) {
-                startActivity(new Intent(this, CampaignsActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_matches) {
-                startActivity(new Intent(this, MatchesActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_chat) {
-                startActivity(new Intent(this, ChatListActivity.class));
-                finish();
-                return true;
-            }
-            return false;
-        });
+        setupBottomNavigation(R.id.nav_profile);
     }
 
     // Observadores

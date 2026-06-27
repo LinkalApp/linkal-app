@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.utils.SessionManager;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private Button btnSignUp, btnLogIn;
 

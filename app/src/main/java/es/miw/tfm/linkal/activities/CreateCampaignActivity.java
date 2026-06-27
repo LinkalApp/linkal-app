@@ -23,7 +23,7 @@ import es.miw.tfm.linkal.models.requests.CreateCampaignRequest;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.CampaignViewModel;
 
-public class CreateCampaignActivity extends AppCompatActivity {
+public class CreateCampaignActivity extends BaseActivity {
 
     EditText edtTitle, edtDescription, edtObjective, edtRequirements, edtReward;
     MaterialButton btnSave;

@@ -27,7 +27,7 @@ import es.miw.tfm.linkal.adapters.MessageAdapter;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.ChatViewModel;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends BaseActivity {
 
     public static final String EXTRA_CHAT_ID = "chat_id";
     public static final String EXTRA_COUNTERPART = "counterpart";

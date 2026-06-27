@@ -2,9 +2,14 @@ package es.miw.tfm.linkal.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -16,6 +21,38 @@ import es.miw.tfm.linkal.utils.SessionManager;
  * Todas las Activities deben extender esta clase en lugar de AppCompatActivity.
  */
 public abstract class BaseActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+        applyWindowInsets();
+    }
+
+    private void applyWindowInsets() {
+        View root = findViewById(R.id.main);
+        if (root == null) return;
+
+        BottomNavigationView nav = findViewById(R.id.bottomNavigation);
+
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            if (nav != null) {
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, ime.bottom);
+                nav.setPadding(0, 0, 0, systemBars.bottom);
+            } else {
+                int bottom = Math.max(systemBars.bottom, ime.bottom);
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottom);
+            }
+            return insets;
+        });
+    }
 
     @Override
     protected void onResume() {

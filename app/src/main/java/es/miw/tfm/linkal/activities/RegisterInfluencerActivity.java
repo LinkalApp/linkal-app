@@ -26,7 +26,7 @@ import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.models.requests.RegisterInfluencerRequest;
 import es.miw.tfm.linkal.viewModel.InfluencerViewModel;
 
-public class RegisterInfluencerActivity extends AppCompatActivity {
+public class RegisterInfluencerActivity extends BaseActivity {
 
     private EditText edtArtisticName, edtInstagram, edtTikTok, edtYoutube;
     private ChipGroup chipGroupInterests;

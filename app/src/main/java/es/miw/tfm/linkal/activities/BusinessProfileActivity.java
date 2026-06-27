@@ -29,7 +29,7 @@ import es.miw.tfm.linkal.models.responses.BusinessProfileResponse;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.BusinessViewModel;
 
-public class BusinessProfileActivity extends AppCompatActivity {
+public class BusinessProfileActivity extends BaseActivity {
 
     TextView txtInitials, txtName, txtCategory, txtDescription, txtAddress, txtProvince, txtWebsite, txtPhone, txtRatingValue, txtError;
     ImageView imgVerifiedBadge, btnMoreOptions;
@@ -133,31 +133,7 @@ public class BusinessProfileActivity extends AppCompatActivity {
 
     //Navegación
     private void setupBottomNavigation() {
-        bottomNavigation.setSelectedItemId(R.id.nav_profile);
-
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_profile) {
-                return true;
-            } else if (id == R.id.nav_home) {
-                startActivity(new Intent(this, ExploreInfluencersActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_campaigns) {
-                startActivity(new Intent(this, CampaignsActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_matches) {
-                startActivity(new Intent(this, MatchesActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_chat) {
-                startActivity(new Intent(this, ChatListActivity.class));
-                finish();
-                return true;
-            }
-            return false;
-        });
+        setupBottomNavigation(R.id.nav_profile);
     }
 
     // Observadores

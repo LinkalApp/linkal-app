@@ -22,7 +22,7 @@ import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.BusinessViewModel;
 import es.miw.tfm.linkal.viewModel.UserViewModel;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
 
     EditText edtEmail, edtPassword;
     TextView txtError, txtForgotPassword;

@@ -27,7 +27,7 @@ import es.miw.tfm.linkal.models.responses.CampaignResponse;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.CampaignViewModel;
 
-public class EditCampaignActivity extends AppCompatActivity {
+public class EditCampaignActivity extends BaseActivity {
 
     public static final String EXTRA_CAMPAIGN_ID = "campaign_id";
     public static final String EXTRA_CAMPAIGN_TITLE = "campaign_title";

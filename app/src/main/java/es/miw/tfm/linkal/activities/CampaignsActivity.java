@@ -24,7 +24,7 @@ import es.miw.tfm.linkal.adapters.CampaignAdapter;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.CampaignViewModel;
 
-public class CampaignsActivity extends AppCompatActivity {
+public class CampaignsActivity extends BaseActivity {
 
     private MaterialButton btnCreateCampaign;
     private TextView txtError;
@@ -79,30 +79,7 @@ public class CampaignsActivity extends AppCompatActivity {
     }
 
     private void setupNavigation() {
-        bottomNavigation.setSelectedItemId(R.id.nav_campaigns);
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_campaigns) {
-                return true;
-            } else if (id == R.id.nav_profile) {
-                startActivity(new Intent(this, BusinessProfileActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_home) {
-                startActivity(new Intent(this, ExploreInfluencersActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_matches) {
-                startActivity(new Intent(this, MatchesActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_chat) {
-                startActivity(new Intent(this, ChatListActivity.class));
-                finish();
-                return true;
-            }
-            return false;
-        });
+        setupBottomNavigation(R.id.nav_campaigns);
     }
 
     private void observeViewModel() {

@@ -30,7 +30,7 @@ import es.miw.tfm.linkal.adapters.InfluencerAdapter;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.InfluencerViewModel;
 
-public class ExploreInfluencersActivity extends AppCompatActivity {
+public class ExploreInfluencersActivity extends BaseActivity {
 
     private RecyclerView recyclerInfluencers;
     private TextView txtEmpty, txtError;
@@ -85,29 +85,7 @@ public class ExploreInfluencersActivity extends AppCompatActivity {
     }
 
     private void setupNavigation() {
-        bottomNavigation.setSelectedItemId(R.id.nav_home);
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_campaigns) {
-                startActivity(new Intent(this, CampaignsActivity.class));
-                finish();
-            } else if (id == R.id.nav_profile) {
-                startActivity(new Intent(this, BusinessProfileActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_home) {
-                return true;
-            } else if (id == R.id.nav_matches) {
-                startActivity(new Intent(this, MatchesActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_chat) {
-                startActivity(new Intent(this, ChatListActivity.class));
-                finish();
-                return true;
-            }
-            return false;
-        });
+        setupBottomNavigation(R.id.nav_home);
     }
 
     private void setupInterestChips() {

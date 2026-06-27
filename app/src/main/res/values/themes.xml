@@ -27,6 +27,9 @@
         <!-- Text -->
         <item name="android:textColor">@color/neutral_dark</item>
 
+        <!-- Sin animaciones de transición entre Activities -->
+        <item name="android:windowAnimationStyle">@null</item>
+
     </style>
 
     <!-- Main theme -->

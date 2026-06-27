@@ -21,7 +21,7 @@ import es.miw.tfm.linkal.R;
 import es.miw.tfm.linkal.utils.PasswordRequirementsHelper;
 import es.miw.tfm.linkal.utils.PasswordValidator;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends BaseActivity {
 
     private LinearLayout selectorBusiness, selectorInfluencer, layoutAddInfoUser;
     private TextView txtNameLabel;

@@ -31,7 +31,7 @@ import es.miw.tfm.linkal.models.responses.MatchResponse;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.MatchViewModel;
 
-public class MatchesActivity extends AppCompatActivity {
+public class MatchesActivity extends BaseActivity {
 
     private static final String STATUS_PENDING   = "Pendientes";
     private static final String STATUS_COMPLETED = "Confirmados";
@@ -143,44 +143,7 @@ public class MatchesActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        boolean isBusiness = "BUSINESS".equals(SessionManager.getInstance().getRole());
-
-        bottomNavigation.getMenu().clear();
-        if(isBusiness){
-            bottomNavigation.inflateMenu(R.menu.nav_business_menu);
-        }else{
-            bottomNavigation.inflateMenu(R.menu.nav_influencer_menu);
-        }
-
-        bottomNavigation.setSelectedItemId(R.id.nav_matches);
-
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_matches) {
-                return true;
-            } else if (id == R.id.nav_home) {
-                startActivity(new Intent(this, isBusiness
-                        ? ExploreInfluencersActivity.class
-                        : ExploreCampaignsActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_profile) {
-                startActivity(new Intent(this, isBusiness
-                        ? BusinessProfileActivity.class
-                        : InfluencerProfileActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_campaigns) {
-                startActivity(new Intent(this, CampaignsActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_chat) {
-                startActivity(new Intent(this, ChatListActivity.class));
-                finish();
-                return true;
-            }
-            return false;
-        });
+        setupBottomNavigation(R.id.nav_matches);
     }
 
     private void onMatchClick(MatchResponse match) {

@@ -29,7 +29,7 @@ import es.miw.tfm.linkal.utils.AppConstants;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.InfluencerViewModel;
 
-public class EditInfluencerProfileActivity extends AppCompatActivity {
+public class EditInfluencerProfileActivity extends BaseActivity {
 
     EditText edtName, edtArtisticName, edtPhone, edtDescription, edtInstagram, edtTiktok, edtYoutube;
     TextView txtError;

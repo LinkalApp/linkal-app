@@ -33,7 +33,7 @@ import es.miw.tfm.linkal.adapters.OpenCampaignAdapter;
 import es.miw.tfm.linkal.utils.SessionManager;
 import es.miw.tfm.linkal.viewModel.CampaignViewModel;
 
-public class ExploreCampaignsActivity extends AppCompatActivity {
+public class ExploreCampaignsActivity extends BaseActivity {
 
     private RecyclerView recyclerOpenCampaigns;
     private TextView txtEmpty, txtError;
@@ -136,27 +136,7 @@ public class ExploreCampaignsActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        bottomNavigation.setSelectedItemId(R.id.nav_home);
-
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_profile) {
-                startActivity(new Intent(this, InfluencerProfileActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_home) {
-                return true;
-            } else if (id == R.id.nav_matches) {
-                startActivity(new Intent(this, MatchesActivity.class));
-                finish();
-                return true;
-            } else if (id == R.id.nav_chat) {
-                startActivity(new Intent(this, ChatListActivity.class));
-                finish();
-                return true;
-            }
-            return false;
-        });
+        setupBottomNavigation(R.id.nav_home);
     }
 
     private void observeViewModel() {
